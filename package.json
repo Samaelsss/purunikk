@@ -1,0 +1,12 @@
+{
+  "name": "purunik-landing",
+  "version": "1.0.0",
+  "description": "Landing page for Purunik Kerajinan",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}

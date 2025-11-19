@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact - Don't Hesitate to Reach Out</title>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f9fafb;
+      min-height: 100vh;
+    }
+
+    .brand-green {
+      background-color: #00E676;
+    }
+
+    .brand-yellow {
+      background-color: #FFD600;
+    }
+
+    @keyframes blob-wobble {
+      0%, 100% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      }
+      25% {
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+      }
+      50% {
+        border-radius: 50% 50% 30% 70% / 30% 60% 70% 40%;
+      }
+      75% {
+        border-radius: 60% 40% 60% 40% / 70% 30% 50% 60%;
+      }
+    }
+
+    .animate-blob-wobble {
+      animation: blob-wobble 8s ease-in-out infinite;
+    }
+
+    .hover-elevate {
+      transition: transform 0.2s ease;
+    }
+
+    .hover-elevate:hover {
+      transform: translateY(-2px);
+    }
+
+    .hover-elevate:active {
+      transform: translateY(0);
+    }
+
+    input {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 0.375rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: black;
+      font-size: 0.875rem;
+    }
+
+    input::placeholder {
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    input:focus {
+      outline: none;
+      ring: 2px solid black;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: rgba(0, 0, 0, 0.9);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    function AnimatedBlob() {
+      const [pupilPositions, setPupilPositions] = useState({ left: { x: 8, y: 0 }, right: { x: 8, y: 0 } });
+      const [blobTransform, setBlobTransform] = useState({ x: 0, y: 0, rotate: 0 });
+      const leftEyeRef = useRef(null);
+      const rightEyeRef = useRef(null);
+      const blobRef = useRef(null);
+
+      useEffect(() => {
+        const handleMouseMove = (e) => {
+          const calculatePupilPosition = (eyeRef) => {
+            if (!eyeRef.current) return { x: 8, y: 0 };
+            
+            const eyeRect = eyeRef.current.getBoundingClientRect();
+            const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+            const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+            
+            const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
+            const maxDistance = 8;
+            
+            const x = Math.cos(angle) * maxDistance;
+            const y = Math.sin(angle) * maxDistance;
+            
+            return { x, y };
+          };
+
+          setPupilPositions({
+            left: calculatePupilPosition(leftEyeRef),
+            right: calculatePupilPosition(rightEyeRef),
+          });
+
+          if (blobRef.current) {
+            const blobRect = blobRef.current.getBoundingClientRect();
+            const blobCenterX = blobRect.left + blobRect.width / 2;
+            const blobCenterY = blobRect.top + blobRect.height / 2;
+            
+            const deltaX = (e.clientX - blobCenterX) / window.innerWidth;
+            const deltaY = (e.clientY - blobCenterY) / window.innerHeight;
+            
+            const maxMove = 30;
+            const x = deltaX * maxMove;
+            const y = deltaY * maxMove;
+            const rotate = deltaX * 3;
+            
+            setBlobTransform({ x, y, rotate });
+          }
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+      }, []);
+
+      return (
+        <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', overflow: 'visible' }}>
+          <div 
+            ref={blobRef}
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: '50%',
+              transition: 'transform 300ms ease-out',
+              transform: `translateX(-50%) translateX(${blobTransform.x}px) translateY(${blobTransform.y}px) rotate(${blobTransform.rotate}deg)`,
+            }}
+          >
+            <div 
+              className="brand-green animate-blob-wobble"
+              style={{
+                width: window.innerWidth >= 1024 ? '100vw' : window.innerWidth >= 768 ? '110vw' : '130vw',
+                aspectRatio: '1',
+                borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%",
+                transform: "translateY(50%)",
+              }}
+            />
+            
+            <div style={{ position: 'absolute', bottom: window.innerWidth >= 1024 ? '35%' : window.innerWidth >= 768 ? '32%' : '28%', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: window.innerWidth >= 1024 ? '4rem' : window.innerWidth >= 768 ? '3.5rem' : '2.5rem', zIndex: 10 }}>
+              <div 
+                ref={leftEyeRef}
+                style={{ position: 'relative', background: 'white', borderRadius: '50%', width: window.innerWidth >= 1024 ? '8rem' : window.innerWidth >= 768 ? '6.5rem' : '4.5rem', height: window.innerWidth >= 1024 ? '8rem' : window.innerWidth >= 768 ? '6.5rem' : '4.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+              >
+                <div 
+                  style={{ 
+                    background: 'black',
+                    borderRadius: '50%',
+                    width: window.innerWidth >= 1024 ? '4rem' : window.innerWidth >= 768 ? '3.25rem' : '2.25rem',
+                    height: window.innerWidth >= 1024 ? '4rem' : window.innerWidth >= 768 ? '3.25rem' : '2.25rem',
+                    transition: 'transform 100ms ease-out',
+                    transform: `translate(${pupilPositions.left.x}px, ${pupilPositions.left.y}px)` 
+                  }}
+                />
+              </div>
+              
+              <div 
+                ref={rightEyeRef}
+                style={{ position: 'relative', background: 'white', borderRadius: '50%', width: window.innerWidth >= 1024 ? '8rem' : window.innerWidth >= 768 ? '6.5rem' : '4.5rem', height: window.innerWidth >= 1024 ? '8rem' : window.innerWidth >= 768 ? '6.5rem' : '4.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+              >
+                <div 
+                  style={{ 
+                    background: 'black',
+                    borderRadius: '50%',
+                    width: window.innerWidth >= 1024 ? '4rem' : window.innerWidth >= 768 ? '3.25rem' : '2.25rem',
+                    height: window.innerWidth >= 1024 ? '4rem' : window.innerWidth >= 768 ? '3.25rem' : '2.25rem',
+                    transition: 'transform 100ms ease-out',
+                    transform: `translate(${pupilPositions.right.x}px, ${pupilPositions.right.y}px)` 
+                  }}
+                />
+              </div>
+            </div>
+            
+            <button
+              style={{
+                position: 'absolute',
+                bottom: window.innerWidth >= 1024 ? '20%' : window.innerWidth >= 768 ? '18%' : '15%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 20,
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                transition: 'transform 0.2s'
+              }}
+              className="hover-elevate"
+              onClick={() => console.log('Get in touch clicked')}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateX(-50%) scale(1.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateX(-50%) scale(1)'}
+            >
+              <div style={{ position: 'relative', width: window.innerWidth >= 1024 ? '11rem' : window.innerWidth >= 768 ? '9.5rem' : '7.5rem', height: window.innerWidth >= 1024 ? '11rem' : window.innerWidth >= 768 ? '9.5rem' : '7.5rem' }}>
+                <div className="brand-yellow" style={{ position: 'absolute', inset: 0, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '4px solid black', boxShadow: '0 6px 12px rgba(0,0,0,0.15)' }}>
+                  <svg 
+                    style={{ width: window.innerWidth >= 1024 ? '3.5rem' : window.innerWidth >= 768 ? '3rem' : '2.25rem', height: window.innerWidth >= 1024 ? '3.5rem' : window.innerWidth >= 768 ? '3rem' : '2.25rem' }} 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="black" 
+                    strokeWidth="2.5"
+                  >
+                    <path d="M7 17L17 7M17 7H7M17 7V17" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                
+                <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 160 160">
+                  <path
+                    id="circlePath"
+                    d="M 80, 80 m -60, 0 a 60,60 0 1,1 120,0 a 60,60 0 1,1 -120,0"
+                    fill="none"
+                  />
+                  <text style={{ fontSize: window.innerWidth >= 1024 ? '14px' : window.innerWidth >= 768 ? '12px' : '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em' }} fill="black">
+                    <textPath href="#circlePath" startOffset="50%" textAnchor="middle">
+                      GET IN TOUCH
+                    </textPath>
+                  </text>
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function ContactFooter() {
+      const [email, setEmail] = useState('');
+
+      const handleNewsletterSubmit = (e) => {
+        e.preventDefault();
+        console.log('Newsletter signup:', email);
+        setEmail('');
+      };
+
+      const containerStyle = {
+        maxWidth: '1280px',
+        margin: '0 auto',
+        padding: '0 1.5rem'
+      };
+
+      const gridStyle = {
+        display: 'grid',
+        gridTemplateColumns: window.innerWidth >= 1024 ? 'repeat(4, 1fr)' : window.innerWidth >= 768 ? 'repeat(2, 1fr)' : '1fr',
+        gap: window.innerWidth >= 768 ? '2rem' : '1.5rem',
+        alignItems: 'start'
+      };
+
+      return (
+        <footer className="brand-green" style={{ color: 'black', padding: window.innerWidth >= 768 ? '2rem 0' : '1.5rem 0' }}>
+          <div style={containerStyle}>
+            <div style={gridStyle}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <h3 style={{ fontWeight: 'bold', fontSize: '0.875rem', textTransform: 'uppercase', marginBottom: '1rem' }}>Contact</h3>
+                <a 
+                  href="mailto:burnout@gmail.com" 
+                  className="hover-elevate"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', marginLeft: '-0.5rem', borderRadius: '0.375rem', transition: 'colors 0.2s', fontSize: '0.875rem', textDecoration: 'none', color: 'black' }}
+                >
+                  <span>✉</span>
+                  <span>burnout@gmail.com</span>
+                </a>
+                <a 
+                  href="tel:+17045550127" 
+                  className="hover-elevate"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', marginLeft: '-0.5rem', borderRadius: '0.375rem', transition: 'colors 0.2s', fontSize: '0.875rem', textDecoration: 'none', color: 'black' }}
+                >
+                  <span>📞</span>
+                  <span>(704) 555-0127</span>
+                </a>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <h3 style={{ fontWeight: 'bold', fontSize: '0.875rem', textTransform: 'uppercase', marginBottom: '1rem' }}>Navigation</h3>
+                <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {['Home', 'About Us', 'Contact Us', 'Career'].map((item) => (
+                    <a
+                      key={item}
+                      href={`#${item.toLowerCase().replace(' ', '-')}`}
+                      className="hover-elevate"
+                      style={{ padding: '0.5rem', marginLeft: '-0.5rem', borderRadius: '0.375rem', transition: 'colors 0.2s', fontSize: '0.875rem', textDecoration: 'none', color: 'black' }}
+                    >
+                      {item}
+                    </a>
+                  ))}
+                </nav>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <h3 style={{ fontWeight: 'bold', fontSize: '0.875rem', textTransform: 'uppercase', marginBottom: '1rem' }}>Projects</h3>
+                <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {['Project', 'Project Single', 'Our Service', 'Service Single'].map((item) => (
+                    <a
+                      key={item}
+                      href={`#${item.toLowerCase().replace(' ', '-')}`}
+                      className="hover-elevate"
+                      style={{ padding: '0.5rem', marginLeft: '-0.5rem', borderRadius: '0.375rem', transition: 'colors 0.2s', fontSize: '0.875rem', textDecoration: 'none', color: 'black' }}
+                    >
+                      {item}
+                    </a>
+                  ))}
+                </nav>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <h3 style={{ fontWeight: 'bold', fontSize: '0.875rem', textTransform: 'uppercase' }}>Newsletter</h3>
+                <p style={{ fontSize: '0.875rem', opacity: 0.9 }}>Sign up for the latest news and insights</p>
+                <form onSubmit={handleNewsletterSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    type="email"
+                    placeholder="Your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    style={{ flex: 1 }}
+                  />
+                  <button type="submit">
+                    →
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(0, 0, 0, 0.2)' }}>
+              <div style={{ display: 'flex', flexDirection: window.innerWidth >= 768 ? 'row' : 'column', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <a
+                    href="https://dribbble.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover-elevate"
+                    style={{ padding: '0.5rem', borderRadius: '0.375rem', transition: 'colors 0.2s', color: 'black', textDecoration: 'none' }}
+                  >
+                    Dribbble
+                  </a>
+                  <a
+                    href="https://behance.net"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover-elevate"
+                    style={{ padding: '0.5rem', borderRadius: '0.375rem', transition: 'colors 0.2s', color: 'black', textDecoration: 'none' }}
+                  >
+                    Behance
+                  </a>
+                  <a
+                    href="https://linkedin.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover-elevate"
+                    style={{ padding: '0.5rem', borderRadius: '0.375rem', transition: 'colors 0.2s', color: 'black', textDecoration: 'none' }}
+                  >
+                    LinkedIn
+                  </a>
+                  <a
+                    href="https://instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover-elevate"
+                    style={{ padding: '0.5rem', borderRadius: '0.375rem', transition: 'colors 0.2s', color: 'black', textDecoration: 'none' }}
+                  >
+                    Instagram
+                  </a>
+                </div>
+                
+                <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.75rem', opacity: 0.75 }}>
+                  <a href="#privacy" className="hover-elevate" style={{ padding: '0.5rem', borderRadius: '0.375rem', color: 'black', textDecoration: 'none' }}>
+                    Privacy Policy
+                  </a>
+                  <a href="#terms" className="hover-elevate" style={{ padding: '0.5rem', borderRadius: '0.375rem', color: 'black', textDecoration: 'none' }}>
+                    Terms & Condition
+                  </a>
+                  <a href="#license" className="hover-elevate" style={{ padding: '0.5rem', borderRadius: '0.375rem', color: 'black', textDecoration: 'none' }}>
+                    License
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </footer>
+      );
+    }
+
+    function Home() {
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#f9fafb' }}>
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ position: 'relative', height: window.innerWidth >= 1024 ? '750px' : window.innerWidth >= 768 ? '650px' : '550px', overflow: 'hidden' }}>
+              <AnimatedBlob />
+            </div>
+          </main>
+          <ContactFooter />
+        </div>
+      );
+    }
+
+    ReactDOM.render(<Home />, document.getElementById('root'));
+  </script>
+</body>
+</html>

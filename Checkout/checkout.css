@@ -1,0 +1,227 @@
+/* Checkout page styles */
+:root{
+  --bg:#f7efe1;
+  --card:#fff8f1;
+  --ink:#3b2917;
+  --tan:#b68a60;
+  --line:#d3b890;
+  --brown:#6b4b30;
+}
+:root {
+  --background: #F9F4E1;
+  --foreground: #543310;
+  --primary: #B08F70;
+  --primary-foreground: #F9F4E1;
+  --secondary: #73512C;
+  --secondary-foreground: #F9F4E1;
+  --accent: #543310;
+  --border: #B08F70;
+  --card: #F9F4E1;
+  --background-dark: #543310;
+  --foreground-dark: #B08F70;
+  --primary-dark: #B08F70;
+  --primary-foreground-dark: #543310;
+  --secondary-dark: #F9F4E1;
+  --secondary-foreground-dark: #543310;
+  --accent-dark: #73512C;
+  --border-dark: #B08F70;
+  --card-dark: #543310;
+}
+
+body.dark {
+  --background: var(--background-dark);
+  --foreground: var(--foreground-dark);
+  --primary: var(--primary-dark);
+  --primary-foreground: var(--primary-foreground-dark);
+  --secondary: var(--secondary-dark);
+  --secondary-foreground: var(--secondary-foreground-dark);
+  --accent: var(--accent-dark);
+  --border: var(--border-dark);
+  --card: var(--card-dark);
+}
+
+/* Layout base */
+html, body { height: 100%; }
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  /* Remove browser default gaps and align content exactly with stripe inner edges */
+  margin: 0;
+  padding-left: var(--stripe-total);
+  padding-right: var(--stripe-total);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/* Responsive side border stripes (left and right) */
+:root {
+  /* At 1920px viewport these equal: 106px, 21px, 21px */
+  --stripe-1: calc(100vw * 106 / 1920); /* #543310 */
+  --stripe-2: calc(100vw * 21 / 1920);  /* #73512C */
+  --stripe-3: calc(100vw * 21 / 1920);  /* #D7B290 */
+  --stripe-total: calc(var(--stripe-1) + var(--stripe-2) + var(--stripe-3));
+  /* Extra inner gutter beyond the stripe width, scales on small/large screens */
+  --content-extra: clamp(8px, 1vw, 20px);
+  --nav-safe-area: clamp(64px, 10vh, 96px);
+  --hero-wave-height: 120px;
+  --hero-wave-gap: 12px;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--stripe-total) + 1px); /* slight overlap to avoid hairline gaps */
+  pointer-events: none; /* visual only */
+  z-index: 1; /* above body background, below overlays */
+}
+
+body::before {
+  left: 0;
+  background: linear-gradient(
+    to right,
+    #543310 0,
+    #543310 var(--stripe-1),
+    #73512C var(--stripe-1),
+    #73512C calc(var(--stripe-1) + var(--stripe-2)),
+    #D7B290 calc(var(--stripe-1) + var(--stripe-2)),
+    #D7B290 var(--stripe-total)
+  );
+}
+
+body::after {
+  right: 0;
+  background: linear-gradient(
+    to left,
+    #543310 0,
+    #543310 var(--stripe-1),
+    #73512C var(--stripe-1),
+    #73512C calc(var(--stripe-1) + var(--stripe-2)),
+    #D7B290 calc(var(--stripe-1) + var(--stripe-2)),
+    #D7B290 var(--stripe-total)
+  );
+}
+
+/* Scroll progress bars */
+.scroll-progress {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  z-index: 1000;
+  background: transparent;
+}
+.scroll-progress--top {
+  top: 0;
+}
+.scroll-progress--bottom {
+  bottom: 0;
+}
+.scroll-progress__bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(to right, var(--primary), var(--accent));
+}
+
+.checkout-page{
+  margin-top: 10rem;
+  margin-bottom: 10rem;
+}
+
+.checkout-header{padding:18px 20px}
+.checkout-header h1{
+  text-align: center;
+  font-size:3rem;
+  color:#4a2e17
+}
+
+.checkout-container{
+  max-width:1100px;margin:10px auto;display:grid;grid-template-columns:1fr 380px;gap:18px;padding:0 16px;
+}
+
+.form-card, .summary-card{
+  background:var(--card);border:2px solid var(--line);border-radius:12px;padding:18px;box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
+
+.form-card h2, .summary-card h2{margin:0 0 14px 0;color:#4a2e17;font-size:24px}
+
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.form-group label{font-weight:600;color:#4a2e17}
+.label-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.label-row .required::after{content:"*";color:#d04a3a;margin-left:6px}
+.field-error{color:#d04a3a;font-size:12px;line-height:1.2;min-height:14px}
+.form-group input, .form-group textarea{border:2px solid var(--line);border-radius:8px;padding:12px 12px;background:#fff;outline:none;font:inherit}
+.form-group input:focus, .form-group textarea:focus{border-color:var(--tan);box-shadow:0 0 0 3px rgba(182,138,96,.15)}
+
+.summary-list{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+.summary-item{display:grid;grid-template-columns:1fr auto;gap:6px;border-bottom:1px dashed var(--line);padding-bottom:8px}
+.summary-item .meta{font-size:12px;color:#7a5230}
+.summary-item .name{font-weight:700;color:#3b2917}
+.summary-item .qty{color:#3b2917}
+.summary-item .price{font-weight:700}
+
+.summary-footer .row{display:flex;justify-content:space-between;margin:8px 0;color:#3b2917}
+.summary-footer .subtotal strong{font-size:18px}
+.summary-footer .note{font-size:12px;color:#7a5230;margin:6px 0 10px}
+
+.place-order{display:inline-flex;align-items:center;gap:10px;justify-content:center;width:100%;background:var(--brown);color:#fff;border:2px solid #2a1b0a;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+.place-order i{font-size:18px}
+
+.receipt-modal{position:fixed;inset:0;display:none;z-index:1000; }
+.receipt-modal.show{display:block}
+.receipt-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.5); }
+.receipt-card{position:relative;max-width:760px;margin: 10rem auto; background:#fff;border-radius:18px;box-shadow:0 14px 38px rgba(0,0,0,.28);overflow:hidden}
+.receipt-header{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:22px 26px;border-bottom:1px dashed var(--line)}
+.receipt-brand{font-weight:900;font-size:24px;color:#4a2e17}
+.receipt-header h3{margin:0;font-size:22px;color:#3b2917}
+.receipt-body{padding:18px 22px}
+.receipt-info{color:#3b2917;line-height:1.8}
+.receipt-sep{border:none;border-top:1px dashed var(--line);margin:14px 0}
+.receipt-items{display:flex;flex-direction:column;gap:10px;margin:8px 0 12px}
+.receipt-item{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.receipt-item:last-child{border-bottom:none}
+.receipt-item .ri-name{color:#3b2917;flex:1}
+.receipt-item .ri-price{font-weight:700;min-width:140px;text-align:right}
+.receipt-total{display:flex;justify-content:space-between;align-items:center;font-weight:900;color:#3b2917;margin-top:8px;font-size:18px}
+.receipt-thanks{text-align:center;color:#7a5230;margin-top:18px}
+.receipt-actions{display:flex;gap:10px;justify-content:flex-end;padding:12px 22px 18px;border-top:1px dashed var(--line)}
+.btn{appearance:none;border:2px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700;color:#3b2917}
+.btn.primary{background:var(--brown);color:#fff;border-color:#2a1b0a}
+
+@media print{
+  @page{margin:6mm}
+  html, body{background:#fff}
+  /* Hide everything visually */
+  body *{visibility:hidden !important}
+  /* Show only the receipt modal and its content */
+  #receipt-modal{visibility:visible !important; display:block !important; position:static !important}
+  #receipt-modal *{visibility:visible !important}
+  .receipt-backdrop{display:none !important}
+  .receipt-actions{display:none !important}
+  /* Normalize card for print */
+  .receipt-card{box-shadow:none; border-radius:0; max-width:640px; width:100%; margin:0; position:static; transform:none; background:#fff; font-size:10.5px; page-break-inside:avoid}
+  .receipt-header{padding:6px 10px; gap:4px; border-bottom:1px solid #ddd}
+  .receipt-brand{font-size:16px}
+  .receipt-header h3{font-size:14px}
+  .receipt-body{padding:6px 10px}
+  .receipt-info{line-height:1.3}
+  .receipt-sep{display:none !important}
+  .receipt-items{gap:3px; margin:3px 0 5px}
+  .receipt-item{padding:2px 0; border-bottom:none}
+  .receipt-item .ri-price{min-width:90px}
+  .receipt-total{font-size:14px; margin-top:3px}
+  .receipt-thanks{margin-top:6px; font-size:11px}
+}
+
+@media (max-width:900px){
+  .checkout-container{grid-template-columns:1fr;}
+}

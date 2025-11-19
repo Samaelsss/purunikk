@@ -1,0 +1,232 @@
+
+:root {
+    --background: #F9F4E1;
+    --foreground: #543310;
+    --primary: #B08F70;
+    --primary-foreground: #F9F4E1;
+    --secondary: #73512C;
+    --secondary-foreground: #F9F4E1;
+    --accent: #543310;
+    --border: #B08F70;
+    --card: #F9F4E1;
+    --background-dark: #543310;
+    --foreground-dark: #B08F70;
+    --primary-dark: #B08F70;
+    --primary-foreground-dark: #543310;
+    --secondary-dark: #F9F4E1;
+    --secondary-foreground-dark: #543310;
+    --accent-dark: #73512C;
+    --border-dark: #B08F70;
+    --card-dark: #543310;
+}
+
+body.dark {
+    --background: var(--background-dark);
+    --foreground: var(--foreground-dark);
+    --primary: var(--primary-dark);
+    --primary-foreground: var(--primary-foreground-dark);
+    --secondary: var(--secondary-dark);
+    --secondary-foreground: var(--secondary-foreground-dark);
+    --accent: var(--accent-dark);
+    --border: var(--border-dark);
+    --card: var(--card-dark);
+}
+
+/* Layout base */
+html, body { height: 100%; }
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    margin: 0;
+    padding-left: var(--stripe-total);
+    padding-right: var(--stripe-total);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+* {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+}
+/* Responsive side border stripes (left and right) */
+:root {
+    --stripe-1: calc(100vw * 106 / 1920);
+    --stripe-2: calc(100vw * 21 / 1920);
+    --stripe-3: calc(100vw * 21 / 1920);
+    --stripe-total: calc(var(--stripe-1) + var(--stripe-2) + var(--stripe-3));
+    --content-extra: clamp(8px, 1vw, 20px);
+    --nav-safe-area: clamp(64px, 10vh, 96px);
+    --hero-wave-height: 120px;
+    --hero-wave-gap: 12px;
+}
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: calc(var(--stripe-total) + 1px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+body::before {
+    left: 0;
+    background: linear-gradient(
+        to right,
+        #543310 0,
+        #543310 var(--stripe-1),
+        #73512C var(--stripe-1),
+        #73512C calc(var(--stripe-1) + var(--stripe-2)),
+        #D7B290 calc(var(--stripe-1) + var(--stripe-2)),
+        #D7B290 var(--stripe-total)
+    );
+}
+
+body::after {
+    right: 0;
+    background: linear-gradient(
+        to left,
+        #543310 0,
+        #543310 var(--stripe-1),
+        #73512C var(--stripe-1),
+        #73512C calc(var(--stripe-1) + var(--stripe-2)),
+        #D7B290 calc(var(--stripe-1) + var(--stripe-2)),
+        #D7B290 var(--stripe-total)
+    );
+}
+
+.page-wrapper {
+    max-width: 1100px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+    border-radius: 0 0 15px 15px;
+    background: var(--card);
+    margin: 0 auto;
+}
+
+.page-wrapper-v2 {
+    margin-top: 8vw;
+    margin-right: 2vh;
+    margin-left: 2vh;
+}
+
+.main-content {
+        margin: 0 auto;
+        max-width: 1100px;
+        padding: 0 40px;
+        position: relative;
+        z-index: 2;
+}
+
+/* ——————————————————————————————————
+   GLOBAL SPACING
+—————————————————————————————————— */
+.navbar-space {
+    height: 95px;
+}
+
+.footer-space {
+    height: 150px;
+}
+
+/* ——————————————————————————————————
+   CONTACT SECTION
+—————————————————————————————————— */
+/* Contact header card styles for h1 & p */
+.contact-header-card {
+    width: 340px;
+    margin: 0 auto 40px auto;
+    background: #fff8f1;
+    border-radius: 18px;
+    border: 2px solid #d4b089;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 32px 18px 0px 18px;
+    transition: all 0.25s ease;
+} 
+.contact-section {
+    text-align: center;
+    padding: 60px 0 80px;
+}
+
+.contact-title {
+    font-size: 32px;
+    color: #3b1f09;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.contact-subtitle {
+    font-size: 16px;
+    color: #6f4a2f;
+    margin-bottom: 50px;
+}
+
+/* ICON GRID */
+.contact-icons {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+}
+
+/* CONTACT CARDS */
+.contact-card {
+    width: 140px;
+    height: 140px;
+    background: #fff8f1;
+    border-radius: 18px;
+    border: 2px solid #d4b089;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.contact-card i {
+    font-size: 48px;
+    margin-bottom: 8px;
+    color: #3b1f09;
+    transition: 0.25s;
+}
+
+.contact-card span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #3b1f09;
+}
+
+.contact-card:hover {
+    transform: translateY(-8px) scale(1.05);
+    border-color: #b68a60;
+    background: #fff3e5;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* In dark mode, icon turns white on hover */
+.contact-card:hover i {
+    color: #b68a60;
+}
+body.dark .contact-card:hover i {
+    color: #fff;
+}
+body.dark .contact-card:hover i {
+    color: #fff;
+}
+
+/* Optional platform highlight */
+.whatsapp:hover i { color: #25d366; }
+.instagram:hover i { color: #e1306c; }
+.facebook:hover i { color: #1877f2; }
+.tiktok:hover i { color: #000; }
