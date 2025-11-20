@@ -125,7 +125,7 @@ placeBtn?.addEventListener('click', ()=>{
   const closeArea = document.getElementById('receipt-close');
   btnPrint && (btnPrint.onclick = () => {
     const modal = document.getElementById('receipt-modal');
-    // Pastikan modal terlihat sebelum print (menghindari PDF kosong)
+    // Pastikan modal terlihat sebelum print 
     modal?.classList.add('show');
     modal?.setAttribute('aria-hidden','false');
     // Beri waktu reflow singkat agar CSS print menangkap konten
@@ -169,3 +169,56 @@ window.addEventListener('afterprint', ()=>{
     modal.setAttribute('aria-hidden','false');
   }
 });
+
+// Theme toggle for light/dark modes with persistence
+function initThemeToggle() {
+  const btns = [
+    document.getElementById('themeToggleMobile'),
+    document.getElementById('themeToggleTablet'),
+    document.getElementById('themeToggleDesktop'),
+  ].filter(Boolean);
+
+  const saved = localStorage.getItem('pk-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    document.body.classList.remove('dark');
+  } else if (saved === 'dark') {
+    document.body.classList.add('dark');
+    document.body.classList.remove('light');
+  }
+
+  function setTheme(mode) {
+    if (mode === 'light') {
+      document.body.classList.add('light');
+      document.body.classList.remove('dark');
+      localStorage.setItem('pk-theme', 'light');
+    } else {
+      document.body.classList.remove('light');
+      document.body.classList.add('dark');
+      localStorage.setItem('pk-theme', 'dark');
+    }
+  }
+
+  function currentMode() {
+    return document.body.classList.contains('light') ? 'light' : 'dark';
+  }
+
+  btns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const next = currentMode() === 'light' ? 'dark' : 'light';
+      setTheme(next);
+    });
+  });
+
+  // Default: start in dark if nothing saved
+  if (!saved) {
+    setTheme('dark');
+  }
+}
+
+// Initialize theme toggles ASAP
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initThemeToggle);
+} else {
+  initThemeToggle();
+}

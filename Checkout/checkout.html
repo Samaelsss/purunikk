@@ -38,14 +38,7 @@
     }
           body.light .hero-wave .wave { mix-blend-mode: normal; opacity:.45; }
     body.dark .hero-wave .wave { fill:#F9F4E1; }
-    @media (max-width: 680px) {
-      .hero-wave {
-        height: 90px;
-        left: var(--stripe-total);
-        right: var(--stripe-total);
-        max-width: calc(100vw - (var(--stripe-total) * 2));
-      }
-    }
+   
   
   </style>
 </head>
@@ -466,11 +459,6 @@
                         <path d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 6.95-1.41-1.41M6.46 6.46 5.05 5.05m13.9 0-1.41 1.41M6.46 17.54l-1.41 1.41"></path>
                     </svg>
                 </button>
-
-                <div class="auth-buttons">
-                    <button class="btn-login" id="loginBtn">Login</button>
-                    <button class="btn-register" id="registerBtn">Register</button>
-                </div>
             </div>
         </nav>
     </div>
