@@ -52,6 +52,55 @@ function renderProduct(){
     document.querySelectorAll(sel).forEach(el => el && (el.style.display = 'none'));
   });
 
+// Theme toggle for light/dark modes with persistence
+function initThemeToggle() {
+  const btns = [
+    document.getElementById('themeToggleMobile'),
+    document.getElementById('themeToggleTablet'),
+    document.getElementById('themeToggleDesktop'),
+  ].filter(Boolean);
+
+  const saved = localStorage.getItem('pk-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    document.body.classList.remove('dark');
+  } else if (saved === 'dark') {
+    document.body.classList.add('dark');
+    document.body.classList.remove('light');
+  }
+
+  function setTheme(mode) {
+    if (mode === 'light') {
+      document.body.classList.add('light');
+      document.body.classList.remove('dark');
+      localStorage.setItem('pk-theme', 'light');
+    } else {
+      document.body.classList.remove('light');
+      document.body.classList.add('dark');
+      localStorage.setItem('pk-theme', 'dark');
+    }
+  }
+
+  function currentMode() {
+    return document.body.classList.contains('light') ? 'light' : 'dark';
+  }
+
+  btns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const next = currentMode() === 'light' ? 'dark' : 'light';
+      setTheme(next);
+    });
+  });
+
+  if (!saved) { setTheme('dark'); }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initThemeToggle);
+} else {
+  initThemeToggle();
+}
+
   if (root) root.style.display = '';
 
   const dataset = (typeof PRODUCTS !== 'undefined') ? PRODUCTS : ((typeof PRODUCTS_DATA !== 'undefined') ? PRODUCTS_DATA : []);
