@@ -289,46 +289,105 @@ function renderProduct(){
     });
   }
 
-  const track = document.getElementById('recommendations-track') || document.querySelector('.rekomendasi-track');
-  if (track) {
-    track.innerHTML = '';
-    const others = dataset.filter(p=>String(p.id)!==String(prod.id));
+  // Recommendations: prefer grid with Product card styles; fallback to old scroller if absent
+  // Use PRODUCTS_DATA (full catalog) if available; otherwise fall back to current dataset
+  const recDataset = (typeof PRODUCTS_DATA !== 'undefined' && Array.isArray(PRODUCTS_DATA) && PRODUCTS_DATA.length)
+    ? PRODUCTS_DATA
+    : dataset;
+  const grid = document.getElementById('productsGrid');
+  if (grid) {
+    grid.innerHTML = '';
+    const others = recDataset.filter(p=>String(p.id)!==String(prod.id));
     shuffleArray(others);
-    others.slice(0,6).forEach(p=>{
+    others.slice(0, 8).forEach(p => {
+      const icon = p.icon || '';
+      const subtitle = p.subtitle || '';
+      const categoryText = (p.category || 'Produk');
+      const imgSrc = p.img || p.image || p.thumb || '';
+      const priceStr = typeof p.price === 'string' && p.price.trim().startsWith('Rp') ? p.price : formatRupiah(p.price);
       const card = document.createElement('div');
-      card.className = 'produk-card';
+      card.className = 'product-card';
+      card.setAttribute('data-id', String(p.id));
       card.innerHTML = `
-        <div class="produk-header">
-          <i>★</i>
-          <div>
-            <h4>${p.category || 'Produk'}</h4>
-            <p>${p.name}</p>
+        <div class="card-header">
+          <div class="card-header-icon">${icon}</div>
+          <div class="card-header-text">
+            <h3>${categoryText.charAt(0).toUpperCase() + categoryText.slice(1)}</h3>
+            <p>${subtitle}</p>
           </div>
         </div>
-        <div class="produk-body">
-          <img src="${p.thumb || p.img || p.image || ''}" alt="${p.name || ''}">
-          <h5>${p.name || ''}</h5>
-          <div class="subtitle">${formatRupiah(p.price)}</div>
-          <div class="buttons">
-            <button class="add-cart">Tambah</button>
-            <button class="btn-detail">Detail</button>
+        <div class="card-image">
+          <img src="${imgSrc}" alt="${p.name || ''}" loading="lazy">
+        </div>
+        <div class="card-content-product">
+          <h2 class="card-title-product">${p.name || ''}</h2>
+          <p class="card-subtitle-product">${subtitle}</p>
+          <p class="card-price">${priceStr}</p>
+          <div class="card-buttons-product">
+            <button class="btn btn-secondary">Detail</button>
+            <button class="btn btn-primary">Beli</button>
           </div>
         </div>
       `;
-      card.querySelector('.add-cart').addEventListener('click', ()=>{
-        const priceNum = parsePriceToNumber(p.price);
-        const existing = cart.find(x=>String(x.id)===String(p.id));
-        if(existing) existing.qty += 1; else cart.push({ id: p.id, name: p.name, price: priceNum, qty: 1 });
-        localStorage.setItem('cart', JSON.stringify(cart));
-        if (typeof showToast === 'function') {
-          showToast((p.name || 'Produk') + ' ditambahkan ke keranjang.', 'success');
-        } else {
-          alert((p.name || 'Produk') + ' ditambahkan ke keranjang.');
+      // Click whole card to detail if buttons not clicked
+      card.addEventListener('click', (e) => {
+        if (!e.target.closest('.btn')) {
+          window.location.href = resolveDetailUrl(p.id);
         }
       });
-      card.querySelector('.btn-detail').addEventListener('click', ()=>{ window.location.href = resolveDetailUrl(p.id); });
-      track.appendChild(card);
+      // Button handlers mirroring product.js behavior
+      card.querySelector('.btn.btn-secondary').addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.location.href = resolveDetailUrl(p.id);
+      });
+      card.querySelector('.btn.btn-primary').addEventListener('click', (e) => {
+        e.stopPropagation();
+        alert(`Produk ${p.name || ''} ditambahkan ke keranjang!`);
+      });
+      grid.appendChild(card);
     });
+  } else {
+    const track = document.getElementById('recommendations-track') || document.querySelector('.rekomendasi-track');
+    if (track) {
+      track.innerHTML = '';
+      const others = recDataset.filter(p=>String(p.id)!==String(prod.id));
+      shuffleArray(others);
+      others.slice(0,6).forEach(p=>{
+        const card = document.createElement('div');
+        card.className = 'produk-card';
+        card.innerHTML = `
+          <div class="produk-header">
+            <i>★</i>
+            <div>
+              <h4>${p.category || 'Produk'}</h4>
+              <p>${p.name}</p>
+            </div>
+          </div>
+          <div class="produk-body">
+            <img src="${p.thumb || p.img || p.image || ''}" alt="${p.name || ''}">
+            <h5>${p.name || ''}</h5>
+            <div class="subtitle">${formatRupiah(p.price)}</div>
+            <div class="buttons">
+              <button class="add-cart">Tambah</button>
+              <button class="btn-detail">Detail</button>
+            </div>
+          </div>
+        `;
+        card.querySelector('.add-cart').addEventListener('click', ()=>{
+          const priceNum = parsePriceToNumber(p.price);
+          const existing = cart.find(x=>String(x.id)===String(p.id));
+          if(existing) existing.qty += 1; else cart.push({ id: p.id, name: p.name, price: priceNum, qty: 1 });
+          localStorage.setItem('cart', JSON.stringify(cart));
+          if (typeof showToast === 'function') {
+            showToast((p.name || 'Produk') + ' ditambahkan ke keranjang.', 'success');
+          } else {
+            alert((p.name || 'Produk') + ' ditambahkan ke keranjang.');
+          }
+        });
+        card.querySelector('.btn-detail').addEventListener('click', ()=>{ window.location.href = resolveDetailUrl(p.id); });
+        track.appendChild(card);
+      });
+    }
   }
 }
 

@@ -6,7 +6,7 @@ const PRODUCTS = [
     name: 'Slingbag Purun Lala',
     price: 249000,
     category: 'Tas Selempang & Bahu Wanita',
-    img: 'Product/img/IMG_4099.jpg',
+    img: 'Product/img/Slingbag-Purun-Lala/01.webp',
     images: [
       'Product/img/Slingbag-Purun-Lala/01.webp',
       'Product/img/Slingbag-Purun-Lala/02.webp',

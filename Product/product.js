@@ -17,7 +17,7 @@ const RAW_PRODUCTS_DATA = [
         category: 'purun',
         price: 'Rp 250.000',
         icon: '🖼️',
-        image: 'img/products/product-002.jpg'
+        image: ''
     },
     {
         id: 3,

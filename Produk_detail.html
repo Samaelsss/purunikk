@@ -14,8 +14,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../purunikkk/navbar/navbar.css">
-    <link rel="stylesheet" href="../purunikkk/footer/footer.css">
+    <link rel="stylesheet" href="navbar/navbar.css">
+    <link rel="stylesheet" href="footer/footer.css">
+    <link rel="stylesheet" href="Product/product.css">
 
      <style>
       /* Hero top waving element */
@@ -65,19 +66,10 @@
       </div>
     </section>
         <div class="page-wrapper-v2">
-            <!-- HERO -->
-            
-            <div class="Go_back">
-                <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="30px">
-                    <path d="m287-446.67 240 240L480-160 160-480l320-320 47 46.67-240 240h513v66.66H287Z"></path>
-                </svg>
-                <h4>Go back</h4>
-            </div>
-
              <!-- Breadcrumb -->
             <div class="breadcrumb">
                 <a href="index.html">Beranda</a> <span>›</span>
-                <a href="#">Produk</a> <span>›</span>
+                <a href="Product/product.html">Produk</a> <span>›</span>
                 <p id="breadcrumb-product">Nama Produk</p>
             </div>
 
@@ -90,8 +82,6 @@
                             <img id="main-img" src="" alt="Product" class="main">
                         </div>
                     </div>
-
-
 
                     <div class="product-info">
                         <h2 id="product-name"></h2>
@@ -164,12 +154,14 @@
 
             <section class="rekomendasi-section">
                 <h3>Rekomendasi Produk</h3>
-                <div class="rekomendasi-track"></div>
-                <div class="rekomendasi-scroll">
+               <!-- Products Grid -->
+            <div class="products-grid" id="productsGrid">
+                <!-- Products will be inserted here by JavaScript -->
+            </div>
                     <span class="scroll-btn left">&lt;</span>
                     <span class="scroll-btn right">&gt;</span>
-                </div>
             </section>
+
         </div>
     </section>
 
@@ -290,7 +282,7 @@
                 </button>
 
                 <div class="nav-items-mobile">
-                    <button class="nav-item active" data-nav="home">
+                    <button class="nav-item" data-nav="home">
                         <div class="nav-item-content">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -299,7 +291,7 @@
                             <span class="nav-label">Home</span>
                         </div>
                     </button>
-                    <button class="nav-item" data-nav="bag">
+                    <button class="nav-item active" data-nav="bag">
                         <div class="nav-item-content">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
@@ -348,7 +340,7 @@
                 </button>
 
                 <div class="nav-items-tablet">
-                    <button class="nav-item active" data-nav="home">
+                    <button class="nav-item" data-nav="home">
                         <div class="nav-item-content">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -357,7 +349,7 @@
                             <span class="nav-label">Home</span>
                         </div>
                     </button>
-                    <button class="nav-item" data-nav="bag">
+                    <button class="nav-item active" data-nav="bag">
                         <div class="nav-item-content">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
@@ -395,12 +387,6 @@
                     </svg>
                 </button>
 
-                <button class="profile-btn" id="profileBtn">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                </button>
             </div>
 
             <!-- Desktop Layout -->
@@ -418,7 +404,7 @@
                 </div>
 
                 <div class="nav-items-desktop">
-                    <button class="nav-item active" data-nav="home">
+                    <button class="nav-item" data-nav="home">
                         <div class="nav-item-content">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -427,7 +413,7 @@
                             <span class="nav-label">Home</span>
                         </div>
                     </button>
-                    <button class="nav-item" data-nav="bag">
+                    <button class="nav-item active" data-nav="bag">
                         <div class="nav-item-content">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
@@ -465,10 +451,6 @@
                     </svg>
                 </button>
 
-                <div class="auth-buttons">
-                    <button class="btn-login" id="loginBtn">Login</button>
-                    <button class="btn-register" id="registerBtn">Register</button>
-                </div>
             </div>
         </nav>
     </div>
@@ -484,11 +466,13 @@
     </div>
   </div>
 
-  <script src="../purunikkk/navbar/navbar.js"></script>
-  <script src="ui/toast.js?v=1"></script>
-  <script src="../purunikkk/footer/footer.js"></script>
+  <script src="navbar/navbar.js"></script>
+  <script src="footer/footer.js"></script>
   <script defer src="Product/products.js?v=2"></script>
+  <!-- Load full product dataset so recommendations can use PRODUCTS_DATA -->
+  <script defer src="Product/product.js?v=1"></script>
   <script defer src="Produk_detail/Produk_detail.js?v=7"></script>
+  <script src="ui/toast.js?v=1"></script>
 
 </body>
 </html>

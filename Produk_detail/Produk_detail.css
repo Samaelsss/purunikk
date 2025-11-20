@@ -124,7 +124,7 @@ body::after {
   font-size: 14px;
   color: #5e3a1f;
   padding: 20px 40px 0;
-  margin-left: 6.5vw;
+  margin-left: 0;
 }
 
 .breadcrumb a {
@@ -136,72 +136,6 @@ body::after {
 .breadcrumb p {
   margin: 0;
   font-weight: 600;
-}
-
-/* ===============================
-   GO BACK BUTTON (Compact Expand)
-   =============================== */
-.Go_back {
-  top: 5vh;
-  left: 10vw;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(247, 235, 218, 0.85);
-  backdrop-filter: blur(4px);
-  padding: 5px 10px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  color: #5e3a1f;
-  font-size: 14px;
-  font-weight: 600;
-  z-index: 999;
-  transition: all 0.25s ease;
-  overflow: hidden;
-  width: 40px; /* collapsed width */
-  height: 40px;
-  white-space: nowrap;
-}
-
-/* Hide text by default */
-.Go_back h4 {
-  opacity: 0;
-  width: 0;
-  overflow: hidden;
-  transition: all 0.25s ease;
-}
-
-/* Icon size */
-.Go_back svg {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-}
-
-.Go_back svg path {
-  fill: currentColor;
-  transition: 0.25s ease;
-}
-
-/* Hover to expand */
-.Go_back:hover {
-  background: #b68a60;
-  color: #fff;
-  transform: scale(1.04);
-  width: 120px; /* expanded width */
-  justify-content: flex-start;
-  padding-right: 15px;
-}
-
-.Go_back:hover h4 {
-  opacity: 1;
-  width: auto;
-  margin-left: 4px;
-}
-
-.Go_back:hover svg path {
-  fill: #fff;
 }
 
 /* ===============================
@@ -782,23 +716,16 @@ button:hover {
    🔥 Rekomendasi Produk (Advanced + Interactive)
    =============================== */
 .rekomendasi-section {
-  background: linear-gradient(180deg, #f7ebda 0%, #f2e1c7 100%);
-  padding: 30px 0 40px;
-  overflow: hidden;
+  background: transparent; /* let Product/product.css define card look */
+  padding: 8px 0 24px;     /* give breathing room around grid */
+  overflow: visible;
   position: relative;
-  border-radius: 16px;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+  border-radius: 0;
+  box-shadow: none;
+  margin-top: 2rem;
 }
-
-.rekomendasi-section h2 {
-  text-align: center;
-  font-family: 'Inter', sans-serif;
-  color: #3b1f09;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-bottom: 24px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+.rekomendasi-section h3{
+  font-size: 2rem;
 }
 
 .rekomendasi-container {
@@ -806,23 +733,22 @@ button:hover {
   overflow: hidden;
   position: relative;
 }
+/* Ensure nice spacing and fixed 5 columns for recommendation cards */
+.rekomendasi-section .products-grid {
+  gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+/* Ensure cards follow grid column width (not fixed width) */
+.rekomendasi-section .product-card { width: 100% !important; max-width: none; }
 
 .scroll-btn {
   z-index: 20;
 }
 
 /* === Track === */
-.rekomendasi-track {
-  display: flex;
-  gap: 18px;
-  animation: scrollTrack 30s linear infinite;
-  width: max-content;
-  will-change: transform;
-  padding-left: 20px;
-  margin-top: 2vw;
-  margin-bottom: 2vw;
-  scroll-behavior: smooth;
-}
+/* Disable old horizontal scroller in detail page */
+.rekomendasi-track { display: none !important; }
 
 /* Themed scrollbar for thumbnail rail */
 .thumbnail-list::-webkit-scrollbar { width: 8px; }
@@ -836,181 +762,11 @@ button:hover {
 }
 
 /* === Product Card === */
-.produk-card {
-  background: #fff8f1;
-  border: 1.5px solid #d3b890;
-  border-radius: 10px;
-  width: 230px;
-  flex-shrink: 0;
-  color: #5b3b27;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  transition: all 0.35s ease;
-  position: relative;
-}
 
-.produk-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-  border-color: #b68a60;
-}
-
-/* === Header === */
-.produk-header {
-  background-color: #b68a60;
-  color: #fff8f1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-.produk-header i {
-  background-color: #fff8f1;
-  color: #5b3b27;
-  border-radius: 50%;
-  padding: 6px;
-  font-size: 13px;
-  box-shadow: 0 0 6px rgba(255,255,255,0.4);
-}
-
-.produk-header h4 {
-  font-size: 13px;
-  margin: 0;
-  color: #fff8f1;
-  font-weight: 600;
-}
-
-.produk-header p {
-  font-size: 11px;
-  margin: 0;
-  color: #e8d4b7;
-}
-
-/* === Body === */
-.produk-body {
-  padding: 12px 10px 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.produk-body img {
-  width: 65%;
-  height: auto;
-  border-radius: 8px;
-  border: 1px solid #e4d3bc;
-  margin-bottom: 8px;
-  transition: transform 0.3s ease;
-}
-
-.produk-card:hover img {
-  transform: scale(1.05);
-}
-
-.produk-body h5 {
-  font-size: 14px;
-  color: #5e3a1f;
-  font-weight: 700;
-  margin: 4px 0 2px;
-}
-
-.produk-body .subtitle {
-  font-size: 11.5px;
-  color: #7a5230;
-  font-style: italic;
-  margin-bottom: 5px;
-}
-
-.produk-body p {
-  font-size: 10.5px;
-  color: #7a5230;
-  margin: 2px 0 6px;
-  line-height: 1.3;
-}
-
-/* === Buttons === */
-.buttons {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-button.primary,
-button.secondary {
-  font-size: 11px;
-  font-family: 'Inter', sans-serif;
-  border-radius: 6px;
-  padding: 5px 10px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  letter-spacing: 0.2px;
-}
-
-button.primary {
-  background: #b68a60;
-  color: #fff;
-  border: none;
-}
-
-button.secondary {
-  background: transparent;
-  border: 1.3px solid #b68a60;
-  color: #b68a60;
-}
-
-button.primary:hover {
-  background: #a7794f;
-  transform: scale(1.05);
-}
-
-button.secondary:hover {
-  background: #b68a60;
-  color: #fff;
-  transform: scale(1.05);
-}
-
-/* === Glow Overlay === */
-.produk-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -50%;
-  width: 200%;
-  height: 100%;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
-  transform: translateX(-100%);
-  transition: 0.6s;
-  opacity: 0;
-}
-
-.produk-card:hover::before {
-  transform: translateX(100%);
-  opacity: 1;
-}
 
 /* === Navigation Buttons === */
-.scroll-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #b68a60;
-  color: #fff;
-  border: none;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  font-size: 18px;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  z-index: 10;
-  transition: all 0.3s ease;
-  opacity: 0;
-}
+/* Hide old nav buttons; grid doesn't use them */
+.scroll-btn { display: none !important; }
 
 .rekomendasi-section:hover .scroll-btn {
   opacity: 1;
