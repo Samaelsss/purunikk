@@ -736,6 +736,67 @@
       setInterval(tick, 2200);
     }
 
+    function initVideoModal() {
+      var triggers = Array.prototype.slice.call(document.querySelectorAll('[data-video-modal-target][data-youtube-id]'));
+      if (!triggers.length) return;
+
+      var activeModal = null;
+      var activeIframe = null;
+
+      function openModal(modal, videoId) {
+        if (!modal || !videoId) return;
+        var iframe = modal.querySelector('.video-modal__iframe');
+        if (!iframe) return;
+
+        var base = 'https://www.youtube.com/embed/' + encodeURIComponent(videoId);
+        var params = '?autoplay=1&rel=0';
+        iframe.src = base + params;
+
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        activeModal = modal;
+        activeIframe = iframe;
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        if (!activeModal) return;
+        activeModal.classList.remove('is-open');
+        activeModal.setAttribute('aria-hidden', 'true');
+        if (activeIframe) {
+          activeIframe.src = '';
+        }
+        activeModal = null;
+        activeIframe = null;
+        document.body.style.overflow = '';
+      }
+
+      triggers.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var selector = btn.getAttribute('data-video-modal-target');
+          var videoId = btn.getAttribute('data-youtube-id');
+          if (!selector || !videoId) return;
+          var modal = document.querySelector(selector);
+          if (!modal) return;
+          openModal(modal, videoId);
+        });
+      });
+
+      var closers = Array.prototype.slice.call(document.querySelectorAll('[data-video-modal-close]'));
+      closers.forEach(function (el) {
+        el.addEventListener('click', function () {
+          closeModal();
+        });
+      });
+
+      document.addEventListener('keydown', function (e) {
+        var key = e.key || e.keyCode;
+        if (key === 'Escape' || key === 'Esc' || key === 27) {
+          closeModal();
+        }
+      });
+    }
+
     function initThemeToggle() {
       const btns = [
         document.getElementById('themeToggleMobile'),
@@ -788,6 +849,7 @@
     initCtaInteractive();
     initSmoothScrollers();
     initHeroRotatingSubtitle();
+    initVideoModal();
     initThemeToggle();
     initGrass();
 
