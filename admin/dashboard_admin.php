@@ -23,8 +23,8 @@ if (isset($_GET['logout'])) {
         body {
             min-height: 100vh;
             margin: 0;
-            background: radial-gradient(circle at top, #1e293b 0, #020617 55%);
-            color: #e5e7eb;
+            background: radial-gradient(circle at top, #73512C 0, #F9F4E1 55%);
+            color: #543310;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             display: flex;
             flex-direction: column;
@@ -35,8 +35,8 @@ if (isset($_GET['logout'])) {
             min-height: 100vh;
         }
         .admin-sidebar {
-            background: linear-gradient(180deg, #020617, #020617 40%, #0f172a 100%);
-            border-right: 1px solid rgba(30, 64, 175, 0.55);
+            background: linear-gradient(180deg, #543310, #73512C 50%, #B08F70 100%);
+            border-right: 1px solid rgba(176, 143, 112, 0.65);
             padding: 1.5rem 1.25rem;
             display: flex;
             flex-direction: column;
@@ -51,14 +51,14 @@ if (isset($_GET['logout'])) {
             width: 32px;
             height: 32px;
             border-radius: 0.9rem;
-            background: radial-gradient(circle at 30% 0, #22c55e, #16a34a 45%, #14532d 100%);
+            background: radial-gradient(circle at 30% 0, #F9F4E1, #D7B290 45%, #B08F70 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #022c22;
+            color: #543310;
             font-weight: 800;
             font-size: 0.85rem;
-            box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.65), 0 10px 25px rgba(22, 163, 74, 0.45);
+            box-shadow: 0 0 0 1px rgba(249, 244, 225, 0.9), 0 10px 25px rgba(84, 51, 16, 0.5);
         }
         .admin-brand-text {
             display: flex;
@@ -72,13 +72,13 @@ if (isset($_GET['logout'])) {
         }
         .admin-brand-subtitle {
             font-size: 0.7rem;
-            color: #9ca3af;
+            color: #D7B290;
             text-transform: uppercase;
             letter-spacing: 0.16em;
         }
         .admin-nav-section-label {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: #D7B290;
             text-transform: uppercase;
             letter-spacing: 0.16em;
             margin-bottom: 0.25rem;
@@ -96,43 +96,43 @@ if (isset($_GET['logout'])) {
             align-items: center;
             justify-content: space-between;
             gap: 0.4rem;
-            color: #d1d5db;
+            color: #F9F4E1;
             cursor: pointer;
             border: 1px solid transparent;
             transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, transform 0.08s ease;
         }
         .admin-nav-item.active {
-            background: radial-gradient(circle at 0 0, rgba(34, 197, 94, 0.18), rgba(15, 23, 42, 0.8));
-            border-color: rgba(34, 197, 94, 0.7);
-            color: #e5e7eb;
+            background: radial-gradient(circle at 0 0, rgba(249, 244, 225, 0.25), rgba(176, 143, 112, 0.9));
+            border-color: rgba(249, 244, 225, 0.9);
+            color: #543310;
         }
         .admin-nav-item:hover {
-            background: rgba(15, 23, 42, 0.9);
-            border-color: rgba(30, 64, 175, 0.8);
+            background: rgba(249, 244, 225, 0.16);
+            border-color: rgba(176, 143, 112, 0.9);
             transform: translateY(-1px);
         }
         .admin-nav-item-dot {
             width: 6px;
             height: 6px;
             border-radius: 999px;
-            background: #22c55e;
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+            background: #B08F70;
+            box-shadow: 0 0 0 3px rgba(249, 244, 225, 0.4);
         }
         .admin-nav-footer {
             margin-top: auto;
             padding-top: 1.25rem;
-            border-top: 1px dashed rgba(31, 41, 55, 0.9);
+            border-top: 1px dashed rgba(249, 244, 225, 0.35);
         }
         .admin-logout-btn {
             width: 100%;
             border-radius: 999px;
-            border: 1px solid rgba(248, 113, 113, 0.6);
+            border: 1px solid rgba(176, 143, 112, 0.85);
             padding: 0.6rem 0.85rem;
             font-size: 0.8rem;
             font-weight: 500;
             letter-spacing: 0.08em;
-            background: radial-gradient(circle at 0 0, rgba(248, 113, 113, 0.2), rgba(15, 23, 42, 0.9));
-            color: #fecaca;
+            background: radial-gradient(circle at 0 0, rgba(249, 244, 225, 0.85), rgba(176, 143, 112, 0.95));
+            color: #543310;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -144,13 +144,13 @@ if (isset($_GET['logout'])) {
         }
         .admin-logout-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 10px 26px rgba(248, 113, 113, 0.35);
+            box-shadow: 0 10px 26px rgba(84, 51, 16, 0.35);
         }
         .admin-logout-dot {
             width: 7px;
             height: 7px;
             border-radius: 999px;
-            background: #fecaca;
+            background: #F9F4E1;
         }
         .admin-main {
             padding: 1.5rem 2rem 2rem;
@@ -170,16 +170,16 @@ if (isset($_GET['logout'])) {
         }
         .admin-page-subtitle {
             font-size: 0.85rem;
-            color: #9ca3af;
+            color: #73512C;
             margin-top: 0.15rem;
         }
         .admin-status-pill {
             padding: 0.3rem 0.6rem;
             border-radius: 999px;
-            border: 1px solid rgba(34, 197, 94, 0.6);
-            background: rgba(22, 163, 74, 0.15);
+            border: 1px solid rgba(176, 143, 112, 0.8);
+            background: rgba(249, 244, 225, 0.25);
             font-size: 0.7rem;
-            color: #bbf7d0;
+            color: #543310;
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
@@ -190,8 +190,8 @@ if (isset($_GET['logout'])) {
             width: 7px;
             height: 7px;
             border-radius: 999px;
-            background: #22c55e;
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.35);
+            background: #F9F4E1;
+            box-shadow: 0 0 0 3px rgba(176, 143, 112, 0.55);
         }
         .admin-main-grid {
             display: grid;
@@ -201,9 +201,9 @@ if (isset($_GET['logout'])) {
         .admin-card {
             border-radius: 1rem;
             padding: 1.1rem 1.1rem 1.15rem;
-            background: radial-gradient(circle at 0 0, rgba(30, 64, 175, 0.18), rgba(15, 23, 42, 0.95));
-            border: 1px solid rgba(30, 64, 175, 0.65);
-            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+            background: radial-gradient(circle at 0 0, rgba(176, 143, 112, 0.15), rgba(249, 244, 225, 0.98));
+            border: 1px solid rgba(176, 143, 112, 0.75);
+            box-shadow: 0 18px 40px rgba(84, 51, 16, 0.25);
         }
         .admin-card-header {
             display: flex;
@@ -217,15 +217,15 @@ if (isset($_GET['logout'])) {
         }
         .admin-card-subtitle {
             font-size: 0.75rem;
-            color: #9ca3af;
+            color: #73512C;
             margin-top: 0.2rem;
         }
         .admin-badge {
             padding: 0.25rem 0.55rem;
             border-radius: 999px;
-            border: 1px solid rgba(56, 189, 248, 0.7);
+            border: 1px solid rgba(176, 143, 112, 0.8);
             font-size: 0.7rem;
-            color: #e0f2fe;
+            color: #543310;
             text-transform: uppercase;
             letter-spacing: 0.12em;
         }
@@ -238,18 +238,18 @@ if (isset($_GET['logout'])) {
         .admin-metric-pill {
             border-radius: 0.9rem;
             padding: 0.6rem 0.65rem;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(31, 41, 55, 0.9);
+            background: rgba(249, 244, 225, 0.96);
+            border: 1px solid rgba(176, 143, 112, 0.7);
         }
         .admin-metric-label {
             font-size: 0.7rem;
-            color: #9ca3af;
+            color: #73512C;
             margin-bottom: 0.25rem;
         }
         .admin-metric-value {
             font-size: 1rem;
             font-weight: 700;
-            color: #e5e7eb;
+            color: #543310;
         }
         .admin-metric-chip {
             display: inline-flex;
@@ -260,16 +260,16 @@ if (isset($_GET['logout'])) {
             font-size: 0.65rem;
         }
         .chip-green {
-            background: rgba(22, 163, 74, 0.18);
-            color: #bbf7d0;
+            background: rgba(176, 143, 112, 0.18);
+            color: #543310;
         }
         .chip-blue {
-            background: rgba(59, 130, 246, 0.15);
-            color: #bfdbfe;
+            background: rgba(249, 244, 225, 0.9);
+            color: #73512C;
         }
         .chip-amber {
-            background: rgba(245, 158, 11, 0.15);
-            color: #fef3c7;
+            background: rgba(84, 51, 16, 0.08);
+            color: #543310;
         }
         .admin-list {
             margin-top: 0.4rem;
@@ -285,14 +285,14 @@ if (isset($_GET['logout'])) {
             gap: 0.75rem;
             padding: 0.45rem 0.55rem;
             border-radius: 0.6rem;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid rgba(31, 41, 55, 0.95);
+            background: rgba(249, 244, 225, 0.95);
+            border: 1px solid rgba(176, 143, 112, 0.8);
         }
         .admin-list-label {
-            color: #d1d5db;
+            color: #543310;
         }
         .admin-list-meta {
-            color: #9ca3af;
+            color: #73512C;
         }
         .admin-quick-actions {
             display: grid;
@@ -302,10 +302,10 @@ if (isset($_GET['logout'])) {
         }
         .admin-action-btn {
             border-radius: 0.8rem;
-            border: 1px dashed rgba(55, 65, 81, 1);
+            border: 1px dashed rgba(176, 143, 112, 0.9);
             padding: 0.55rem 0.6rem;
-            background: rgba(15, 23, 42, 0.95);
-            color: #e5e7eb;
+            background: rgba(249, 244, 225, 0.96);
+            color: #543310;
             font-size: 0.8rem;
             display: flex;
             flex-direction: column;
@@ -318,12 +318,12 @@ if (isset($_GET['logout'])) {
         }
         .admin-action-btn span:nth-child(2) {
             font-size: 0.7rem;
-            color: #9ca3af;
+            color: #73512C;
         }
         .admin-action-btn:hover {
             border-style: solid;
-            border-color: rgba(34, 197, 94, 0.7);
-            background: radial-gradient(circle at 0 0, rgba(34, 197, 94, 0.14), rgba(15, 23, 42, 0.95));
+            border-color: rgba(176, 143, 112, 0.95);
+            background: radial-gradient(circle at 0 0, rgba(249, 244, 225, 0.9), rgba(215, 178, 144, 0.9));
             transform: translateY(-1px);
         }
         @media (max-width: 900px) {

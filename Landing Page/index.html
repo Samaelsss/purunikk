@@ -237,6 +237,23 @@
               alt="Hand holding woven material"
             />
           </div>
+          <button
+            class="history__video-trigger"
+            type="button"
+            data-video-modal-target="#historyVideoModal"
+            data-youtube-id="xM8yVOWtWC8"
+          >
+            <div class="history__video-thumb">
+              <img
+                src="asset/Screenshot 2025-11-20 153802.png"
+                alt="Video sejarah Purunik"
+                class="history__video-thumb-img"
+              />
+              <div class="history__video-thumb-overlay" aria-hidden="true"></div>
+              <div class="history__video-thumb-play" aria-hidden="true"></div>
+              <span class="history__video-trigger-text">Tonton Video Sejarah</span>
+            </div>
+          </button>
         </div>
       </div>
     </section>
@@ -588,6 +605,26 @@
   <section class="grass-section">
     <canvas class="grass-canvas"></canvas>
   </section>
+
+  <div class="video-modal" id="historyVideoModal" aria-hidden="true">
+    <div class="video-modal__backdrop" data-video-modal-close></div>
+    <div class="video-modal__dialog" role="dialog" aria-modal="true" aria-label="Video Sejarah Purunik">
+      <button class="video-modal__close" type="button" aria-label="Tutup video" data-video-modal-close>
+        
+      </button>
+      <div class="video-modal__body">
+        <div class="video-modal__aspect">
+          <iframe
+            class="video-modal__iframe"
+            src=""
+            title="Video Sejarah Purunik"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- FOOTER -->
   <div class="footer-scope">

@@ -33,27 +33,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
+            background: linear-gradient(135deg, #543310, #73512C);
         }
         .admin-auth-container {
             max-width: 420px;
             width: 100%;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(249, 244, 225, 0.96);
             border-radius: 1rem;
             padding: 2.5rem 2rem;
-            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.75);
-            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 20px 45px rgba(84, 51, 16, 0.35);
+            border: 1px solid rgba(176, 143, 112, 0.7);
             backdrop-filter: blur(18px);
         }
         .admin-auth-title {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #e5e7eb;
+            color: #543310;
             margin-bottom: 0.25rem;
         }
         .admin-auth-subtitle {
             font-size: 0.9rem;
-            color: #9ca3af;
+            color: #73512C;
             margin-bottom: 1.75rem;
         }
         .admin-input-group {
@@ -65,25 +65,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .admin-input-label {
             font-size: 0.85rem;
             font-weight: 500;
-            color: #e5e7eb;
+            color: #543310;
         }
         .admin-input {
             border-radius: 0.6rem;
-            border: 1px solid #1f2937;
+            border: 1px solid #B08F70;
             padding: 0.7rem 0.85rem;
-            background: rgba(15, 23, 42, 0.8);
-            color: #f9fafb;
+            background: rgba(249, 244, 225, 0.98);
+            color: #543310;
             font-size: 0.9rem;
             outline: none;
             transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
         }
         .admin-input::placeholder {
-            color: #6b7280;
+            color: rgba(84, 51, 16, 0.6);
         }
         .admin-input:focus {
-            border-color: #22c55e;
-            box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.5);
-            background: rgba(15, 23, 42, 1);
+            border-color: #B08F70;
+            box-shadow: 0 0 0 1px rgba(176, 143, 112, 0.6);
+            background: #F9F4E1;
         }
         .admin-submit-btn {
             width: 100%;
@@ -95,27 +95,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 600;
             letter-spacing: 0.03em;
             cursor: pointer;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #022c22;
-            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
+            background: linear-gradient(135deg, #543310, #B08F70);
+            color: #F9F4E1;
+            box-shadow: 0 10px 25px rgba(84, 51, 16, 0.4);
             transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
         }
         .admin-submit-btn:hover {
             transform: translateY(-1px);
-            filter: brightness(1.05);
-            box-shadow: 0 14px 35px rgba(34, 197, 94, 0.55);
+            filter: brightness(1.03);
+            box-shadow: 0 14px 35px rgba(84, 51, 16, 0.55);
         }
         .admin-submit-btn:active {
             transform: translateY(0);
-            box-shadow: 0 8px 18px rgba(34, 197, 94, 0.35);
+            box-shadow: 0 8px 18px rgba(84, 51, 16, 0.35);
         }
         .admin-error {
             margin-bottom: 0.75rem;
             padding: 0.6rem 0.75rem;
             border-radius: 0.6rem;
-            border: 1px solid rgba(248, 113, 113, 0.5);
-            background: rgba(30, 64, 175, 0.15);
-            color: #fecaca;
+            border: 1px solid rgba(176, 143, 112, 0.8);
+            background: rgba(249, 244, 225, 0.96);
+            color: #543310;
             font-size: 0.8rem;
         }
     </style>
