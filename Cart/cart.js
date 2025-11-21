@@ -3,6 +3,34 @@
 // { key, id, name, model, motif, price, qty, img/thumb/image }
 
 (function(){
+  // Theme toggle with persistence (shares key 'pk-theme' with product page)
+  function initThemeToggle() {
+    const btns = [
+      document.getElementById('themeToggleMobile'),
+      document.getElementById('themeToggleTablet'),
+      document.getElementById('themeToggleDesktop')
+    ].filter(Boolean);
+
+    const saved = localStorage.getItem('pk-theme');
+    if (saved === 'light') { document.body.classList.add('light'); document.body.classList.remove('dark'); }
+    else if (saved === 'dark') { document.body.classList.add('dark'); document.body.classList.remove('light'); }
+    else { document.body.classList.add('dark'); localStorage.setItem('pk-theme','dark'); }
+
+    function setTheme(mode) {
+      if (mode === 'light') {
+        document.body.classList.add('light'); document.body.classList.remove('dark'); localStorage.setItem('pk-theme','light');
+      } else {
+        document.body.classList.remove('light'); document.body.classList.add('dark'); localStorage.setItem('pk-theme','dark');
+      }
+    }
+
+    function currentMode(){ return document.body.classList.contains('light') ? 'light' : 'dark'; }
+
+    btns.forEach(btn => btn.addEventListener('click', ()=> setTheme(currentMode() === 'light' ? 'dark' : 'light')));
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initThemeToggle);
+  else initThemeToggle();
   const rupiah = (v) => 'Rp ' + Number(v||0).toLocaleString('id-ID');
   const getCart = () => JSON.parse(localStorage.getItem('cart')||'[]');
   const setCart = (arr) => localStorage.setItem('cart', JSON.stringify(arr));

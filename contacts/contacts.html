@@ -387,16 +387,31 @@
         <script src="../navbar/navbar.js"></script>
         <script src="../footer/footer.js"></script>
         <script>
-            // Enable theme toggle for contacts page
-            document.addEventListener('DOMContentLoaded', function() {
-                const themeBtns = document.querySelectorAll('#themeToggleMobile, #themeToggleTablet, #themeToggleDesktop');
-                themeBtns.forEach(btn => {
-                    if (!btn) return;
-                    btn.addEventListener('click', function() {
-                        document.body.classList.toggle('dark');
-                    });
-                });
-            });
+            // Persistent theme toggle for contacts page (uses same key as product page)
+            (function(){
+                function initThemeToggle(){
+                    const btns = Array.from(document.querySelectorAll('#themeToggleMobile, #themeToggleTablet, #themeToggleDesktop')).filter(Boolean);
+                    const saved = localStorage.getItem('pk-theme');
+                    if (saved === 'light') { document.body.classList.add('light'); document.body.classList.remove('dark'); }
+                    else if (saved === 'dark') { document.body.classList.add('dark'); document.body.classList.remove('light'); }
+                    else { document.body.classList.add('dark'); localStorage.setItem('pk-theme','dark'); }
+
+                    function setTheme(mode){
+                        if (mode === 'light') {
+                            document.body.classList.add('light'); document.body.classList.remove('dark'); localStorage.setItem('pk-theme','light');
+                        } else {
+                            document.body.classList.remove('light'); document.body.classList.add('dark'); localStorage.setItem('pk-theme','dark');
+                        }
+                    }
+
+                    function currentMode(){ return document.body.classList.contains('light') ? 'light' : 'dark'; }
+
+                    btns.forEach(btn => btn.addEventListener('click', function(){ setTheme(currentMode() === 'light' ? 'dark' : 'light'); }));
+                }
+
+                if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initThemeToggle);
+                else initThemeToggle();
+            })();
         </script>
 </body>
 
