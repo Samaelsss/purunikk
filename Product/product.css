@@ -21,6 +21,14 @@
         'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
+/* Disable legacy gallery sections removed from HTML */
+.top-row,
+.material-section,
+.material-section .gallery-grid,
+.gallery-grid,
+.gallery-card,
+.section-header { display: none !important; }
+
 :root {
   --background: #F9F4E1;
   --foreground: #543310;
