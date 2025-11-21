@@ -157,6 +157,8 @@ body.dark .navbar-scope {
     background: transparent;
     border: none;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
     z-index: 10;
     border-radius: 9999px;
 }
