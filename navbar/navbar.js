@@ -17,7 +17,6 @@ const mobileSearchInput = document.getElementById('mobileSearchInput');
 const loginBtn = document.getElementById('loginBtn');
 const registerBtn = document.getElementById('registerBtn');
 const profileBtn = document.getElementById('profileBtn');
-
 const allNavItems = document.querySelectorAll('.nav-item');
 const themeBtns = document.querySelectorAll('#themeToggleMobile, #themeToggleTablet, #themeToggleDesktop');
 
@@ -249,12 +248,15 @@ if (mobileSearchInput) {
     });
 }
 
-// Close mobile search when clicking outside
+// Close mobile search when clicking outside (ignore clicks on the buttons or their children)
 document.addEventListener('click', (e) => {
-    if (isMobileSearchOpen && 
-        !mobileSearchDropdown.contains(e.target) && 
-        e.target !== searchBtnMobile && 
-        e.target !== searchBtnTablet) {
+    if (
+        isMobileSearchOpen &&
+        mobileSearchDropdown &&
+        !mobileSearchDropdown.contains(e.target) &&
+        (!searchBtnMobile || !searchBtnMobile.contains(e.target)) &&
+        (!searchBtnTablet || !searchBtnTablet.contains(e.target))
+    ) {
         toggleMobileSearch();
     }
 });
