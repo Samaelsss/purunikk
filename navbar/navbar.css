@@ -273,7 +273,7 @@ body.dark .navbar-scope .theme-toggle-btn .icon {
 	position: fixed;
 	top: calc(var(--nav-safe-area, 72px) + 4px);
 	left: 50%;
-	transform: translateX(-50%);
+	transform: translateX(-50%) translateY(-10px);
 
 	background: var(--nb-bg);
 	border-radius: 24px;
