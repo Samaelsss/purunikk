@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Puruniks Produk</title>
   <link rel="stylesheet" href="product.css">
-  <link rel="stylesheet" href="loading-screen/loading.css">
+  <link rel="stylesheet" href="../loading-screen/loading.css">
+  <script defer src="../loading-screen/loading.js"></script>
+  <script defer src="products.js?v=2"></script>
   <script defer src="product.js"></script>
 
   <link rel="stylesheet" href="styles.css">
@@ -202,6 +204,24 @@
   </section>
   <main class="product-page">
 
+    <section class="shop-hero">
+      <div class="shop-hero__grid">
+        <section class="shop-banner">
+          <div class="shop-banner__main" id="shopBannerMain"></div>
+          <div class="shop-banner__tiles" id="shopBannerTiles"></div>
+        </section>
+        <aside class="shop-side">
+         <div class="shop-side__card">
+            <h3 class="shop-side__title">Eksplor Material</h3>
+            <div class="shop-side__list" id="suggestions"></div>
+          </div>
+          <div class="shop-side__card">
+            <h3 class="shop-side__title">Recently Viewed</h3>
+            <div class="shop-side__list" id="recentlyViewed"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
 
     <!-- Navigation Container -->
     <div class="products-container">
@@ -475,13 +495,6 @@
               </path>
             </svg>
           </button>
-
-          <button class="profile-btn" id="profileBtn">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </button>
         </div>
 
         <!-- Desktop Layout -->
@@ -547,11 +560,6 @@
               </path>
             </svg>
           </button>
-
-          <div class="auth-buttons">
-            <button class="btn-login" id="loginBtn">Login</button>
-            <button class="btn-register" id="registerBtn">Register</button>
-          </div>
         </div>
       </nav>
     </div>

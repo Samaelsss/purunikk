@@ -1050,28 +1050,16 @@ function getFilteredProducts() {
     return PRODUCTS_DATA.filter(predicate);
 }
 
-// Loading Screen Management
-const loadingScreen = document.getElementById('loadingScreen');
-const productPage = document.querySelector('.product-page');
-
-// Simulate loading progress
-let loadingProgress = 0;
-const loadingInterval = setInterval(() => {
-    loadingProgress += Math.random() * 15;
-    if (loadingProgress >= 100) {
-        loadingProgress = 100;
-        clearInterval(loadingInterval);
-        
-        setTimeout(() => {
-            loadingScreen.classList.add('hidden');
-            productPage.classList.add('loaded');
-            
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-            }, 800);
-        }, 500);
-    }
-}, 200);
+// Smoothly scroll viewport to the products section instead of the very top
+function scrollToProductsSection() {
+    const container = document.querySelector('.products-container');
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const offset = window.pageYOffset || document.documentElement.scrollTop || 0;
+    // Keep a small margin above the category bar so it sits nicely under the navbar
+    const targetTop = offset + rect.top - 40;
+    window.scrollTo({ top: targetTop, behavior: 'smooth' });
+}
 
 // Get products for current page
 function getPageProducts(page) {
@@ -1197,7 +1185,7 @@ function updatePaginationUI() {
             currentPage = parseInt(btn.dataset.page);
             renderProductCards(currentPage);
             updatePaginationUI();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollToProductsSection();
         });
     });
 }
@@ -1221,7 +1209,7 @@ document.getElementById('paginationPrev').addEventListener('click', () => {
         currentPage--;
         renderProductCards(currentPage);
         updatePaginationUI();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        scrollToProductsSection();
     }
 });
 
@@ -1230,7 +1218,7 @@ document.getElementById('paginationNext').addEventListener('click', () => {
         currentPage++;
         renderProductCards(currentPage);
         updatePaginationUI();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        scrollToProductsSection();
     }
 });
 
@@ -1249,7 +1237,7 @@ document.getElementById('paginationNext').addEventListener('click', () => {
             filteredProducts = getFilteredProducts();
             renderProductCards(currentPage);
             updatePaginationUI();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollToProductsSection();
         });
     });
 })();
@@ -1258,9 +1246,21 @@ document.getElementById('paginationNext').addEventListener('click', () => {
 renderProductCards(currentPage);
 updatePaginationUI();
 
+// --- Shop Hero helpers ---
+function addRecentlyViewed(id){
+  try {
+    const key = 'rv-ids';
+    const arr = JSON.parse(localStorage.getItem(key) || '[]').map(String);
+    const sid = String(id);
+    const next = [sid, ...arr.filter(x=>x!==sid)].slice(0, 8);
+    localStorage.setItem(key, JSON.stringify(next));
+  } catch(e){}
+}
+
 function goToDetail(id){
   const path = window.location.pathname;
   // arahkan ke Produk_detail.html
+  addRecentlyViewed(id);
   if (path.includes('/Product/')) {
     window.location.href = `../Produk_detail.html?id=${encodeURIComponent(id)}`;
   } else {
@@ -1320,5 +1320,125 @@ function goToDetail(id){
     document.addEventListener('DOMContentLoaded', initThemeToggle);
   } else {
     initThemeToggle();
+  }
+})();
+
+// Render the new shop-hero section if present
+(function initShopHero(){
+  const catEl = document.getElementById('shopCategories');
+  const mainEl = document.getElementById('shopBannerMain');
+  const tilesEl = document.getElementById('shopBannerTiles');
+  const rvEl = document.getElementById('recentlyViewed');
+  const sugEl = document.getElementById('suggestions');
+  if (!catEl && !mainEl && !tilesEl && !rvEl && !sugEl) return;
+
+  // Build categories list dynamically (all + unique categories)
+  if (catEl) {
+    const pretty = (s)=> String(s||'').replace(/[-_]+/g,' ').replace(/\b\w/g, m=>m.toUpperCase());
+    const counts = PRODUCTS_DATA.reduce((acc,p)=>{ const k=(p.category||'lain').toLowerCase(); acc[k]=(acc[k]||0)+1; return acc; },{});
+    const baseCats = [
+      { key: 'all', label: 'Semua', count: PRODUCTS_DATA.length },
+      ...Object.entries(counts).map(([key,count])=>({ key, label: pretty(key), count }))
+    ];
+    catEl.innerHTML = baseCats.map(c => `<button class="cat-item" data-category="${c.key}"><span>${c.label}</span><span style="margin-left:auto;opacity:.7;font-weight:600;">${c.count}</span></button>`).join('');
+    const catButtons = Array.from(catEl.querySelectorAll('.cat-item'));
+    if (catButtons.length) catButtons[0].classList.add('active');
+    catButtons.forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        catButtons.forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.category || 'all';
+        if (target==='all') {
+          document.querySelector(`.category-chip[data-category="all"]`)?.click();
+        } else {
+          // Map to UI chips if exists, else fall back to 'all'
+          const chip = document.querySelector(`.category-chip[data-category="${target}"]`) || document.querySelector('.category-chip[data-category="all"]');
+          chip?.click();
+        }
+        window.scrollTo({ top: document.querySelector('.products-container')?.offsetTop || 0, behavior:'smooth' });
+      });
+    });
+  }
+
+  // Banner main: pick a featured product (first of filtered or first in dataset)
+  const datasetFull = (typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS) && PRODUCTS.length) ? PRODUCTS : PRODUCTS_DATA;
+  function bannerCard(p){
+    return `<div class="banner-inner">
+      <div class="banner-text">
+        <p>Biggest Offer Revealed</p>
+        <h2>${p.name}</h2>
+        <p>${p.subtitle || p.category || ''}</p>
+      </div>
+      <img src="${p.img || p.image}" alt="${p.name}">
+    </div>`;
+  }
+  if (mainEl) {
+    const picks = [...datasetFull].slice(0, 6);
+    let idx = 0;
+    const render = ()=>{
+      const p = picks[idx % picks.length] || PRODUCTS_DATA[0];
+      mainEl.innerHTML = bannerCard(p);
+      idx++;
+    };
+    render();
+    setInterval(render, 6000);
+  }
+  if (tilesEl) {
+    const picks = PRODUCTS_DATA.slice(0, 4);
+    tilesEl.innerHTML = picks.map(p=>`<div class="tile"><img src="${p.img}" alt="${p.name}"><div><div class="t-title">${p.name}</div><div class="t-sub">${p.price}</div></div></div>`).join('');
+  }
+
+  function renderMiniList(el, items){
+    if (!el) return;
+    el.innerHTML = items.map(p=>`<div class="mini" data-id="${p.id}"><img src="${p.img}" alt="${p.name}"><div><div class="m-title">${p.name}</div><div class="m-price">${p.price}</div></div></div>`).join('');
+    el.querySelectorAll('.mini').forEach(div=>{
+      div.addEventListener('click',()=>{ goToDetail(div.dataset.id); });
+    });
+  }
+
+  // Recently viewed from localStorage
+  try {
+    const ids = JSON.parse(localStorage.getItem('rv-ids') || '[]');
+    const rvItems = ids
+      .map(id => PRODUCTS_DATA.find(p => String(p.id) === String(id)))
+      .filter(Boolean)
+      .slice(0, 3);
+    renderMiniList(rvEl, rvItems);
+  } catch(e){}
+
+  // Suggestions panel: quick category shortcuts (Purun, Eceng Gondok, Rotan)
+  if (sugEl) {
+    const catMap = {
+      purun: 'Purun',
+      'eceng-gondok': 'Eceng Gondok',
+      rotan: 'Rotan',
+    };
+
+    const availableKeys = Object.keys(catMap).filter(key =>
+      PRODUCTS_DATA.some(p => (p.category || '').toLowerCase() === key)
+    );
+
+    sugEl.innerHTML = availableKeys.map(key => {
+      const count = PRODUCTS_DATA.filter(p => (p.category || '').toLowerCase() === key).length;
+      return `<button class="mini" data-category="${key}">
+        <div>
+          <div class="m-title">${catMap[key]}</div>
+          <div class="m-price">${count} produk</div>
+        </div>
+      </button>`;
+    }).join('');
+
+    sugEl.querySelectorAll('.mini').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.category;
+        const chip = document.querySelector(`.category-chip[data-category="${key}"]`) ||
+          document.querySelector('.category-chip[data-category="all"]');
+        chip?.click();
+        window.scrollTo({
+          top: document.querySelector('.products-container')?.offsetTop || 0,
+          behavior: 'smooth',
+        });
+      });
+    });
   }
 })();
