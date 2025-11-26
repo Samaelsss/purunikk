@@ -1018,21 +1018,35 @@ const PRODUCT_IMAGE_FILES = [
     'img/IMG_4106.jpg'
 ];
 
-const PRODUCTS_DATA = RAW_PRODUCTS_DATA.map((product, index) => {
-    // Gunakan gambar spesifik produk jika tersedia, jika tidak fallback ke daftar default
-    const imagePath = product.image || product.img || PRODUCT_IMAGE_FILES[index % PRODUCT_IMAGE_FILES.length];
-    return {
-        ...product,
-        img: imagePath,
-        image: imagePath
-    };
-});
+// Dataset produk utama untuk katalog dan rekomendasi.
+// Awalnya kosong dan akan diisi hanya dari database (products_api.php).
+let PRODUCTS_DATA = [];
+
+function formatRupiah(num) {
+    if (typeof num === 'string') {
+        return num.trim().startsWith('Rp') ? num : 'Rp ' + num;
+    }
+    try {
+        return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+    } catch (e) {
+        return 'Rp ' + String(num || 0);
+    }
+}
+
+function getCategoryIcon(category) {
+    const c = String(category || '').toLowerCase();
+    if (c.includes('tas')) return '👜';
+    if (c.includes('dompet')) return '👛';
+    if (c.includes('keranjang') || c.includes('basket')) return '🧺';
+    if (c.includes('furniture') || c.includes('kursi') || c.includes('meja')) return '🪑';
+    return '🧺';
+}
 
 const ITEMS_PER_PAGE = 16;
 let currentPage = 1;
 let currentCategory = 'all';
 let filteredProducts = PRODUCTS_DATA;
-let totalPages = Math.ceil(PRODUCTS_DATA.length / ITEMS_PER_PAGE);
+let totalPages = Math.ceil(PRODUCTS_DATA.length / ITEMS_PER_PAGE) || 1;
 
 // Map UI categories to filtering strategy
 const UI_CATEGORY_MAP = {
@@ -1102,8 +1116,11 @@ function renderProductCards(page) {
         card.addEventListener('click', (e) => {
             if (!e.target.closest('.btn')) {
                 const productId = card.dataset.id;
-                const product = PRODUCTS_DATA.find(p => p.id === parseInt(productId));
+                const product = PRODUCTS_DATA.find(p => String(p.id) === String(productId));
                 if (product) {
+                    try {
+                        localStorage.setItem('pk-last-product', JSON.stringify(product));
+                    } catch (e) {}
                     // arahkan ke Produk_detail.html
                     goToDetail(productId);
                 }
@@ -1116,8 +1133,11 @@ function renderProductCards(page) {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const productId = e.target.closest('.product-card').dataset.id;
-            const product = PRODUCTS_DATA.find(p => p.id === parseInt(productId));
+            const product = PRODUCTS_DATA.find(p => String(p.id) === String(productId));
             if (product) {
+                try {
+                    localStorage.setItem('pk-last-product', JSON.stringify(product));
+                } catch (e) {}
                 // arahkan ke Produk_detail.html
                 goToDetail(productId);
             }
@@ -1128,7 +1148,7 @@ function renderProductCards(page) {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const productId = e.target.closest('.product-card').dataset.id;
-            const product = PRODUCTS_DATA.find(p => p.id === parseInt(productId));
+            const product = PRODUCTS_DATA.find(p => String(p.id) === String(productId));
             if (product) {
                 // Simulate buy action
                 alert(`Produk ${product.name} ditambahkan ke keranjang!`);
@@ -1142,6 +1162,7 @@ function renderProductCards(page) {
 // Update pagination UI
 function updatePaginationUI() {
     const paginationNumbers = document.getElementById('paginationNumbers');
+    if (!paginationNumbers) return;
     let paginationHTML = '';
     
     // Update total pages based on filtered products
@@ -1194,6 +1215,7 @@ function updatePaginationUI() {
 function updateNavigationButtons() {
     const paginationPrev = document.getElementById('paginationPrev');
     const paginationNext = document.getElementById('paginationNext');
+    if (!paginationPrev || !paginationNext) return;
 
     const canGoPrev = currentPage > 1;
     const canGoNext = currentPage < totalPages;
@@ -1202,25 +1224,98 @@ function updateNavigationButtons() {
     paginationNext.disabled = !canGoNext;
 }
 
+function loadProductsFromApi() {
+    const grid = document.getElementById('productsGrid');
+    try {
+        const path = window.location.pathname || '';
+        const basePrefix = path.includes('/Product/') ? '../' : '';
+
+        fetch('http://localhost/purunikk/admin/products_api.php')
+            .then((res) => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then((data) => {
+                if (!Array.isArray(data) || !data.length) {
+                    if (grid) {
+                        grid.innerHTML = '<p class="empty-message">Produk belum tersedia.</p>';
+                    }
+                    PRODUCTS_DATA = [];
+                    filteredProducts = PRODUCTS_DATA;
+                    totalPages = 1;
+                    updatePaginationUI();
+                    return;
+                }
+
+                const mapped = data.map((item, index) => {
+                    const priceNum = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
+                    let imagePath = '';
+                    if (item.image_path) {
+                        imagePath = basePrefix + String(item.image_path);
+                    } else {
+                        imagePath = PRODUCT_IMAGE_FILES[index % PRODUCT_IMAGE_FILES.length];
+                    }
+
+                    const name = item.name || '';
+                    const category = item.category || 'Produk';
+                    const description = item.description || '';
+                    const subtitle = category || 'Koleksi Unggulan';
+                    const icon = getCategoryIcon(category);
+
+                    return {
+                        id: item.id,
+                        name,
+                        subtitle,
+                        category,
+                        description,
+                        price: formatRupiah(priceNum),
+                        icon,
+                        img: imagePath,
+                        image: imagePath
+                    };
+                });
+
+                PRODUCTS_DATA = mapped;
+                filteredProducts = PRODUCTS_DATA;
+                totalPages = Math.ceil(PRODUCTS_DATA.length / ITEMS_PER_PAGE) || 1;
+                currentPage = 1;
+                renderProductCards(currentPage);
+                updatePaginationUI();
+                initShopHero();
+            })
+            .catch((err) => {
+                console.error('Gagal memuat produk dari API:', err);
+            });
+    } catch (e) {
+        console.error('Fetch API tidak tersedia:', e);
+    }
+}
+
 // Navigation handlers (prev/next buttons removed; use pagination buttons instead)
 
-document.getElementById('paginationPrev').addEventListener('click', () => {
-    if (currentPage > 1) {
-        currentPage--;
-        renderProductCards(currentPage);
-        updatePaginationUI();
-        scrollToProductsSection();
-    }
-});
+const paginationPrevBtn = document.getElementById('paginationPrev');
+if (paginationPrevBtn) {
+    paginationPrevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderProductCards(currentPage);
+            updatePaginationUI();
+            scrollToProductsSection();
+        }
+    });
+}
 
-document.getElementById('paginationNext').addEventListener('click', () => {
-    if (currentPage < totalPages) {
-        currentPage++;
-        renderProductCards(currentPage);
-        updatePaginationUI();
-        scrollToProductsSection();
-    }
-});
+const paginationNextBtn = document.getElementById('paginationNext');
+if (paginationNextBtn) {
+    paginationNextBtn.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderProductCards(currentPage);
+            updatePaginationUI();
+            scrollToProductsSection();
+        }
+    });
+}
 
 // Category filter handlers for new chips
 (function initCategoryChips(){
@@ -1242,9 +1337,8 @@ document.getElementById('paginationNext').addEventListener('click', () => {
     });
 })();
 
-// Initialize app
-renderProductCards(currentPage);
-updatePaginationUI();
+// Initialize app: load products only from database
+loadProductsFromApi();
 
 // --- Shop Hero helpers ---
 function addRecentlyViewed(id){
@@ -1324,13 +1418,14 @@ function goToDetail(id){
 })();
 
 // Render the new shop-hero section if present
-(function initShopHero(){
+function initShopHero(){
   const catEl = document.getElementById('shopCategories');
   const mainEl = document.getElementById('shopBannerMain');
   const tilesEl = document.getElementById('shopBannerTiles');
   const rvEl = document.getElementById('recentlyViewed');
   const sugEl = document.getElementById('suggestions');
   if (!catEl && !mainEl && !tilesEl && !rvEl && !sugEl) return;
+  if (!Array.isArray(PRODUCTS_DATA) || !PRODUCTS_DATA.length) return;
 
   // Build categories list dynamically (all + unique categories)
   if (catEl) {
@@ -1361,7 +1456,7 @@ function goToDetail(id){
   }
 
   // Banner main: pick a featured product (first of filtered or first in dataset)
-  const datasetFull = (typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS) && PRODUCTS.length) ? PRODUCTS : PRODUCTS_DATA;
+  const datasetFull = PRODUCTS_DATA;
   function bannerCard(p){
     return `<div class="banner-inner">
       <div class="banner-text">
@@ -1441,4 +1536,4 @@ function goToDetail(id){
       });
     });
   }
-})();
+}

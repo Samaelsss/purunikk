@@ -21,6 +21,31 @@ function parsePriceToNumber(price){
   return Number(digits || 0);
 }
 
+function resolveProductImagePath(path) {
+  if (!path) return '';
+  let p = String(path).replace(/\\/g, '/');
+  if (/^(https?:)?\/\//.test(p) || p.startsWith('data:')) return p;
+  while (p.startsWith('./')) {
+    p = p.slice(2);
+  }
+  if (p.startsWith('../uploads/')) {
+    p = p.replace(/^\.\.\//g, '');
+  }
+  if (p.startsWith('/uploads/')) {
+    p = p.replace(/^\//, '');
+  }
+  if (p.startsWith('uploads/')) {
+    return p;
+  }
+  if (p.startsWith('Product/')) {
+    return p;
+  }
+  if (p.startsWith('img/')) {
+    return 'Product/' + p;
+  }
+  return p;
+}
+
 const wishlist = JSON.parse(localStorage.getItem('wishlist')||'[]').map(String);
 let cart = JSON.parse(localStorage.getItem('cart')||'[]');
 
@@ -38,7 +63,7 @@ function resolveDetailUrl(id){
   return `Produk_detail.html?id=${encodeURIComponent(id)}`;
 }
 
-function renderProduct(){
+async function renderProduct(){
   const id = getParam('id');
   const root = document.querySelector('.product-section')
             || document.getElementById('product-root')
@@ -103,12 +128,23 @@ if (document.readyState === 'loading') {
 
   if (root) root.style.display = '';
 
-  const dataset = (typeof PRODUCTS !== 'undefined') ? PRODUCTS : ((typeof PRODUCTS_DATA !== 'undefined') ? PRODUCTS_DATA : []);
-  let prod = dataset.find(p => String(p.id) === String(id) || p.id === parseInt(id));
+  const dataset = (typeof PRODUCTS_DATA !== 'undefined' && Array.isArray(PRODUCTS_DATA)) ? PRODUCTS_DATA : [];
+  let prod = dataset.find(p => String(p.id) === String(id));
   // Fallback: jika id numerik dan tidak cocok dengan field id, gunakan index (1-based)
   if (!prod && /^\d+$/.test(String(id))) {
     const idx = Math.max(0, parseInt(id, 10) - 1);
     if (idx >= 0 && idx < dataset.length) prod = dataset[idx];
+  }
+  if (!prod) {
+    try {
+      const stored = localStorage.getItem('pk-last-product');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && String(parsed.id) === String(id)) {
+          prod = parsed;
+        }
+      }
+    } catch (e) {}
   }
 
   if(!prod){
@@ -117,22 +153,41 @@ if (document.readyState === 'loading') {
     return;
   }
 
+  // Ambil semua gambar warna untuk produk ini dari database
+  let colorImages = [];
+  try {
+    if (prod.id) {
+      const res = await fetch('http://localhost/purunikk/admin/product_images_api.php?product_id=' + encodeURIComponent(prod.id));
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          colorImages = data;
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Gagal memuat gambar warna produk:', e);
+  }
+
   const imgEl = document.getElementById('product-img') || document.getElementById('main-img');
   const nameEl = document.getElementById('product-name');
   const priceEl = document.getElementById('product-price');
   const descEl = document.getElementById('product-desc');
   const specsWrap = document.getElementById('product-specs');
   const breadcrumbEl = document.getElementById('breadcrumb-product');
-
-  if (imgEl) { imgEl.src = prod.img || prod.image || ''; imgEl.alt = prod.name || ''; }
+  const mainImgSrc = resolveProductImagePath(prod.img || prod.image || prod.image_path || prod.thumb || '');
+  if (imgEl) { imgEl.src = mainImgSrc; imgEl.alt = prod.name || ''; }
   if (nameEl) { nameEl.textContent = prod.name || ''; }
   if (breadcrumbEl) { breadcrumbEl.textContent = prod.name || ''; }
   if (priceEl) { priceEl.textContent = formatRupiah(prod.price); }
   if (descEl) { descEl.textContent = prod.description || ''; }
 
-  const thumbs = (Array.isArray(prod.images) && prod.images.length)
-    ? prod.images
-    : [prod.thumb || prod.img, prod.thumb || prod.img, prod.img].filter(Boolean);
+  const rawThumbs = (Array.isArray(colorImages) && colorImages.length)
+    ? colorImages.map(ci => ci.image_path)
+    : ((Array.isArray(prod.images) && prod.images.length)
+        ? prod.images
+        : [prod.thumb || prod.img || prod.image || prod.image_path].filter(Boolean));
+  const thumbs = rawThumbs.map(resolveProductImagePath);
   const thumbList = document.getElementById('thumbnail-list');
   if (thumbList && thumbs.length) {
     thumbList.innerHTML = '';
@@ -208,7 +263,7 @@ if (document.readyState === 'loading') {
       const div = document.createElement('div');
       if (idx === 0) div.classList.add('active');
       const img = document.createElement('img');
-      img.src = m.img || '';
+      img.src = resolveProductImagePath(m.img || '');
       img.alt = m.name || '';
       const h4 = document.createElement('h4');
       h4.textContent = m.name || '';
@@ -220,8 +275,28 @@ if (document.readyState === 'loading') {
 
   // Render models dari data
   const modelsWrap = document.querySelector('.model_produk_fun');
-  if (modelsWrap && Array.isArray(prod.models) && prod.models.length) {
+  if (modelsWrap && Array.isArray(colorImages) && colorImages.length) {
     // simpan judul jika ada
+    const title = modelsWrap.querySelector('h4')?.textContent || 'Pilih model';
+    modelsWrap.innerHTML = '';
+    const titleEl = document.createElement('h4');
+    titleEl.textContent = title;
+    modelsWrap.appendChild(titleEl);
+    colorImages.forEach((imgRow, idx) => {
+      const div = document.createElement('div');
+      div.className = 'Model_1';
+      if (idx === 0) div.classList.add('active');
+      const img = document.createElement('img');
+      img.src = resolveProductImagePath(imgRow.image_path || '');
+      img.alt = imgRow.color || '';
+      const h4 = document.createElement('h4');
+      h4.textContent = imgRow.color || '';
+      div.appendChild(img);
+      div.appendChild(h4);
+      modelsWrap.appendChild(div);
+    });
+  } else if (modelsWrap && Array.isArray(prod.models) && prod.models.length) {
+    // fallback ke perilaku lama jika tidak ada data gambar warna di database
     const title = modelsWrap.querySelector('h4')?.textContent || 'Pilih model';
     modelsWrap.innerHTML = '';
     const titleEl = document.createElement('h4');
@@ -264,11 +339,23 @@ if (document.readyState === 'loading') {
       updateDisplayedPrice();
     });
   });
-  document.querySelectorAll('.model_produk_fun > .Model_1').forEach(div => {
+  document.querySelectorAll('.model_produk_fun > .Model_1').forEach((div, index) => {
     div.addEventListener('click', () => {
       document.querySelectorAll('.model_produk_fun > .Model_1').forEach(b=>b.classList.remove('active'));
       div.classList.add('active');
       updateDisplayedPrice();
+
+      // Sinkronkan gambar utama dan thumbnail dengan model/warna yang aktif
+      const thumbImgs = document.querySelectorAll('#thumbnail-list img');
+      const targetSrc = Array.isArray(thumbs) ? thumbs[index] : null;
+
+      if (imgEl && targetSrc) {
+        imgEl.src = targetSrc;
+      }
+      if (thumbImgs.length && thumbImgs[index]) {
+        thumbImgs.forEach(i => i.classList.remove('active'));
+        thumbImgs[index].classList.add('active');
+      }
     });
   });
   // Inisialisasi harga varian awal
@@ -352,7 +439,7 @@ if (document.readyState === 'loading') {
       const icon = p.icon || '';
       const subtitle = p.subtitle || '';
       const categoryText = (p.category || 'Produk');
-      const imgSrc = p.img || p.image || p.thumb || '';
+      const imgSrc = resolveProductImagePath(p.img || p.image || p.image_path || p.thumb || '');
       const priceStr = typeof p.price === 'string' && p.price.trim().startsWith('Rp') ? p.price : formatRupiah(p.price);
       const card = document.createElement('div');
       card.className = 'product-card';
@@ -381,12 +468,18 @@ if (document.readyState === 'loading') {
       // Click whole card to detail if buttons not clicked
       card.addEventListener('click', (e) => {
         if (!e.target.closest('.btn')) {
+          try {
+            localStorage.setItem('pk-last-product', JSON.stringify(p));
+          } catch (err) {}
           window.location.href = resolveDetailUrl(p.id);
         }
       });
       // Button handlers mirroring product.js behavior
       card.querySelector('.btn.btn-secondary').addEventListener('click', (e) => {
         e.stopPropagation();
+        try {
+          localStorage.setItem('pk-last-product', JSON.stringify(p));
+        } catch (err) {}
         window.location.href = resolveDetailUrl(p.id);
       });
       card.querySelector('.btn.btn-primary').addEventListener('click', (e) => {
@@ -404,6 +497,7 @@ if (document.readyState === 'loading') {
       others.slice(0,6).forEach(p=>{
         const card = document.createElement('div');
         card.className = 'produk-card';
+        const imgSrc = resolveProductImagePath(p.thumb || p.img || p.image || p.image_path || '');
         card.innerHTML = `
           <div class="produk-header">
             <i>★</i>
@@ -413,7 +507,7 @@ if (document.readyState === 'loading') {
             </div>
           </div>
           <div class="produk-body">
-            <img src="${p.thumb || p.img || p.image || ''}" alt="${p.name || ''}">
+            <img src="${imgSrc}" alt="${p.name || ''}">
             <h5>${p.name || ''}</h5>
             <div class="subtitle">${formatRupiah(p.price)}</div>
             <div class="buttons">
