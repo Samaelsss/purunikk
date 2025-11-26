@@ -271,7 +271,7 @@ body.dark .navbar-scope .theme-toggle-btn .icon {
 .navbar-scope .mobile-search-dropdown {
     display: flex;
 	position: fixed;
-	top: calc(var(--nav-safe-area, 72px) + 4px);
+	top: 105px;
 	left: 50%;
 	transform: translateX(-50%) translateY(-10px);
 
@@ -328,6 +328,7 @@ body.dark .navbar-scope .theme-toggle-btn .icon {
 
 /* Tablet Layout */
 @media (min-width: 640px) {
+
     .navbar-scope .container {
         padding: 20px;
     }

@@ -396,6 +396,9 @@
     var items = Array.prototype.slice.call(track.querySelectorAll('.product-card'));
     if (!items.length) return;
 
+    if (track.dataset.carouselInitialized === '1') return;
+    track.dataset.carouselInitialized = '1';
+
     // Duplicate cards to allow seamless looping
     var cloneCount = items.length;
     for (var i = 0; i < cloneCount; i++) {
@@ -676,6 +679,10 @@
   // -----------------------------
   // Init
   // -----------------------------
+  if (typeof window !== 'undefined') {
+    window.initLandingProductCarousel = initProductCarousel;
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     // Smooth scroll helper for any [data-scroll] triggers
     function initSmoothScrollers() {
