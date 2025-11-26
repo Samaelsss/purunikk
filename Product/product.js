@@ -1402,7 +1402,7 @@ function goToDetail(id){
     const rvItems = ids
       .map(id => PRODUCTS_DATA.find(p => String(p.id) === String(id)))
       .filter(Boolean)
-      .slice(0, 3);
+      .slice(0, 4);
     renderMiniList(rvEl, rvItems);
   } catch(e){}
 

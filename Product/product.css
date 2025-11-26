@@ -31,7 +31,7 @@
   /* stretch to full width of page content (cancel inner padding) */
   margin-left: -2rem;
   margin-right: -2rem;
-  padding: 1rem 2rem 1.2rem;
+  padding: 1.5rem 2rem 2.2rem;
   background: transparent;
   border: none;
 }
@@ -59,7 +59,7 @@
 
 .shop-banner { display: grid; grid-template-rows: 1fr auto; gap: 1rem; width: 900px; max-width: 100%; }
 .shop-banner__main {
-  min-height: 420px; padding: 1.2rem 1.4rem; position: relative; overflow: hidden;
+  min-height: 520px; padding: 1.6rem 1.8rem; position: relative; overflow: hidden;
   background:
     radial-gradient(120% 80% at 10% 0%, color-mix(in oklab, var(--primary) 58%, var(--card) 42%) 0%, transparent 60%),
     linear-gradient(135deg,
@@ -79,17 +79,17 @@
 .shop-banner__main img { width: 100%; max-height: 260px; border-radius: 16px; object-fit: cover; box-shadow: 0 12px 30px rgba(0,0,0,.20); animation: floatUp 6s ease-in-out infinite alternate; }
 
 .shop-banner__tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; padding: 0.8rem; }
-.shop-banner__tiles .tile { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 18%, var(--card) 82%), color-mix(in oklab, var(--accent) 22%, var(--card) 78%)); border: 1px solid color-mix(in oklab, var(--border) 80%, #000 20%); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; position: relative; overflow: hidden; }
+.shop-banner__tiles .tile { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 14px; background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 18%, var(--card) 82%), color-mix(in oklab, var(--accent) 22%, var(--card) 78%)); border: 1px solid color-mix(in oklab, var(--border) 80%, #000 20%); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; position: relative; overflow: hidden; min-height: 110px; }
 .shop-banner__tiles .tile::after{ content:""; position:absolute; inset:0; pointer-events:none; background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--primary) 18%, transparent), transparent); opacity:0; transition: opacity .2s; }
 .shop-banner__tiles .tile:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(84,51,16,.18); }
 .shop-banner__tiles .tile:hover::after{ opacity:1; }
-.shop-banner__tiles .tile img { width: 56px; height: 56px; object-fit: cover; border-radius: 10px; }
+.shop-banner__tiles .tile img { width: 72px; height: 72px; object-fit: cover; border-radius: 12px; }
 .shop-banner__tiles .tile .t-title { font-weight: 700; color: var(--foreground); }
 .shop-banner__tiles .tile .t-sub { font-size: 12px; color: color-mix(in oklab, var(--foreground) 70%, transparent); }
 
 .shop-side { display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 520px; }
 .shop-side__card {
-  padding: 0.8rem;
+  padding: 1.2rem 1rem 1.4rem;
   background: linear-gradient(145deg,
     color-mix(in oklab, #73512C 65%, var(--card) 35%) 0%,
     color-mix(in oklab, var(--primary) 60%, var(--card) 40%) 45%,
@@ -97,7 +97,7 @@
   );
 }
 .shop-side__title { font-size: 16px; margin: 0 0 8px; color: var(--foreground); }
-.shop-side__list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.shop-side__list { display: grid; grid-template-columns: 1fr; gap: 14px; }
 .shop-side__list .mini { display: grid; grid-template-columns: 56px 1fr; gap: 10px; align-items: center; padding: 8px; border-radius: 10px; background: color-mix(in oklab, var(--card) 96%, #000 4%); border: 1px solid color-mix(in oklab, var(--border) 80%, #000 20%); transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease; position: relative; }
 .shop-side__list .mini::after{ content:""; position:absolute; right:10px; top:50%; translate:0 -50%; width:6px; height:10px; mask: linear-gradient(90deg, #000 0 0) center/6px 10px no-repeat; background: var(--accent); clip-path: polygon(0 0, 100% 50%, 0 100%); opacity:.55; }
 .shop-side__list .mini:hover{ transform: translateY(-2px); box-shadow: 0 10px 20px rgba(84,51,16,.16); border-color: color-mix(in oklab, var(--border) 60%, #fff 40%); }
@@ -522,6 +522,7 @@ body::after {
     align-items: stretch;
     justify-content: center;
     gap: 1rem;
+    top: 0;
     padding: 32px 24px 0;
     margin: 40px 0;
     scroll-margin-top: calc(max(var(--nav-safe-area), 72px) + 16px);
