@@ -137,13 +137,14 @@
 <body class="side-borders">
   <!-- Loading Screen with 3D Animation -->
   <div class="loading-screen" id="loadingScreen">
-    <div class="loading-screen__inner">
-      <div class="loading-screen__halo"></div>
-      <div class="loading-logo-orb">
-        <div class="loading-logo-orb__ring"></div>
-        <div class="loading-logo-orb__core">
-          <span class="loading-logo-orb__initial">P</span>
-        </div>
+    <div class="loading-container">
+      <div class="loading-cube">
+        <div class="cube-face front"></div>
+        <div class="cube-face back"></div>
+        <div class="cube-face left"></div>
+        <div class="cube-face right"></div>
+        <div class="cube-face top"></div>
+        <div class="cube-face bottom"></div>
       </div>
       <div class="loading-text">
         <h2>Puruniks</h2>
@@ -152,9 +153,6 @@
       <div class="loading-bar">
         <div class="loading-progress"></div>
       </div>
-      <section class="grass-section loading-grass-section" aria-hidden="true">
-        <canvas class="grass-canvas loading-grass-canvas"></canvas>
-      </section>
     </div>
   </div>
 
