@@ -119,7 +119,6 @@ body::after {
         max-width: 1100px;
         padding: 0 40px;
         position: relative;
-        z-index: 2;
 }
 
 /* ——————————————————————————————————
@@ -155,6 +154,8 @@ body::after {
 .contact-section {
     text-align: center;
     padding: 60px 0 80px;
+    position: relative;
+    z-index: 2;
 }
 
 .contact-title {
@@ -230,3 +231,102 @@ body.dark .contact-card:hover i {
 .instagram:hover i { color: #e1306c; }
 .facebook:hover i { color: #1877f2; }
 .tiktok:hover i { color: #000; }
+
+/* Hero wave header, shared with other pages */
+@property --tx {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --ty {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+.hero-section {
+  --wave-dy: 0px;
+  overflow: visible;
+}
+
+.hero-wave {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 95vw;
+  height: 120px;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-wave__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.hero-wave .wave {
+  fill: #543310;
+  opacity: .55;
+  mix-blend-mode: plus-lighter;
+  transform-origin: 50% 0%;
+  will-change: transform;
+  animation: waveX var(--dur, 16s) linear infinite, waveY calc(var(--dur, 16s) * 1.5) ease-in-out infinite;
+  transform: translate3d(var(--tx), calc(var(--y, 0px) + var(--wave-dy) + var(--ty)), 0);
+}
+
+.hero-wave .wave--1 {
+  --dur: 14s;
+  --y: 0px;
+  --amp: 4px;
+  opacity: .5;
+  animation-delay: -1s;
+}
+
+.hero-wave .wave--2 {
+  --dur: 16s;
+  --y: 8px;
+  --amp: 6px;
+  opacity: .35;
+  animation-delay: -2s;
+}
+
+.hero-wave .wave--3 {
+  --dur: 20s;
+  --y: 14px;
+  --amp: 8px;
+  opacity: .25;
+  animation-delay: -3s;
+}
+
+@keyframes waveX {
+  from { --tx: 0px; }
+  to   { --tx: -64px; }
+}
+
+@keyframes waveY {
+  0%   { --ty: 0px; }
+  50%  { --ty: var(--amp, 6px); }
+  100% { --ty: 0px; }
+}
+
+body.light .hero-wave .wave {
+  mix-blend-mode: normal;
+  opacity: .45;
+}
+
+body.dark .hero-wave .wave {
+  fill: #F9F4E1;
+}
+
+@media (max-width: 680px) {
+  .hero-wave {
+    height: 90px;
+    left: var(--stripe-total);
+    right: var(--stripe-total);
+    max-width: calc(100vw - (var(--stripe-total) * 2));
+  }
+}

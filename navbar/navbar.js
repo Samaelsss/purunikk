@@ -247,14 +247,24 @@ function navigateToSearchPage(rawQuery) {
         const params = new URLSearchParams();
         params.set('q', query);
 
-        // If user opens the site directly as file://, build a local relative path
+        // If user opens the site directly as file://, always resolve to the
+        // purunikk root folder before appending search.html, no matter which
+        // subfolder (Product, Cart, contacts, etc.) the current page lives in.
         if (protocol === 'file:') {
             const normalized = String(path).replace(/\\/g, '/');
-            const dir = normalized.replace(/\/[^/]*$/, '/');
-            let baseDir = dir;
-            if (/\/Product\/$/i.test(dir)) {
-                baseDir = dir.replace(/\/Product\/$/i, '/');
+            const lower = normalized.toLowerCase();
+            const marker = '/purunikk/';
+            let baseDir;
+
+            const idx = lower.indexOf(marker);
+            if (idx !== -1) {
+                // "/something/.../purunikk/" -> keep up to and including that marker
+                baseDir = normalized.slice(0, idx + marker.length);
+            } else {
+                // Fallback: directory of current file
+                baseDir = normalized.replace(/\/[^/]*$/, '/');
             }
+
             const target = baseDir + 'search.html';
             const url = target + '?' + params.toString();
             window.location.href = url;

@@ -12,6 +12,133 @@
   <link rel="stylesheet" href="navbar/navbar.css">
   <link rel="stylesheet" href="footer/footer.css">
   <style>
+    @property --tx {
+      syntax: '<length>';
+      inherits: false;
+      initial-value: 0px;
+    }
+
+    @property --ty {
+      syntax: '<length>';
+      inherits: false;
+      initial-value: 0px;
+    }
+
+    .hero-section {
+      /* Local override for search page: use a compact wave header,
+         not the full viewport hero from Landing Page/styles.css */
+      --wave-dy: 0px;
+      position: relative;
+      overflow: visible;
+      background: transparent;
+      margin: 0;
+      min-height: 0;
+      scroll-margin-top: 0;
+      display: block;
+      padding: 0;
+    }
+
+    /* Remove Landing Page hero pseudo-elements (big gradient + dots)
+       so they don't overlay the search results page */
+    .hero-section::before,
+    .hero-section::after {
+      content: none;
+    }
+
+    .hero-wave {
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 95vw;
+      height: 120px;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-wave__svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .hero-wave .wave {
+      fill: #543310;
+      opacity: .55;
+      mix-blend-mode: plus-lighter;
+      transform-origin: 50% 0%;
+      will-change: transform;
+      animation: waveX var(--dur, 16s) linear infinite, waveY calc(var(--dur, 16s) * 1.5) ease-in-out infinite;
+      transform: translate3d(var(--tx), calc(var(--y, 0px) + var(--wave-dy) + var(--ty)), 0);
+    }
+
+    .hero-wave .wave--1 {
+      --dur: 14s;
+      --y: 0px;
+      --amp: 4px;
+      opacity: .5;
+      animation-delay: -1s;
+    }
+
+    .hero-wave .wave--2 {
+      --dur: 16s;
+      --y: 8px;
+      --amp: 6px;
+      opacity: .35;
+      animation-delay: -2s;
+    }
+
+    .hero-wave .wave--3 {
+      --dur: 20s;
+      --y: 14px;
+      --amp: 8px;
+      opacity: .25;
+      animation-delay: -3s;
+    }
+
+    @keyframes waveX {
+      from {
+        --tx: 0px;
+      }
+
+      to {
+        --tx: -64px;
+      }
+    }
+
+    @keyframes waveY {
+      0% {
+        --ty: 0px;
+      }
+
+      50% {
+        --ty: var(--amp, 6px);
+      }
+
+      100% {
+        --ty: 0px;
+      }
+    }
+
+    body.light .hero-wave .wave {
+      mix-blend-mode: normal;
+      opacity: .45;
+    }
+
+    body.dark .hero-wave .wave {
+      fill: #F9F4E1;
+    }
+
+    @media (max-width: 680px) {
+      .hero-wave {
+        height: 90px;
+        left: var(--stripe-total);
+        right: var(--stripe-total);
+        max-width: calc(100vw - (var(--stripe-total) * 2));
+      }
+    }
+
     .search-results-header {
       margin-top: 5.5rem;
       padding: 2rem 1.5rem 1rem;
@@ -27,6 +154,13 @@
 
     .search-results-header .section-title {
       margin: 0;
+    }
+
+    body.dark .search-results-header .section-title {
+      background: none;
+      -webkit-background-clip: initial;
+      background-clip: initial;
+      color: #F9F4E1;
     }
 
     .search-results-header .search-summary {
@@ -97,6 +231,16 @@
   <div class="scroll-progress scroll-progress--top">
     <div class="scroll-progress__bar"></div>
   </div>
+
+  <section class="hero-section" id="search-hero">
+    <div class="hero-wave" aria-hidden="true">
+      <svg class="hero-wave__svg" viewBox="0 0 1200 140" preserveAspectRatio="none">
+        <path class="wave wave--1" d="M0,40 C200,80 400,0 600,40 C800,80 1000,0 1200,40 L1200,0 L0,0 Z"></path>
+        <path class="wave wave--2" d="M0,60 C200,100 400,20 600,60 C800,100 1000,20 1200,60 L1200,0 L0,0 Z"></path>
+        <path class="wave wave--3" d="M0,80 C200,120 400,40 600,80 C800,120 1000,40 1200,80 L1200,0 L0,0 Z"></path>
+      </svg>
+    </div>
+  </section>
 
   <main class="product-page">
     <section class="search-results-header" id="searchTop">
@@ -461,6 +605,60 @@
 
   <script src="navbar/navbar.js"></script>
   <script src="footer/footer.js"></script>
+
+  <script>
+    (function () {
+      function initThemeToggle() {
+        var btns = [
+          document.getElementById('themeToggleMobile'),
+          document.getElementById('themeToggleTablet'),
+          document.getElementById('themeToggleDesktop')
+        ].filter(Boolean);
+
+        var saved = localStorage.getItem('pk-theme');
+        if (saved === 'light') {
+          document.body.classList.add('light');
+          document.body.classList.remove('dark');
+        } else if (saved === 'dark') {
+          document.body.classList.add('dark');
+          document.body.classList.remove('light');
+        } else {
+          document.body.classList.add('dark');
+          document.body.classList.remove('light');
+          localStorage.setItem('pk-theme', 'dark');
+        }
+
+        function setTheme(mode) {
+          if (mode === 'light') {
+            document.body.classList.add('light');
+            document.body.classList.remove('dark');
+            localStorage.setItem('pk-theme', 'light');
+          } else {
+            document.body.classList.remove('light');
+            document.body.classList.add('dark');
+            localStorage.setItem('pk-theme', 'dark');
+          }
+        }
+
+        function currentMode() {
+          return document.body.classList.contains('light') ? 'light' : 'dark';
+        }
+
+        btns.forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            setTheme(currentMode() === 'light' ? 'dark' : 'light');
+          });
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initThemeToggle);
+      } else {
+        initThemeToggle();
+      }
+    })();
+  </script>
+
   <script>
     (function () {
       var SEARCH_QUERY = '';
