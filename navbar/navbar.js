@@ -236,15 +236,70 @@ if (profileBtn) {
 }
 
 // Search input handlers
+function navigateToSearchPage(rawQuery) {
+    const query = (rawQuery || '').trim();
+    if (!query) return;
+
+    try {
+        const loc = window.location || {};
+        const path = loc.pathname || '';
+        const protocol = loc.protocol || '';
+        const params = new URLSearchParams();
+        params.set('q', query);
+
+        // If user opens the site directly as file://, build a local relative path
+        if (protocol === 'file:') {
+            const normalized = String(path).replace(/\\/g, '/');
+            const dir = normalized.replace(/\/[^/]*$/, '/');
+            let baseDir = dir;
+            if (/\/Product\/$/i.test(dir)) {
+                baseDir = dir.replace(/\/Product\/$/i, '/');
+            }
+            const target = baseDir + 'search.html';
+            const url = target + '?' + params.toString();
+            window.location.href = url;
+            return;
+        }
+
+        const origin = loc.origin || '';
+        let basePath = origin;
+
+        if (path.includes('/purunikk/')) {
+            basePath += '/purunikk/search.html';
+        } else {
+            basePath += '/search.html';
+        }
+
+        const url = `${basePath}?${params.toString()}`;
+        window.location.href = url;
+    } catch (err) {
+        console.error('Failed to navigate to search page:', err);
+    }
+}
+
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         console.log('Desktop search:', e.target.value);
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            navigateToSearchPage(e.target.value);
+        }
     });
 }
 
 if (mobileSearchInput) {
     mobileSearchInput.addEventListener('input', (e) => {
         console.log('Mobile search:', e.target.value);
+    });
+
+    mobileSearchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            navigateToSearchPage(e.target.value);
+        }
     });
 }
 

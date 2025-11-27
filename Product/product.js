@@ -1282,6 +1282,14 @@ function loadProductsFromApi() {
                 renderProductCards(currentPage);
                 updatePaginationUI();
                 initShopHero();
+
+                if (typeof window !== 'undefined' && typeof window.pkOnProductsLoaded === 'function') {
+                    try {
+                        window.pkOnProductsLoaded(PRODUCTS_DATA.slice());
+                    } catch (e) {
+                        console.error('pkOnProductsLoaded callback error:', e);
+                    }
+                }
             })
             .catch((err) => {
                 console.error('Gagal memuat produk dari API:', err);
