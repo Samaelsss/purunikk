@@ -1582,9 +1582,14 @@ body.light .products-carousel-shadow--right {
 /* Responsive Product Cards (adapted grid class) */
 @media (max-width: 768px) {
   .products__grid {
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1.5rem;
-    padding: 1rem 0;
+    padding: 1rem 1rem 1.5rem;
+    overflow-x: visible;
+    overscroll-behavior-x: auto;
+    cursor: default;
+    touch-action: auto;
   }
 
   .product-card {
@@ -1617,6 +1622,7 @@ body.light .products-carousel-shadow--right {
   .products__grid {
     grid-template-columns: 1fr;
     gap: 1rem;
+    padding: 0.75rem 0.75rem 1.5rem;
   }
 
   .card-image {
@@ -2825,4 +2831,46 @@ body::after {
 .cta-blob .blob-bg {
   display: none !important;
   animation: none !important;
+}
+
+@media (max-width:1280px){
+  .hero{
+    margin-top: 100px;
+    margin-bottom: 100px;
+  }
+}
+@media (max-width:501px){
+  .cta__title-highlight{
+    font-size: 1.8rem;
+  }
+
+  
+  .cta__badge p{
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+@media (max-width:433px){
+  .cta__title-highlight{
+    font-size: 1.5rem;
+  }
+  .cta-section .btn{
+    font-size: 1rem;
+  }
+  .cta__badge p{
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width:364px){
+  .cta__title-highlight{
+    font-size: 1.2rem;
+  }
+  .cta__subtitle{
+    font-size: 0.8rem;
+  }
+  .cta-section .btn{
+    font-size: 0.8rem;
+  }
 }

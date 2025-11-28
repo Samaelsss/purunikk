@@ -127,6 +127,25 @@
         max-width: calc(100vw - (var(--stripe-total) * 2));
       }
     }
+
+    .grass-section {
+      position: relative;
+      display: block;
+      height: clamp(160px, 26vh, 320px);
+      margin-left: calc(var(--stripe-total) * -1);
+      margin-right: calc(var(--stripe-total) * -1);
+      width: calc(100% + 2 * var(--stripe-total));
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .grass-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.2));
+    }
   </style>
 
 </head>
@@ -247,6 +266,10 @@
 
   </main>
 
+  <section class="grass-section">
+    <canvas class="grass-canvas"></canvas>
+  </section>
+
   <!-- FOOTER -->
   <div class="footer-scope">
     <footer class="footer" data-section-id="footer">
@@ -346,7 +369,7 @@
           <a href="#" class="footer__inline-link">Accessibility</a>
           <a href="#" class="footer__inline-link">Status</a>
         </div>
-        <p class="footer__copy">© 2025 Purunik Kerajinan. All rights reserved.</p>
+        <p class="footer__copy"> 2025 Purunik Kerajinan. All rights reserved.</p>
       </div>
     </footer>
   </div>
@@ -560,6 +583,7 @@
 
   <script src="../navbar/navbar.js"></script>
   <script src="../footer/footer.js"></script>
+  <script src="../ui/grass.js"></script>
 
 </body>
 
