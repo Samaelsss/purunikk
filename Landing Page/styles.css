@@ -1582,64 +1582,92 @@ body.light .products-carousel-shadow--right {
 /* Responsive Product Cards (adapted grid class) */
 @media (max-width: 768px) {
   .products__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.5rem;
-    padding: 1rem 1rem 1.5rem;
-    overflow-x: visible;
-    overscroll-behavior-x: auto;
-    cursor: default;
-    touch-action: auto;
+    gap: 0.9rem;
+    padding: 0.5rem 0 0.75rem;
   }
 
   .product-card {
-    border-radius: 12px;
-  }
-
-  .card-image {
-    height: 200px;
-  }
-
-  .card-content-product {
-    padding: 1.25rem;
-  }
-
-  .card-title-product {
-    font-size: 1.125rem;
-  }
-
-  .card-price {
-    font-size: 1.25rem;
-  }
-
-  .card-buttons-product .btn {
-    padding: 0.625rem 0.875rem;
-    font-size: 0.8125rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .products__grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 0.75rem 0.75rem 1.5rem;
+    /* Show ~2 cards at once in the horizontal carousel */
+    flex: 0 0 calc(50% - 0.6rem);
+    max-width: 230px;
+    border-radius: 16px;
   }
 
   .card-image {
     height: 180px;
   }
 
+  .card-content-product {
+    padding: 1rem 1rem 1.1rem;
+  }
+
+  .card-subtitle-product {
+    font-size: 0.65rem;
+  }
+
+  .card-title-product {
+    font-size: 1.05rem;
+  }
+
+  .card-description-product {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .card-price {
+    font-size: 1.15rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .card-buttons-product .btn {
+    padding: 0.55rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
   .card-header {
-    padding: 0.875rem 1.25rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .card-header-text h3 {
+    font-size: 0.7rem;
+  }
+
+  .card-header-text p {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .products__grid {
+    gap: 0.75rem;
+  }
+
+  .product-card {
+    /* Still keep two cards visible, but slightly tighter for very small screens */
+    flex: 0 0 calc(50% - 0.5rem);
+    max-width: none;
+    border-radius: 14px;
+  }
+
+  .card-image {
+    height: 160px;
   }
 
   .card-content-product {
-    padding: 1rem;
+    padding: 0.9rem 0.9rem 1rem;
+  }
+
+  .card-title-product {
+    font-size: 0.98rem;
+  }
+
+  .card-price {
+    font-size: 1.05rem;
   }
 }
 
 @media (max-width: 680px) {
-  .products__grid { grid-template-columns: 1fr; }
   .search-strip { padding: 0.5rem 0.9rem; }
   .hero {
     grid-template-columns: 1fr;
