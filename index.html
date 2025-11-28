@@ -465,7 +465,7 @@
       <div class="cta">
         <div class="cta__badge">
           <span class="cta__badge-dot"></span>
-          E-commerce Kerajinan dari Kalimantan
+          <p>E-commerce Kerajinan dari Kalimantan</p>
         </div>
         <h2 class="cta__title">
           <span class="cta__title-highlight">Belanja Kerajinan Purun</span>
@@ -939,8 +939,14 @@
                 '<p class="card-description-product">' + escapeHtml(shortDesc) + '</p>' +
                 '<p class="card-price">' + escapeHtml(priceText) + '</p>' +
                 '<div class="card-buttons-product">' +
-                  '<button class="btn btn-secondary">Detail</button>' +
-                  '<button class="btn btn-primary">Beli</button>' +
+                  '<button class="btn btn-secondary card-icon-btn card-icon-btn--detail" aria-label="Lihat detail produk">' +
+                    '<span class="card-icon-btn__icon">🔍</span>' +
+                    '<span class="card-icon-btn__label">Detail</span>' +
+                  '</button>' +
+                  '<button class="btn btn-primary card-icon-btn card-icon-btn--buy" aria-label="Tambah ke keranjang">' +
+                    '<span class="card-icon-btn__icon">🛒</span>' +
+                    '<span class="card-icon-btn__label">Beli</span>' +
+                  '</button>' +
                 '</div>' +
               '</div>' +
             '</article>'

@@ -224,5 +224,23 @@ body::after {
 @media(max-width:900px){.cart-layout{grid-template-columns:1fr}.item-right{flex-wrap:wrap;gap:12px;justify-content:flex-end}.item-left{align-items:flex-start}}
 
 /* Add breathing room from footer and navbar containers present on this page */
-.footer-scope{ margin-top: 36px; }
 .navbar-scope + .cart-page{ margin-top: 56px; }
+
+.grass-section {
+  position: relative;
+  display: block;
+  height: clamp(160px, 26vh, 320px);
+  margin-left: calc(var(--stripe-total) * -1);
+  margin-right: calc(var(--stripe-total) * -1);
+  width: calc(100% + 2 * var(--stripe-total));
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.grass-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.2));
+}
