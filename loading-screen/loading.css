@@ -34,8 +34,9 @@ body.dark {
 .loading-screen {
     position: fixed;
     top: 0;
-    left: 0;
-    width: 100vw;
+    left: var(--stripe-total);
+    right: var(--stripe-total);
+    width: auto;
     height: 100vh;
     background: linear-gradient(
       135deg,
@@ -64,6 +65,58 @@ body.dark .loading-screen {
         #150c06 100%
       );
 }
+/* Responsive side border stripes (left and right) */
+:root {
+  /* At 1920px viewport these equal: 106px, 21px, 21px */
+  --stripe-1: calc(100vw * 106 / 1920); /* #543310 */
+  --stripe-2: calc(100vw * 21 / 1920);  /* #73512C */
+  --stripe-3: calc(100vw * 21 / 1920);  /* #D7B290 */
+  --stripe-total: calc(var(--stripe-1) + var(--stripe-2) + var(--stripe-3));
+  /* Extra inner gutter beyond the stripe width, scales on small/large screens */
+  --content-extra: clamp(8px, 1vw, 20px);
+  --nav-safe-area: clamp(64px, 10vh, 96px);
+  --hero-wave-height: 120px;
+  --hero-wave-gap: 12px;
+}
+
+/* Show stripes only when body has loading-with-stripes */
+body.loading-with-stripes::before,
+body.loading-with-stripes::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--stripe-total) + 1px); /* slight overlap to avoid hairline gaps */
+  pointer-events: none; /* visual only */
+  z-index: 1; /* above body background, below overlays */
+}
+
+body.loading-with-stripes::before {
+  left: 0;
+  background: linear-gradient(
+    to right,
+    #543310 0,
+    #543310 var(--stripe-1),
+    #73512C var(--stripe-1),
+    #73512C calc(var(--stripe-1) + var(--stripe-2)),
+    #D7B290 calc(var(--stripe-1) + var(--stripe-2)),
+    #D7B290 var(--stripe-total)
+  );
+}
+
+body.loading-with-stripes::after {
+  right: 0;
+  background: linear-gradient(
+    to left,
+    #543310 0,
+    #543310 var(--stripe-1),
+    #73512C var(--stripe-1),
+    #73512C calc(var(--stripe-1) + var(--stripe-2)),
+    #D7B290 calc(var(--stripe-1) + var(--stripe-2)),
+    #D7B290 var(--stripe-total)
+  );
+}
+
 
 .loading-screen.hidden {
     opacity: 0;
