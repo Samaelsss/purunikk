@@ -1582,88 +1582,143 @@ body.light .products-carousel-shadow--right {
 /* Responsive Product Cards (adapted grid class) */
 @media (max-width: 768px) {
   .products__grid {
-    gap: 0.9rem;
-    padding: 0.5rem 0 0.75rem;
+    gap: 0.75rem;
+    padding: 0.4rem 0 0.6rem;
   }
 
   .product-card {
     /* Show ~2 cards at once in the horizontal carousel */
-    flex: 0 0 calc(50% - 0.6rem);
-    max-width: 230px;
-    border-radius: 16px;
+    flex: 0 0 calc(50% - 0.5rem);
+    max-width: 220px;
+    border-radius: 14px;
   }
 
   .card-image {
-    height: 180px;
+    height: 150px;
+    margin: 0.6rem 0.7rem 0;
   }
 
   .card-content-product {
-    padding: 1rem 1rem 1.1rem;
+    margin-top: 0.6rem;
+    padding: 0.85rem 0.9rem 0.9rem;
   }
 
   .card-subtitle-product {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
+    margin-bottom: 0.25rem;
   }
 
   .card-title-product {
-    font-size: 1.05rem;
+    font-size: 0.98rem;
+    margin-bottom: 0.3rem;
   }
 
   .card-description-product {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     -webkit-line-clamp: 2;
     line-clamp: 2;
+    line-height: 1.4;
+    margin-bottom: 0.6rem;
   }
 
   .card-price {
-    font-size: 1.15rem;
-    margin-bottom: 0.9rem;
+    font-size: 1.05rem;
+    margin-bottom: 0.6rem;
   }
 
   .card-buttons-product .btn {
-    padding: 0.55rem 0.75rem;
-    font-size: 0.75rem;
-  }
-
-  .card-header {
-    padding: 0.4rem 0.8rem;
-  }
-
-  .card-header-text h3 {
+    padding: 0.45rem 0.65rem;
     font-size: 0.7rem;
   }
 
+  .card-header {
+    top: 0.65rem;
+    left: 0.65rem;
+    padding: 0.25rem 0.6rem;
+  }
+
+  .card-header-icon {
+    font-size: 1rem;
+    margin-right: 0.45rem;
+  }
+
+  .card-header-text h3 {
+    font-size: 0.62rem;
+  }
+
   .card-header-text p {
-    font-size: 0.65rem;
+    font-size: 0.56rem;
   }
 }
 
 @media (max-width: 480px) {
   .products__grid {
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   .product-card {
     /* Still keep two cards visible, but slightly tighter for very small screens */
-    flex: 0 0 calc(50% - 0.5rem);
+    flex: 0 0 calc(50% - 0.45rem);
     max-width: none;
-    border-radius: 14px;
+    border-radius: 12px;
   }
 
   .card-image {
-    height: 160px;
+    height: 125px;
   }
 
   .card-content-product {
-    padding: 0.9rem 0.9rem 1rem;
+    padding: 0.65rem 0.65rem 0.7rem;
+  }
+
+  .card-subtitle-product {
+    font-size: 0.55rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 0.15rem;
   }
 
   .card-title-product {
-    font-size: 0.98rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
   }
 
   .card-price {
-    font-size: 1.05rem;
+    font-size: 0.94rem;
+    margin-bottom: 0.4rem;
+  }
+
+  /* Simplify card content on very small screens */
+  .card-description-product {
+    display: none;
+  }
+
+  .card-header {
+    top: 0.6rem;
+    left: 0.55rem;
+    padding: 0.2rem 0.55rem;
+  }
+
+  .card-header-icon {
+    font-size: 0.9rem;
+    margin-right: 0.4rem;
+  }
+
+  .card-header-text h3 {
+    font-size: 0.58rem;
+  }
+
+  .card-header-text p {
+    font-size: 0.52rem;
+  }
+
+  .card-buttons-product .btn-secondary {
+    display: none;
+  }
+
+  .card-buttons-product .btn-primary {
+    padding: 0.45rem 0.6rem;
+    font-size: 0.7rem;
   }
 }
 
