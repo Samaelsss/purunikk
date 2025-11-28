@@ -25,8 +25,8 @@
 
         setTimeout(() => {
           loadingScreen.style.display = 'none';
-        }, 800);
-      }, 500);
+        }, 50);
+      }, 100);
     }
-  }, 200);
+  }, 100);
 })();
