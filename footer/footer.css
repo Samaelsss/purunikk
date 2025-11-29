@@ -201,6 +201,8 @@ body.light .footer-scope .footer {
   .footer-scope .footer__logo {
     width: 56px;
     height: 56px;
+    flex: 0 0 56px;
+    min-width: 56px;
   }
 
   .footer-scope .footer__title {
