@@ -135,7 +135,7 @@ body::after {
   padding:0 24px 32px;
 
   /* Add breathing room from footer and navbar containers present on this page */
-  margin-top: 10rem;
+  margin-top: 5rem;
 }
 .cart-title{text-align:center;font-size:42px;margin:16px 0 28px;color:#23190f}
 
