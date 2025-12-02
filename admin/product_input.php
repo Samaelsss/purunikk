@@ -223,9 +223,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
             background: var(--bg-gradient);
             color: var(--text-main);
             display: flex;
-            align-items: stretch;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             padding: 32px 16px;
+        }
+
+        .admin-topbar {
+            width: 100%;
+            max-width: 1120px;
+            margin: 0 0 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .admin-topbar-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .admin-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .admin-nav-item {
+            border-radius: 0.65rem;
+            padding: 0.45rem 0.9rem;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #F9F4E1;
+            cursor: pointer;
+            border: 1px solid transparent;
+            background: rgba(84, 51, 16, 0.9);
+            text-decoration: none;
+            transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+        }
+
+        .admin-nav-item.active {
+            background: radial-gradient(circle at 0 0, rgba(249, 244, 225, 0.25), rgba(176, 143, 112, 0.9));
+            border-color: rgba(249, 244, 225, 0.9);
+            color: #543310;
+        }
+
+        .admin-nav-item:hover {
+            background: rgba(249, 244, 225, 0.16);
+            border-color: rgba(176, 143, 112, 0.9);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 600px) {
+            .admin-topbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
 
         .shell {
@@ -844,6 +902,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
     </style>
 </head>
 <body>
+    <div class="admin-topbar">
+        <div class="admin-topbar-title">Admin Panel</div>
+        <nav class="admin-nav">
+            <a href="dashboard_admin.php" class="admin-nav-item">Dashboard</a>
+            <a href="product_input.php" class="admin-nav-item active">Produk</a>
+        </nav>
+    </div>
 <form method="post" enctype="multipart/form-data" id="product-form" novalidate>
 <div class="shell">
     <div class="card">

@@ -100,6 +100,7 @@ if (isset($_GET['logout'])) {
             cursor: pointer;
             border: 1px solid transparent;
             transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease, transform 0.08s ease;
+            text-decoration: none;
         }
         .admin-nav-item.active {
             background: radial-gradient(circle at 0 0, rgba(249, 244, 225, 0.25), rgba(176, 143, 112, 0.9));
@@ -356,19 +357,13 @@ if (isset($_GET['logout'])) {
             <div>
                 <div class="admin-nav-section-label">Menu</div>
                 <nav class="admin-nav">
-                    <div class="admin-nav-item active">
+                    <a href="dashboard_admin.php" class="admin-nav-item active">
                         <span>Dashboard</span>
                         <span class="admin-nav-item-dot"></span>
-                    </div>
-                    <div class="admin-nav-item">
+                    </a>
+                    <a href="product_input.php" class="admin-nav-item">
                         <span>Produk</span>
-                    </div>
-                    <div class="admin-nav-item">
-                        <span>Pesanan</span>
-                    </div>
-                    <div class="admin-nav-item">
-                        <span>Pengguna</span>
-                    </div>
+                    </a>
                 </nav>
             </div>
 
@@ -393,76 +388,131 @@ if (isset($_GET['logout'])) {
             </header>
 
             <section class="admin-main-grid">
-                <article class="admin-card">
+                <article class="admin-card" id="visits-card">
                     <div class="admin-card-header">
                         <div>
-                            <div class="admin-card-title">Statistik Hari Ini</div>
-                            <div class="admin-card-subtitle">Performa singkat penjualan dan kunjungan.</div>
+                            <div class="admin-card-title">Statistik Pengunjung</div>
+                            <div class="admin-card-subtitle">Kunjungan ke Landing Page (index.html).</div>
                         </div>
                         <span class="admin-badge">Live</span>
                     </div>
                     <div class="admin-metrics-grid">
                         <div class="admin-metric-pill">
-                            <div class="admin-metric-label">Penjualan</div>
-                            <div class="admin-metric-value">128</div>
-                            <div class="admin-metric-chip chip-green">+18% dibanding kemarin</div>
+                            <div class="admin-metric-label">Pengunjung Hari Ini</div>
+                            <div class="admin-metric-value" id="visitors-today">-</div>
+                            <div class="admin-metric-chip chip-green">Dihitung dari log kunjungan</div>
                         </div>
                         <div class="admin-metric-pill">
-                            <div class="admin-metric-label">Pendapatan</div>
-                            <div class="admin-metric-value">Rp 7,2jt</div>
-                            <div class="admin-metric-chip chip-blue">Stabil</div>
+                            <div class="admin-metric-label">Pengunjung 7 Hari Terakhir</div>
+                            <div class="admin-metric-value" id="visitors-week">-</div>
+                            <div class="admin-metric-chip chip-blue">Termasuk hari ini</div>
                         </div>
                         <div class="admin-metric-pill">
-                            <div class="admin-metric-label">Pengunjung</div>
-                            <div class="admin-metric-value">2.430</div>
-                            <div class="admin-metric-chip chip-amber">+6% traffic</div>
+                            <div class="admin-metric-label">Total Pengunjung</div>
+                            <div class="admin-metric-value" id="visitors-total">-</div>
+                            <div class="admin-metric-chip chip-amber">Sejak pencatatan dimulai</div>
                         </div>
                     </div>
                 </article>
 
-                <article class="admin-card">
+                <article class="admin-card" id="latest-products-card">
                     <div class="admin-card-header">
                         <div>
-                            <div class="admin-card-title">Aktivitas Terbaru</div>
-                            <div class="admin-card-subtitle">Pantau aktivitas penting secara cepat.</div>
+                            <div class="admin-card-title">Produk Terbaru</div>
+                            <div class="admin-card-subtitle">4 produk terakhir yang ditambahkan.</div>
                         </div>
                     </div>
-                    <div class="admin-list">
+                    <div class="admin-list" id="latest-products-list">
                         <div class="admin-list-item">
-                            <span class="admin-list-label">3 pesanan baru menunggu konfirmasi</span>
-                            <span class="admin-list-meta">1 menit lalu</span>
+                            <span class="admin-list-label">Memuat produk terbaru...</span>
+                            <span class="admin-list-meta"></span>
                         </div>
-                        <div class="admin-list-item">
-                            <span class="admin-list-label">Stok "Produk Favorit" hampir habis</span>
-                            <span class="admin-list-meta">12 menit lalu</span>
-                        </div>
-                        <div class="admin-list-item">
-                            <span class="admin-list-label">2 pembayaran berhasil diverifikasi</span>
-                            <span class="admin-list-meta">30 menit lalu</span>
-                        </div>
-                    </div>
-
-                    <div class="admin-quick-actions">
-                        <button class="admin-action-btn" type="button">
-                            <span>Tambah Produk</span>
-                            <span>Buka form produk baru</span>
-                        </button>
-                        <button class="admin-action-btn" type="button">
-                            <span>Lihat Pesanan</span>
-                            <span>Kelola pesanan terbaru</span>
-                        </button>
-                        <button class="admin-action-btn" type="button">
-                            <span>Kelola Stok</span>
-                            <span>Perbarui ketersediaan</span>
-                        </button>
-                        <button class="admin-action-btn" type="button">
-                            <span>Pengaturan</span>
-                            <span>Atur preferensi toko</span>
-                        </button>
                     </div>
                 </article>
             </section>
         </main>
     </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Load visit statistics for landing page
+    (function loadVisits(){
+        var todayEl = document.getElementById('visitors-today');
+        var weekEl = document.getElementById('visitors-week');
+        var totalEl = document.getElementById('visitors-total');
+        if (!todayEl || !weekEl || !totalEl) return;
+
+        fetch('visits_api.php?page=landing')
+            .then(function(res){ return res.json(); })
+            .then(function(data){
+                if (!data) return;
+                todayEl.textContent = (typeof data.today !== 'undefined') ? data.today : '0';
+                weekEl.textContent = (typeof data.last7days !== 'undefined') ? data.last7days : '0';
+                totalEl.textContent = (typeof data.total !== 'undefined') ? data.total : '0';
+            })
+            .catch(function(err){ console.error('Gagal memuat statistik pengunjung:', err); });
+    })();
+
+    // Load latest 4 products from products_api.php
+    (function loadLatestProducts(){
+        var list = document.getElementById('latest-products-list');
+        if (!list) return;
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatPrice(price) {
+            var num = Number(price) || 0;
+            try {
+                return 'Rp' + num.toLocaleString('id-ID');
+            } catch (e) {
+                return 'Rp' + num.toString();
+            }
+        }
+
+        fetch('products_api.php')
+            .then(function(res){ return res.json(); })
+            .then(function(products){
+                if (!Array.isArray(products) || products.length === 0) {
+                    list.innerHTML = '<div class="admin-list-item"><span class="admin-list-label">Belum ada produk di database.</span><span class="admin-list-meta"></span></div>';
+                    return;
+                }
+
+                var latest = products.slice(0, 4);
+                list.innerHTML = '';
+
+                latest.forEach(function(p){
+                    var name = p.name || 'Produk';
+                    var category = p.category || '';
+                    var priceText = formatPrice(p.price);
+                    var item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'admin-list-item admin-product-link';
+                    item.setAttribute('data-product-id', String(p.id));
+                    item.innerHTML = '<span class="admin-list-label">' + escapeHtml(name) + '</span>' +
+                                     '<span class="admin-list-meta">' + escapeHtml(category) + ' &middot; ' + escapeHtml(priceText) + '</span>';
+                    list.appendChild(item);
+                });
+
+                list.addEventListener('click', function(e){
+                    var target = e.target.closest('.admin-product-link');
+                    if (!target) return;
+                    var id = target.getAttribute('data-product-id');
+                    if (!id) return;
+                    window.location.href = '../Produk_detail.html?id=' + encodeURIComponent(id);
+                });
+            })
+            .catch(function(err){
+                console.error('Gagal memuat produk terbaru untuk dashboard:', err);
+                list.innerHTML = '<div class="admin-list-item"><span class="admin-list-label">Gagal memuat produk terbaru.</span><span class="admin-list-meta"></span></div>';
+            });
+    })();
+});
+</script>
 </body>
 </html>

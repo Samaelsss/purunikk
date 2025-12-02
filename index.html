@@ -950,6 +950,22 @@
   });
   </script>
   <script>
+  // Simple visit logger for landing page
+  (function(){
+    try {
+      fetch('http://localhost/purunikk/admin/visits_api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page: 'landing' })
+      }).catch(function(err){
+        console.error('Gagal mencatat kunjungan landing page:', err);
+      });
+    } catch (e) {
+      console.error('Visit logger error:', e);
+    }
+  })();
+  </script>
+  <script>
   (function(){
     function initHeroWave(){
       var section = document.querySelector('.hero-section');
