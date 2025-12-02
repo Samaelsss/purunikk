@@ -167,6 +167,10 @@ body::after {
   align-items:center;
   justify-content:center;
   gap:10px;
+<<<<<<< Updated upstream
+=======
+  min-width:190px;
+>>>>>>> Stashed changes
 }
 .qty-label{font-weight:700;color:#3a2716}
 
@@ -229,6 +233,11 @@ body::after {
 
 .empty-cart{background:#fff;border:2px dashed #d3b890;border-radius:12px;padding:28px;text-align:center;color:#6b4b30}
 
+<<<<<<< Updated upstream
+=======
+@media(max-width:1439px){.cart-layout{grid-template-columns:1fr}.item-right{flex-wrap:wrap;gap:12px;justify-content:flex-end}.item-left{align-items:flex-start}}
+
+>>>>>>> Stashed changes
 .navbar-scope + .cart-page{ margin-top: 56px; }
 
 .grass-section {
@@ -251,16 +260,20 @@ body::after {
 }
 }
 
+<<<<<<< Updated upstream
 @media(max-width:1439px){
   .cart-layout{grid-template-columns:1fr}
   .item-right{flex-wrap:nowrap; gap:12px; justify-content:space-between}
   .item-left{align-items:flex-start}
 }
 
+=======
+>>>>>>> Stashed changes
 @media (min-width: 1281px) and (max-width: 1439px) {
 }
 
 @media (min-width: 1025px) and (max-width: 1280px) { 
+<<<<<<< Updated upstream
    .cart-layout{grid-template-columns:1fr}
   .item-right{
     flex-wrap: nowrap; 
@@ -427,12 +440,18 @@ body::after {
     width: 400px;
   }
 
+=======
+ 
+>>>>>>> Stashed changes
 }
 
 @media(max-width:480px) {
   .cart-summary {
     padding: 12px;
+<<<<<<< Updated upstream
     width: 300px;
+=======
+>>>>>>> Stashed changes
   }
   
   .summary-row {
@@ -460,6 +479,7 @@ body::after {
 
   .cart-item{
     padding: 12px;
+<<<<<<< Updated upstream
     width: 300px;
     left: -10px;
   }
@@ -471,6 +491,15 @@ body::after {
   }
   .cart-item .select-item:checked::after{
     font-size: 12px;
+=======
+    width: 280px;
+  }
+  .cart-item .select-item{
+    width: 25px;
+    height: 25px;
+    border-radius: 3px;
+    left: -35px;
+>>>>>>> Stashed changes
   }
   .cart-list::before{
     display: none;
@@ -490,16 +519,24 @@ body::after {
 
   .item-right{
     flex-wrap: wrap;
+<<<<<<< Updated upstream
     gap: 1px;
+=======
+    gap: 2px;
+>>>>>>> Stashed changes
     align-items: center;
     justify-content: center;
   }
   .item-total{
+<<<<<<< Updated upstream
     font-size: 12px;
     margin-bottom: 10px;
   }
   .item-total-value{
     font-size: 12px;
+=======
+    display: none;
+>>>>>>> Stashed changes
   }
 
   .qty-group{
@@ -511,18 +548,29 @@ body::after {
   }
 
   .qty-value{
+<<<<<<< Updated upstream
     width: 25px;
     height: 20px;
+=======
+    width: 30px;
+    height: 26px;
+>>>>>>> Stashed changes
     border-radius: 5px;
     font-size: 12px;
   }
   .btn-square{
+<<<<<<< Updated upstream
     width: 20px;
     height: 20px;
+=======
+    width: 26px;
+    height: 26px;
+>>>>>>> Stashed changes
     border-radius: 5px;
     font-size: 12px;
   }
   .btn-chip{
+<<<<<<< Updated upstream
     font-size: 10px;
     border: none;
     background: none;
@@ -530,11 +578,15 @@ body::after {
     cursor: pointer;
     padding: 2px;
     bottom: 0;
+=======
+    font-size: 12px;
+>>>>>>> Stashed changes
   }
   .item-actions{
     left: 30px;
   }
 }
+<<<<<<< Updated upstream
 @media(max-width:375px){
   .cart-summary{
     width: 300px;
@@ -543,3 +595,13 @@ body::after {
 
 
 
+=======
+
+@media (min-width: 481px) and (max-width: 600px) {
+}
+@media (min-width: 601px) and (max-width: 767px) { }
+
+@media (min-width: 767px) and (max-width: 900px) {
+}
+@media (min-width: 768px) and (max-width: 1024px) { }
+>>>>>>> Stashed changes
