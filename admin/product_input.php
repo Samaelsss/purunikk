@@ -42,10 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
     $variantColors = $_POST['variant_color'] ?? [];
     $variantImages = $_FILES['variant_image'] ?? null;
 
+    $modelNames  = $_POST['model_name'] ?? [];
+    $modelImages = $_FILES['model_image'] ?? null;
+
     $logData = [
         'variant_color'        => $variantColors,
         'variant_image_names'  => $variantImages['name'] ?? null,
         'variant_image_errors' => $variantImages['error'] ?? null,
+        'model_name'           => $modelNames,
+        'model_image_names'    => $modelImages['name'] ?? null,
+        'model_image_errors'   => $modelImages['error'] ?? null,
     ];
     error_log(
         'product_input debug: ' . json_encode($logData) . PHP_EOL,
@@ -223,6 +229,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 );
             }
 
+            // Insert models (optional)
+            if ($modelImages && isset($modelImages['name']) && is_array($modelImages['name'])) {
+                $modelFileNames  = $modelImages['name'];
+                $modelTmpNames   = $modelImages['tmp_name'] ?? [];
+                $modelFileErrors = $modelImages['error'] ?? [];
+
+                $stmtModel = $conn->prepare('INSERT INTO product_models (product_id, model_name, image_path) VALUES (?, ?, ?)');
+
+                foreach ($modelFileNames as $idx => $originalName) {
+                    $modelName = trim($modelNames[$idx] ?? '');
+                    if ($originalName === '' || $modelName === '') {
+                        continue;
+                    }
+
+                    if (!isset($modelTmpNames[$idx], $modelFileErrors[$idx])) {
+                        continue;
+                    }
+
+                    if ($modelFileErrors[$idx] !== UPLOAD_ERR_OK) {
+                        throw new RuntimeException('Error uploading file for model ' . htmlspecialchars($modelName));
+                    }
+
+                    $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+                    if (!in_array($ext, $allowedExtensions, true)) {
+                        throw new RuntimeException('Invalid image type for model ' . htmlspecialchars($modelName) . '. Allowed: jpg, jpeg, png, webp.');
+                    }
+
+                    $safeBase  = preg_replace('/[^a-zA-Z0-9-_]/', '_', pathinfo($originalName, PATHINFO_FILENAME));
+                    $uniqueKey = bin2hex(random_bytes(4));
+                    $newName   = $safeBase . '_model_' . $uniqueKey . '.' . $ext;
+                    $target    = $uploadDir . $newName;
+
+                    if (!move_uploaded_file($modelTmpNames[$idx], $target)) {
+                        throw new RuntimeException('Failed to move uploaded file for model ' . htmlspecialchars($modelName));
+                    }
+
+                    $relativePath = 'uploads/products/' . $newName;
+                    $stmtModel->bind_param('iss', $productId, $modelName, $relativePath);
+                    $stmtModel->execute();
+                }
+
+                $stmtModel->close();
+            }
+
             $conn->commit();
 
             $successMessage = 'Produk berhasil disimpan.';
@@ -377,6 +427,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
             border: 1px solid rgba(255, 255, 255, 0.7);
             position: relative;
             overflow: hidden;
+        }
+
+        .card-model-panel {
+            top: -200px;
+            /* Let CSS grid auto-place this after .card in the first column,
+               so it sits below the main card but beside the side-panel */
+            grid-column: 1 / 2;
+        }
+
+        @media (max-width:1060px){
+             .card-model-panel {
+            top: -150px;
+             }
+        }
+
+        
+        @media (max-width:960px){
+             .card-model-panel {
+            top: 0px;
+             }
         }
 
         .card::before {
@@ -1121,6 +1191,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
             </div>
         </div>
     </div>
+
+    <div class="card card-model-panel">
+        <div class="card-inner">
+            <div class="variant-header">
+                <div>
+                    <div class="variant-title">Model Produk</div>
+                    <div class="variant-subtitle">Beri nama model, lalu unggah foto tampilan model tersebut.</div>
+                </div>
+            </div>
+
+            <div id="model-list" class="variant-list"></div>
+
+            <div class="variant-actions">
+                <span class="chip">Contoh: Kecil, Sedang, Besar atau Model A, Model B.</span>
+                <button type="button" class="button-add" id="add-model">
+                    <span class="icon">＋</span>
+                    <span>Tambah model lain</span>
+                </button>
+            </div>
+
+            <div class="variant-footer-text">
+                Gambar model disimpan bersama gambar produk di <code>uploads/products/</code>.
+            </div>
+        </div>
+    </div>
 </div>
 </form>
 
@@ -1147,6 +1242,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
 <script>
     const variantList = document.getElementById('variant-list');
     const addVariantBtn = document.getElementById('add-variant');
+    const modelList = document.getElementById('model-list');
+    const addModelBtn = document.getElementById('add-model');
 
     function createVariantRow() {
         const row = document.createElement('div');
@@ -1200,7 +1297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
             if (variantList.children.length > 1) {
                 row.remove();
             }
-            updateRemoveButtonsState();
+            updateVariantRemoveButtonsState();
         });
 
         return row;
@@ -1209,12 +1306,93 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
     function addVariantRow() {
         const row = createVariantRow();
         variantList.appendChild(row);
-        updateRemoveButtonsState();
+        updateVariantRemoveButtonsState();
     }
 
-    function updateRemoveButtonsState() {
+    function updateVariantRemoveButtonsState() {
         const rows = variantList.querySelectorAll('.variant-row');
         rows.forEach((row, idx) => {
+            const btn = row.querySelector('.variant-remove .icon-button');
+            if (rows.length === 1) {
+                btn.setAttribute('disabled', 'disabled');
+            } else {
+                btn.removeAttribute('disabled');
+            }
+        });
+    }
+
+    function createModelRow() {
+        if (!modelList) return null;
+        const row = document.createElement('div');
+        row.className = 'variant-row';
+
+        row.innerHTML = `
+            <div class="variant-color-input">
+                <label>Nama model</label>
+                <div class="variant-color-input-row">
+                    <span class="color-chip"></span>
+                    <input type="text" name="model_name[]" form="product-form" placeholder="Mis. Kecil / Model A" autocomplete="off">
+                </div>
+            </div>
+            <div class="variant-upload">
+                <div>Gambar model</div>
+                <div class="upload-shell">
+                    <label class="upload-dropzone">
+                        <div class="upload-icon">⇪</div>
+                        <div>
+                            <div class="upload-text-main">Seret atau pilih gambar</div>
+                            <div class="upload-text-sub">JPG / PNG / WEBP · maks ~4 MB</div>
+                        </div>
+                        <input type="file" name="model_image[]" form="product-form" accept="image/*" style="display: none;">
+                    </label>
+                    <div class="upload-preview" data-preview></div>
+                </div>
+            </div>
+            <div class="variant-remove">
+                <button type="button" class="icon-button" aria-label="Hapus model">×</button>
+            </div>
+        `;
+
+        const fileInput = row.querySelector('input[type="file"]');
+        const preview   = row.querySelector('[data-preview]');
+        const removeBtn = row.querySelector('.variant-remove .icon-button');
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) {
+                preview.style.backgroundImage = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.style.backgroundImage = `url('${e.target.result}')`;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        removeBtn.addEventListener('click', () => {
+            if (modelList.children.length > 1) {
+                row.remove();
+            }
+            updateModelRemoveButtonsState();
+        });
+
+        return row;
+    }
+
+    function addModelRow() {
+        if (!modelList) return;
+        const row = createModelRow();
+        if (row) {
+            modelList.appendChild(row);
+            updateModelRemoveButtonsState();
+        }
+    }
+
+    function updateModelRemoveButtonsState() {
+        if (!modelList) return;
+        const rows = modelList.querySelectorAll('.variant-row');
+        rows.forEach((row) => {
             const btn = row.querySelector('.variant-remove .icon-button');
             if (rows.length === 1) {
                 btn.setAttribute('disabled', 'disabled');
@@ -1228,8 +1406,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         addVariantRow();
     });
 
+    if (addModelBtn && modelList) {
+        addModelBtn.addEventListener('click', () => {
+            addModelRow();
+        });
+    }
+
     // Initialize with one row
     addVariantRow();
+    if (modelList) {
+        addModelRow();
+    }
 
     function dismissToast() {
         const t = document.getElementById('toast');

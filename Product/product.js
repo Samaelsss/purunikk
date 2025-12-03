@@ -1033,6 +1033,26 @@ function formatRupiah(num) {
     }
 }
 
+function parsePriceToNumber(price) {
+    if (typeof price === 'number') return price;
+    const digits = String(price).replace(/[^0-9]/g, '');
+    return Number(digits || 0);
+}
+
+function getCart() {
+    try {
+        return JSON.parse(localStorage.getItem('cart') || '[]');
+    } catch (e) {
+        return [];
+    }
+}
+
+function setCart(arr) {
+    try {
+        localStorage.setItem('cart', JSON.stringify(arr));
+    } catch (e) {}
+}
+
 function getCategoryIcon(category) {
     const c = String(category || '').toLowerCase();
     if (c.includes('tas')) return '👜';
@@ -1147,11 +1167,35 @@ function renderProductCards(page) {
     document.querySelectorAll('.btn-primary').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const productId = e.target.closest('.product-card').dataset.id;
+            const card = e.target.closest('.product-card');
+            if (!card) return;
+            const productId = card.dataset.id;
             const product = PRODUCTS_DATA.find(p => String(p.id) === String(productId));
             if (product) {
-                // Simulate buy action
-                alert(`Produk ${product.name} ditambahkan ke keranjang!`);
+                let cart = getCart();
+                const priceNum = parsePriceToNumber(product.price);
+                const key = String(product.id);
+                const existing = cart.find(it => String(it.key || it.id) === key);
+                if (existing) {
+                    existing.qty = (existing.qty || 1) + 1;
+                } else {
+                    cart.push({
+                        key,
+                        id: product.id,
+                        name: product.name,
+                        model: product.model || '-',
+                        motif: product.motif || '-',
+                        price: priceNum,
+                        qty: 1,
+                        thumb: product.img || product.image || product.image_path || product.thumb || ''
+                    });
+                }
+                setCart(cart);
+                if (typeof showToast === 'function') {
+                    showToast(`Produk ${product.name} ditambahkan ke keranjang.`, 'success');
+                } else {
+                    alert(`Produk ${product.name} ditambahkan ke keranjang!`);
+                }
             }
         });
     });

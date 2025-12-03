@@ -169,6 +169,22 @@ if (document.readyState === 'loading') {
     console.error('Gagal memuat gambar warna produk:', e);
   }
 
+  // Ambil semua model untuk produk ini dari database
+  let modelsFromDb = [];
+  try {
+    if (prod.id) {
+      const resModels = await fetch('http://localhost/purunikk/admin/product_models_api.php?product_id=' + encodeURIComponent(prod.id));
+      if (resModels.ok) {
+        const dataModels = await resModels.json();
+        if (Array.isArray(dataModels)) {
+          modelsFromDb = dataModels;
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Gagal memuat model produk:', e);
+  }
+
   const imgEl = document.getElementById('product-img') || document.getElementById('main-img');
   const nameEl = document.getElementById('product-name');
   const priceEl = document.getElementById('product-price');
@@ -275,8 +291,27 @@ if (document.readyState === 'loading') {
 
   // Render models dari data
   const modelsWrap = document.querySelector('.model_produk_fun');
-  if (modelsWrap && Array.isArray(colorImages) && colorImages.length) {
-    // simpan judul jika ada
+  if (modelsWrap && Array.isArray(modelsFromDb) && modelsFromDb.length) {
+    const title = modelsWrap.querySelector('h4')?.textContent || 'Pilih model';
+    modelsWrap.innerHTML = '';
+    const titleEl = document.createElement('h4');
+    titleEl.textContent = title;
+    modelsWrap.appendChild(titleEl);
+    modelsFromDb.forEach((row, idx) => {
+      const div = document.createElement('div');
+      div.className = 'Model_1';
+      if (idx === 0) div.classList.add('active');
+      const img = document.createElement('img');
+      img.src = resolveProductImagePath(row.image_path || '');
+      img.alt = row.model_name || '';
+      const h4 = document.createElement('h4');
+      h4.textContent = row.model_name || '';
+      div.appendChild(img);
+      div.appendChild(h4);
+      modelsWrap.appendChild(div);
+    });
+  } else if (modelsWrap && Array.isArray(colorImages) && colorImages.length) {
+    // fallback: gunakan gambar warna sebagai model jika belum ada tabel model
     const title = modelsWrap.querySelector('h4')?.textContent || 'Pilih model';
     modelsWrap.innerHTML = '';
     const titleEl = document.createElement('h4');
@@ -317,8 +352,16 @@ if (document.readyState === 'loading') {
   function getSelectedVariant() {
     const motifActive = document.querySelector('.model_produk > div.active h4');
     const modelActive = document.querySelector('.model_produk_fun > .Model_1.active h4');
-    const motif = motifActive ? motifActive.textContent.trim() : (prod.motifs?.[0]?.name || '');
-    const model = modelActive ? modelActive.textContent.trim() : (prod.models?.[0] || '');
+    let motif = motifActive ? motifActive.textContent.trim() : (prod.motifs?.[0]?.name || '');
+    let model = modelActive ? modelActive.textContent.trim() : '';
+
+    if (!model) {
+      if (Array.isArray(prod.models) && prod.models.length) {
+        model = prod.models[0];
+      } else if (Array.isArray(modelsFromDb) && modelsFromDb.length) {
+        model = modelsFromDb[0].model_name || '';
+      }
+    }
     let price = parsePriceToNumber(prod.price);
     if (prod.pricing && prod.pricing[model] && prod.pricing[model][motif] != null) {
       price = parsePriceToNumber(prod.pricing[model][motif]);

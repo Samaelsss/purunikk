@@ -302,8 +302,6 @@ body.light .section-connector::before {
   background: #543310;
   overflow: hidden;
   /* Keep the hero fully visible without nav overlap */
-  margin-top: max(var(--nav-safe-area), env(safe-area-inset-top));
-  min-height: calc(106svh - max(var(--nav-safe-area), env(safe-area-inset-top)));
   scroll-margin-top: max(var(--nav-safe-area), env(safe-area-inset-top));
   display: flex;
   align-items: center;

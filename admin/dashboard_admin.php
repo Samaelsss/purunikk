@@ -23,7 +23,7 @@ if (isset($_GET['logout'])) {
         body {
             min-height: 100vh;
             margin: 0;
-            background: radial-gradient(circle at top, #73512C 0, #F9F4E1 55%);
+            background: #F9F4E1;
             color: #543310;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             display: flex;
@@ -69,6 +69,7 @@ if (isset($_GET['logout'])) {
             font-size: 1rem;
             font-weight: 700;
             letter-spacing: 0.04em;
+            color: #F9F4E1;
         }
         .admin-brand-subtitle {
             font-size: 0.7rem;
@@ -125,7 +126,6 @@ if (isset($_GET['logout'])) {
             border-top: 1px dashed rgba(249, 244, 225, 0.35);
         }
         .admin-logout-btn {
-            width: 100%;
             border-radius: 999px;
             border: 1px solid rgba(176, 143, 112, 0.85);
             padding: 0.6rem 0.85rem;
@@ -332,12 +332,83 @@ if (isset($_GET['logout'])) {
                 grid-template-columns: minmax(0, 1fr);
             }
             .admin-sidebar {
+                position: sticky;
+                top: 0;
+                z-index: 20;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.8rem 1rem;
+                gap: 0.9rem;
+            }
+            .admin-nav-section-label {
+                display: none;
+            }
+            .admin-nav {
+                flex-direction: row;
+                gap: 0.4rem;
+            }
+            .admin-nav-footer {
                 display: none;
             }
             .admin-main {
                 padding: 1.25rem 1.1rem 1.5rem;
             }
             .admin-main-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+        @media (max-width: 400px) {
+            .admin-sidebar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 0.75rem 0.8rem;
+                gap: 0.7rem;
+            }
+            .admin-brand-title {
+                font-size: 0.9rem;
+            }
+            .admin-brand-subtitle {
+                font-size: 0.65rem;
+            }
+            .admin-nav {
+                flex-wrap: wrap;
+                gap: 0.35rem;
+            }
+            .admin-nav-item {
+                padding: 0.35rem 0.7rem;
+                font-size: 0.8rem;
+            }
+            .admin-main {
+                padding: 1rem 0.75rem 1.25rem;
+            }
+            .admin-main-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            .admin-page-title {
+                font-size: 1.2rem;
+            }
+            .admin-page-subtitle {
+                font-size: 0.8rem;
+            }
+            .admin-main-grid {
+                gap: 0.9rem;
+            }
+            .admin-card {
+                padding: 0.9rem 0.85rem 1rem;
+            }
+            .admin-metrics-grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 0.6rem;
+            }
+            .admin-list-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.4rem;
+            }
+            .admin-quick-actions {
                 grid-template-columns: minmax(0, 1fr);
             }
         }
