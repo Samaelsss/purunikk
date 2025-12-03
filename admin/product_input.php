@@ -39,19 +39,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
     $description = trim($_POST['product_description'] ?? '');
     $category    = trim($_POST['product_category'] ?? '');
 
-    $variantColors = $_POST['variant_color'] ?? [];
-    $variantImages = $_FILES['variant_image'] ?? null;
-
-    $modelNames  = $_POST['model_name'] ?? [];
-    $modelImages = $_FILES['model_image'] ?? null;
+    // Data varian generik: hingga 3 kategori, masing-masing punya banyak baris
+    $variantCategoryNames    = $_POST['variant_category_name'] ?? [];
+    $variantItemNames        = $_POST['variant_item_name'] ?? [];
+    $variantItemPrices       = $_POST['variant_item_price'] ?? [];
+    $variantItemCategoryIdxs = $_POST['variant_item_category_index'] ?? [];
+    $variantFiles            = $_FILES['variant_item_image'] ?? null;
 
     $logData = [
-        'variant_color'        => $variantColors,
-        'variant_image_names'  => $variantImages['name'] ?? null,
-        'variant_image_errors' => $variantImages['error'] ?? null,
-        'model_name'           => $modelNames,
-        'model_image_names'    => $modelImages['name'] ?? null,
-        'model_image_errors'   => $modelImages['error'] ?? null,
+        'variant_category_name'       => $variantCategoryNames,
+        'variant_item_name'           => $variantItemNames,
+        'variant_item_price'          => $variantItemPrices,
+        'variant_item_category_index' => $variantItemCategoryIdxs,
+        'variant_item_image_names'    => $variantFiles['name'] ?? null,
+        'variant_item_image_errors'   => $variantFiles['error'] ?? null,
     ];
     error_log(
         'product_input debug: ' . json_encode($logData) . PHP_EOL,
@@ -71,12 +72,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         $errors[] = 'Kategori produk wajib diisi.';
     }
 
-    // At least one image+color pair
+    // Minimal satu baris varian dengan gambar agar ada media utama
     $hasAtLeastOneImage = false;
-    if ($variantImages && isset($variantImages['name']) && is_array($variantImages['name'])) {
-        foreach ($variantImages['name'] as $idx => $fileName) {
-            $color = trim($variantColors[$idx] ?? '');
-            if ($fileName !== '' && $color !== '') {
+    if ($variantFiles && isset($variantFiles['name']) && is_array($variantFiles['name'])) {
+        foreach ($variantFiles['name'] as $idx => $fileName) {
+            $itemName = trim($variantItemNames[$idx] ?? '');
+            if ($fileName !== '' && $itemName !== '') {
                 $hasAtLeastOneImage = true;
                 break;
             }
@@ -84,11 +85,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
     }
 
     if (!$hasAtLeastOneImage) {
-        $errors[] = 'Tambahkan minimal satu warna produk beserta gambarnya.';
+        $errors[] = 'Tambahkan minimal satu baris varian dengan gambar.';
     }
 
+    // Siapkan folder upload
     if (empty($errors)) {
-        // Prepare upload directory
         $uploadDir = __DIR__ . '/../uploads/products';
         $uploadDir = rtrim($uploadDir, DIRECTORY_SEPARATOR);
 
@@ -131,22 +132,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
             $productId = $stmtProduct->insert_id;
             $stmtProduct->close();
 
-            // Insert images
+            // Siapkan upload varian + tabel product_variant_options
             $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
 
-            $fileNames  = $variantImages['name'] ?? [];
-            $tmpNames   = $variantImages['tmp_name'] ?? [];
-            $fileErrors = $variantImages['error'] ?? [];
+            $fileNames  = $variantFiles['name'] ?? [];
+            $tmpNames   = $variantFiles['tmp_name'] ?? [];
+            $fileErrors = $variantFiles['error'] ?? [];
 
-            $stmtImage = $conn->prepare('INSERT INTO product_images (product_id, color, image_path, is_primary) VALUES (?, ?, ?, ?)');
+            $stmtImage   = $conn->prepare('INSERT INTO product_images (product_id, color, image_path, is_primary) VALUES (?, ?, ?, ?)');
+            $stmtModel   = $conn->prepare('INSERT INTO product_models (product_id, model_name, image_path) VALUES (?, ?, ?)');
+            $stmtVariant = $conn->prepare('INSERT INTO product_variant_options (product_id, category_name, option_name, option_price, image_path) VALUES (?, ?, ?, ?, ?)');
 
             $primarySet = false;
 
             foreach ($fileNames as $idx => $originalName) {
-                $color = trim($variantColors[$idx] ?? '');
+                $categoryIndex = (int)($variantItemCategoryIdxs[$idx] ?? 0);
+                $categoryName  = trim($variantCategoryNames[$categoryIndex] ?? '');
+                $optionName    = trim($variantItemNames[$idx] ?? '');
+                $rawPrice      = trim($variantItemPrices[$idx] ?? '');
+                $optionPrice   = is_numeric($rawPrice) ? (float)$rawPrice : 0.0;
 
-                if ($originalName === '' || $color === '') {
-                    continue; // skip empty pair
+                if ($originalName === '' || $optionName === '' || $categoryName === '') {
+                    continue;
                 }
 
                 if (!isset($tmpNames[$idx], $fileErrors[$idx])) {
@@ -154,21 +161,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 }
 
                 if ($fileErrors[$idx] !== UPLOAD_ERR_OK) {
-                    throw new RuntimeException('Error uploading file for color ' . htmlspecialchars($color));
+                    throw new RuntimeException('Error uploading file for variant ' . htmlspecialchars($optionName));
                 }
 
                 $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
                 if (!in_array($ext, $allowedExtensions, true)) {
-                    throw new RuntimeException('Invalid image type for color ' . htmlspecialchars($color) . '. Allowed: jpg, jpeg, png, webp.');
+                    throw new RuntimeException('Invalid image type for variant ' . htmlspecialchars($optionName) . '. Allowed: jpg, jpeg, png, webp.');
                 }
 
                 $safeBase  = preg_replace('/[^a-zA-Z0-9-_]/', '_', pathinfo($originalName, PATHINFO_FILENAME));
                 $uniqueKey = bin2hex(random_bytes(4));
-                $newName   = $safeBase . '_' . $uniqueKey . '.' . $ext;
+                $newName   = $safeBase . '_var_' . $uniqueKey . '.' . $ext;
                 $target    = $uploadDir . $newName;
 
                 if (!is_uploaded_file($tmpNames[$idx])) {
-                    throw new RuntimeException('Temporary upload file not valid for color ' . htmlspecialchars($color));
+                    throw new RuntimeException('Temporary upload file not valid for variant ' . htmlspecialchars($optionName));
                 }
 
                 $finalName = $newName;
@@ -193,30 +200,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 if (!$moved) {
                     error_log(
                         'product_input upload_error: ' . json_encode([
-                            'color'           => $color,
-                            'tmp_name'        => $tmpNames[$idx],
-                            'target'          => $target,
-                            'upload_dir'      => $uploadDir,
-                            'is_dir'          => is_dir($uploadDir),
-                            'is_writable'     => is_writable($uploadDir),
-                            'file_exists_tmp' => file_exists($tmpNames[$idx]),
+                            'category_name'    => $categoryName,
+                            'option_name'      => $optionName,
+                            'tmp_name'         => $tmpNames[$idx],
+                            'target'           => $target,
+                            'upload_dir'       => $uploadDir,
+                            'is_dir'           => is_dir($uploadDir),
+                            'is_writable'      => is_writable($uploadDir),
+                            'file_exists_tmp'  => file_exists($tmpNames[$idx]),
                         ]) . PHP_EOL,
                         3,
                         __DIR__ . '/../server.log'
                     );
-                    // Skip this image but continue saving the product and other images.
                     continue;
                 }
 
-                $relativePath = 'uploads/products/' . $finalName; // relative from project root
-                $isPrimary    = $primarySet ? 0 : 1;
-                $primarySet   = true;
+                $relativePath = 'uploads/products/' . $finalName;
 
-                $stmtImage->bind_param('issi', $productId, $color, $relativePath, $isPrimary);
-                $stmtImage->execute();
+                // Simpan ke tabel varian generik
+                $stmtVariant->bind_param('issds', $productId, $categoryName, $optionName, $optionPrice, $relativePath);
+                $stmtVariant->execute();
+
+                // Kompatibilitas: jika kategori mengandung "warna" atau "color", isi product_images
+                if (stripos($categoryName, 'warna') !== false || stripos($categoryName, 'color') !== false) {
+                    $isPrimary  = $primarySet ? 0 : 1;
+                    $primarySet = true;
+                    $colorLabel = $optionName;
+                    $stmtImage->bind_param('issi', $productId, $colorLabel, $relativePath, $isPrimary);
+                    $stmtImage->execute();
+                }
+
+                // Kompatibilitas: jika kategori mengandung "model", isi product_models
+                if (stripos($categoryName, 'model') !== false) {
+                    $stmtModel->bind_param('iss', $productId, $optionName, $relativePath);
+                    $stmtModel->execute();
+                }
             }
 
+            $stmtVariant->close();
             $stmtImage->close();
+            $stmtModel->close();
 
             if (!$primarySet) {
                 error_log(
@@ -229,100 +252,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 );
             }
 
-            // Insert models (optional)
-            if ($modelImages && isset($modelImages['name']) && is_array($modelImages['name'])) {
-                $modelFileNames  = $modelImages['name'];
-                $modelTmpNames   = $modelImages['tmp_name'] ?? [];
-                $modelFileErrors = $modelImages['error'] ?? [];
-
-                $stmtModel = $conn->prepare('INSERT INTO product_models (product_id, model_name, image_path) VALUES (?, ?, ?)');
-
-                foreach ($modelFileNames as $idx => $originalName) {
-                    $modelName = trim($modelNames[$idx] ?? '');
-                    if ($originalName === '' || $modelName === '') {
-                        continue;
-                    }
-
-                    if (!isset($modelTmpNames[$idx], $modelFileErrors[$idx])) {
-                        continue;
-                    }
-
-                    if ($modelFileErrors[$idx] !== UPLOAD_ERR_OK) {
-                        throw new RuntimeException('Error uploading file for model ' . htmlspecialchars($modelName));
-                    }
-
-                    $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
-                    if (!in_array($ext, $allowedExtensions, true)) {
-                        throw new RuntimeException('Invalid image type for model ' . htmlspecialchars($modelName) . '. Allowed: jpg, jpeg, png, webp.');
-                    }
-
-                    $safeBase  = preg_replace('/[^a-zA-Z0-9-_]/', '_', pathinfo($originalName, PATHINFO_FILENAME));
-                    $uniqueKey = bin2hex(random_bytes(4));
-                    $newName   = $safeBase . '_model_' . $uniqueKey . '.' . $ext;
-                    $target    = $uploadDir . $newName;
-
-                    if (!move_uploaded_file($modelTmpNames[$idx], $target)) {
-                        throw new RuntimeException('Failed to move uploaded file for model ' . htmlspecialchars($modelName));
-                    }
-
-                    $relativePath = 'uploads/products/' . $newName;
-                    $stmtModel->bind_param('iss', $productId, $modelName, $relativePath);
-                    $stmtModel->execute();
-                }
-
-                $stmtModel->close();
-            }
-
-            // Insert models (optional)
-            if ($modelImages && isset($modelImages['name']) && is_array($modelImages['name'])) {
-                $modelFileNames  = $modelImages['name'];
-                $modelTmpNames   = $modelImages['tmp_name'] ?? [];
-                $modelFileErrors = $modelImages['error'] ?? [];
-
-                $stmtModel = $conn->prepare('INSERT INTO product_models (product_id, model_name, image_path) VALUES (?, ?, ?)');
-
-                foreach ($modelFileNames as $idx => $originalName) {
-                    $modelName = trim($modelNames[$idx] ?? '');
-                    if ($originalName === '' || $modelName === '') {
-                        continue;
-                    }
-
-                    if (!isset($modelTmpNames[$idx], $modelFileErrors[$idx])) {
-                        continue;
-                    }
-
-                    if ($modelFileErrors[$idx] !== UPLOAD_ERR_OK) {
-                        throw new RuntimeException('Error uploading file for model ' . htmlspecialchars($modelName));
-                    }
-
-                    $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
-                    if (!in_array($ext, $allowedExtensions, true)) {
-                        throw new RuntimeException('Invalid image type for model ' . htmlspecialchars($modelName) . '. Allowed: jpg, jpeg, png, webp.');
-                    }
-
-                    $safeBase  = preg_replace('/[^a-zA-Z0-9-_]/', '_', pathinfo($originalName, PATHINFO_FILENAME));
-                    $uniqueKey = bin2hex(random_bytes(4));
-                    $newName   = $safeBase . '_model_' . $uniqueKey . '.' . $ext;
-                    $target    = $uploadDir . $newName;
-
-                    if (!move_uploaded_file($modelTmpNames[$idx], $target)) {
-                        throw new RuntimeException('Failed to move uploaded file for model ' . htmlspecialchars($modelName));
-                    }
-
-                    $relativePath = 'uploads/products/' . $newName;
-                    $stmtModel->bind_param('iss', $productId, $modelName, $relativePath);
-                    $stmtModel->execute();
-                }
-
-                $stmtModel->close();
-            }
-
             $conn->commit();
 
             $successMessage = 'Produk berhasil disimpan.';
         } catch (Throwable $e) {
             if ($conn && $conn->errno === 0) {
-                // try rollback, ignore errors here
                 try {
                     $conn->rollback();
                 } catch (Throwable $rollbackErr) {
@@ -456,6 +390,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         }
 
         @media (max-width: 960px) {
+
+             .button-primary {
+            top: 0px;
+             }
+
             .shell {
                 grid-template-columns: minmax(0, 1fr);
                 gap: 20px;
@@ -473,24 +412,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
             overflow: hidden;
         }
 
-        .card-model-panel {
-            top: -200px;
-            /* Let CSS grid auto-place this after .card in the first column,
-               so it sits below the main card but beside the side-panel */
-            grid-column: 1 / 2;
+        .submit-row {
+            grid-column: 2 / 3;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 4px;
         }
 
-        @media (max-width:1060px){
-             .card-model-panel {
-            top: -150px;
-             }
+        @media (max-width: 960px) {
+            .submit-row {
+                grid-column: 1 / -1;
+                justify-content: flex-start;
+            }
         }
 
-        
-        @media (max-width:960px){
-             .card-model-panel {
-            top: 0px;
-             }
+      
+        /* Palet warna khusus untuk isi di dalam card-model-panel (tabel varian) */
+        .card-model-panel .variant-row {
+            background: rgba(249, 244, 225, 0.96);
+            border: 1px solid rgba(176, 143, 112, 0.65);
+        }
+
+        .card-model-panel .variant-color-input label {
+            color: var(--foreground);
+        }
+
+        .card-model-panel .variant-upload {
+            color: var(--foreground);
+        }
+
+        .card-model-panel .upload-dropzone {
+            background: rgba(84, 51, 16, 0.03);
+            border-color: rgba(176, 143, 112, 0.8);
+        }
+
+        .card-model-panel .upload-dropzone:hover {
+            background: rgba(84, 51, 16, 0.06);
+            border-color: rgba(176, 143, 112, 0.95);
+        }
+
+        .card-model-panel .upload-text-sub {
+            color: var(--text-muted);
+        }
+
+        .card-model-panel .upload-preview {
+            background-color: #ffffff;
+            border-color: rgba(176, 143, 112, 0.8);
+        }
+
+        .card-model-panel .variant-footer-text {
+            color: var(--text-muted);
+        }
+
+        .card-model-panel .icon-button {
+            background: rgba(84, 51, 16, 0.1);
+            color: var(--foreground);
+            box-shadow: none;
+        }
+
+        .card-model-panel .icon-button:hover {
+            background: rgba(176, 143, 112, 0.22);
+            box-shadow: none;
         }
 
         .card::before {
@@ -720,7 +703,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
 
         .variant-subtitle {
             font-size: 0.76rem;
-            color: rgba(249, 244, 225, 0.82);
+            color: var(--foreground);
         }
 
         .variant-list {
@@ -739,6 +722,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
             background: rgba(84, 51, 16, 0.9);
             border: 1px solid rgba(176, 143, 112, 0.6);
             position: relative;
+        }
+
+        .variant-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 6px;
+        }
+
+        .variant-category-block {
+            border-radius: 18px;
+            background: rgba(249, 244, 225, 0.96);
+            border: 1px solid rgba(176, 143, 112, 0.65);
+            padding: 10px 11px 9px;
+        }
+
+        .variant-category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .variant-category-title {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .variant-category-title label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .variant-category-title input[type="text"] {
+            width: 100%;
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            padding: 6px 10px;
+            font-size: 0.82rem;
+            outline: none;
+            background: #ffffff;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+        }
+
+        .variant-category-title input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px rgba(176, 143, 112, 0.35);
+            background: #ffffff;
+        }
+
+        .variant-price-input {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 0.78rem;
+            color: var(--foreground);
+        }
+
+        .variant-price-input label {
+            font-weight: 500;
+        }
+
+        .variant-price-input input[type="number"] {
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            padding: 6px 10px;
+            font-size: 0.82rem;
+            outline: none;
+            background: #ffffff;
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+        }
+
+        .variant-price-input input[type="number"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px rgba(176, 143, 112, 0.35);
+            background: #ffffff;
         }
 
         .variant-color-input {
@@ -951,6 +1014,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         }
 
         .button-primary {
+            top: -170px;
+            position: relative;
             border-radius: 999px;
             border: none;
             padding: 9px 18px;
@@ -1079,6 +1144,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 transform: translateY(0) scale(1);
             }
         }
+
+        @media (max-width: 550px) {
+            body {
+                padding: 20px 10px;
+            }
+
+            .admin-topbar {
+                margin: 0 0 12px;
+            }
+
+            .card,
+            .side-panel,
+            .card-model-panel {
+                padding: 18px 16px 16px;
+                border-radius: 18px;
+            }
+
+            .title-block h1 {
+                font-size: 1.3rem;
+            }
+
+            .title-block p {
+                font-size: 0.8rem;
+            }
+
+            .field-label {
+                font-size: 0.8rem;
+            }
+
+            .field-description {
+                font-size: 0.72rem;
+            }
+
+            .input,
+            .textarea,
+            .select {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+
+            .side-title {
+                font-size: 1rem;
+            }
+
+            .side-subtitle {
+                font-size: 0.78rem;
+            }
+
+            .metric-card {
+                font-size: 0.72rem;
+                padding: 8px 8px 7px;
+            }
+
+            .variant-title {
+                font-size: 0.82rem;
+            }
+
+            .variant-subtitle {
+                font-size: 0.7rem;
+            }
+
+            .chip {
+                font-size: 0.68rem;
+                padding: 2px 8px;
+            }
+
+            .button-add {
+                font-size: 0.72rem;
+                padding: 5px 10px;
+            }
+
+            .button-primary {
+                font-size: 0.8rem;
+                padding: 8px 14px;
+            }
+
+            .status-pill {
+                font-size: 0.7rem;
+            }
+
+            .variant-category-title label {
+                font-size: 0.76rem;
+            }
+
+            .variant-category-title input[type="text"],
+            .variant-price-input input[type="number"] {
+                font-size: 0.76rem;
+                padding: 6px 9px;
+            }
+
+            .toast {
+                right: 10px;
+                left: 10px;
+                top: 10px;
+                max-width: none;
+                font-size: 0.78rem;
+                padding: 9px 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1172,10 +1336,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 </div>
 
                 <div class="form-footer">
-                    <button type="submit" class="button-primary">
-                        <span>Simpan Produk</span>
-                    </button>
-
                     <div class="status-pill">
                         <span class="status-dot-success"></span>
                         Data disimpan di database MySQL Anda.
@@ -1190,9 +1350,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
 
     <div class="side-panel">
         <div class="side-inner">
-            <div class="pill">Studio Varian · Warna & Gambar</div>
-            <h2 class="side-title">Varian Warna Produk</h2>
-            <p class="side-subtitle">Lampirkan sebanyak mungkin gambar, masing-masing dengan label warna. Gambar pertama menjadi tampilan utama.</p>
+            <div class="pill">Studio Varian · Kategori & Gambar</div>
+            <h2 class="side-title">Tabel Varian Produk</h2>
+            <p class="side-subtitle">Buat hingga 3 kategori (mis. Warna, Model, Ukuran), lalu isi baris varian dengan nama, harga, dan gambar.</p>
 
             <div class="side-metrics">
                 <div class="metric-card">
@@ -1204,55 +1364,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                     </div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label">Logika warna</div>
-                    <div class="metric-value">1 gambar : 1 warna</div>
+                    <div class="metric-label">Kategori populer</div>
+                    <div class="metric-value">Warna, Model, Ukuran</div>
                     <div class="metric-tag">
                         <span class="metric-dot"></span>
-                        Gambar pertama utama
-                    </div>
+                        Nama kategori bebas</div>
                 </div>
-            </div>
-
-            <div class="variant-header">
-                <div>
-                    <div class="variant-title">Pasangan Warna & Gambar</div>
-                    <div class="variant-subtitle">Beri nama warna, lalu unggah foto yang sesuai.</div>
-                </div>
-            </div>
-
-            <div id="variant-list" class="variant-list"></div>
-
-            <div class="variant-actions">
-                <span class="chip">Tips: kelompokkan berdasarkan warna, bukan sudut foto.</span>
-                <button type="button" class="button-add" id="add-variant">
-                    <span class="icon">＋</span>
-                    <span>Tambah warna lain</span>
-                </button>
-            </div>
-
-            <div class="variant-footer-text">
-                Berkas diunggah ke <code>uploads/products/</code> di dalam proyek Anda. Pastikan folder dapat ditulis oleh server.
-            </div>
-
-            <div class="variant-header" style="margin-top: 18px;">
-                <div>
-                    <div class="variant-title">Model Produk</div>
-                    <div class="variant-subtitle">Beri nama model, lalu unggah foto tampilan model tersebut.</div>
-                </div>
-            </div>
-
-            <div id="model-list" class="variant-list"></div>
-
-            <div class="variant-actions">
-                <span class="chip">Contoh: Kecil, Sedang, Besar atau Model A, Model B.</span>
-                <button type="button" class="button-add" id="add-model">
-                    <span class="icon">＋</span>
-                    <span>Tambah model lain</span>
-                </button>
-            </div>
-
-            <div class="variant-footer-text">
-                Gambar model disimpan bersama gambar produk di <code>uploads/products/</code>.
             </div>
         </div>
     </div>
@@ -1261,25 +1378,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         <div class="card-inner">
             <div class="variant-header">
                 <div>
-                    <div class="variant-title">Model Produk</div>
-                    <div class="variant-subtitle">Beri nama model, lalu unggah foto tampilan model tersebut.</div>
+                    <div class="variant-title">Tabel Varian</div>
+                    <div class="variant-subtitle">Setiap kategori punya beberapa baris: nama, harga, dan gambar. Maksimal 3 kategori.</div>
                 </div>
-            </div>
-
-            <div id="model-list" class="variant-list"></div>
-
-            <div class="variant-actions">
-                <span class="chip">Contoh: Kecil, Sedang, Besar atau Model A, Model B.</span>
-                <button type="button" class="button-add" id="add-model">
+                <button type="button" class="button-add" id="add-category">
                     <span class="icon">＋</span>
-                    <span>Tambah model lain</span>
+                    <span>Tambah kategori</span>
                 </button>
             </div>
 
+            <div id="variant-categories" class="variant-categories"></div>
+
             <div class="variant-footer-text">
-                Gambar model disimpan bersama gambar produk di <code>uploads/products/</code>.
+                Jika nama kategori mengandung <code>Warna</code> atau <code>Color</code>, gambar juga digunakan sebagai variasi warna produk.
+                Jika mengandung <code>Model</code>, gambar juga disimpan sebagai model produk.
             </div>
         </div>
+    </div>
+
+    <div class="submit-row">
+        <button type="submit" class="button-primary">
+            <span>Simpan Produk</span>
+        </button>
     </div>
 </div>
 </form>
@@ -1305,25 +1425,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
 <?php endif; ?>
 
 <script>
-    const variantList = document.getElementById('variant-list');
-    const addVariantBtn = document.getElementById('add-variant');
-    const modelList = document.getElementById('model-list');
-    const addModelBtn = document.getElementById('add-model');
+    const categoriesContainer = document.getElementById('variant-categories');
+    const addCategoryBtn      = document.getElementById('add-category');
 
-    function createVariantRow() {
+    let categoryCount = 0;
+
+    function createVariantRow(categoryIndex) {
         const row = document.createElement('div');
         row.className = 'variant-row';
 
         row.innerHTML = `
+            <input type="hidden" name="variant_item_category_index[]" value="${categoryIndex}">
             <div class="variant-color-input">
-                <label>Nama warna</label>
+                <label>Nama opsi</label>
                 <div class="variant-color-input-row">
-                    <span class="color-chip"></span>
-                    <input type="text" name="variant_color[]" form="product-form" placeholder="Mis. Ungu Lembut" autocomplete="off">
+                    <input type="text" name="variant_item_name[]" form="product-form" placeholder="Mis. Merah / Model A" autocomplete="off">
                 </div>
             </div>
+            <div class="variant-price-input">
+                <label>Harga varian (opsional)</label>
+                <input type="number" name="variant_item_price[]" form="product-form" min="0" step="1000" placeholder="Mis. 25000">
+            </div>
             <div class="variant-upload">
-                <div>Gambar warna</div>
+                <div>Gambar opsi</div>
                 <div class="upload-shell">
                     <label class="upload-dropzone">
                         <div class="upload-icon">⇪</div>
@@ -1331,13 +1455,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                             <div class="upload-text-main">Seret atau pilih gambar</div>
                             <div class="upload-text-sub">JPG / PNG / WEBP · maks ~4 MB</div>
                         </div>
-                        <input type="file" name="variant_image[]" form="product-form" accept="image/*" style="display: none;">
+                        <input type="file" name="variant_item_image[]" form="product-form" accept="image/*" style="display: none;">
                     </label>
                     <div class="upload-preview" data-preview></div>
                 </div>
             </div>
             <div class="variant-remove">
-                <button type="button" class="icon-button" aria-label="Hapus varian">×</button>
+                <button type="button" class="icon-button" aria-label="Hapus baris">×</button>
             </div>
         `;
 
@@ -1359,128 +1483,111 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         });
 
         removeBtn.addEventListener('click', () => {
-            if (variantList.children.length > 1) {
+            const list = row.parentElement;
+            if (!list) return;
+            if (list.children.length > 1) {
                 row.remove();
             }
-            updateVariantRemoveButtonsState();
+            updateAllRemoveButtonsState();
         });
 
         return row;
     }
 
-    function addVariantRow() {
-        const row = createVariantRow();
-        variantList.appendChild(row);
-        updateVariantRemoveButtonsState();
-    }
+    function createCategoryBlock(categoryIndex) {
+        const block = document.createElement('div');
+        block.className = 'variant-category-block';
+        block.dataset.categoryIndex = String(categoryIndex);
 
-    function updateVariantRemoveButtonsState() {
-        const rows = variantList.querySelectorAll('.variant-row');
-        rows.forEach((row, idx) => {
-            const btn = row.querySelector('.variant-remove .icon-button');
-            if (rows.length === 1) {
-                btn.setAttribute('disabled', 'disabled');
-            } else {
-                btn.removeAttribute('disabled');
-            }
-        });
-    }
-
-    function createModelRow() {
-        if (!modelList) return null;
-        const row = document.createElement('div');
-        row.className = 'variant-row';
-
-        row.innerHTML = `
-            <div class="variant-color-input">
-                <label>Nama model</label>
-                <div class="variant-color-input-row">
-                    <span class="color-chip"></span>
-                    <input type="text" name="model_name[]" form="product-form" placeholder="Mis. Kecil / Model A" autocomplete="off">
+        block.innerHTML = `
+            <div class="variant-category-header">
+                <div class="variant-category-title">
+                    <label>Nama kategori</label>
+                    <input type="text" name="variant_category_name[]" form="product-form" placeholder="Mis. Warna / Model / Ukuran" autocomplete="off">
                 </div>
+                <button type="button" class="icon-button variant-category-remove" aria-label="Hapus kategori">×</button>
             </div>
-            <div class="variant-upload">
-                <div>Gambar model</div>
-                <div class="upload-shell">
-                    <label class="upload-dropzone">
-                        <div class="upload-icon">⇪</div>
-                        <div>
-                            <div class="upload-text-main">Seret atau pilih gambar</div>
-                            <div class="upload-text-sub">JPG / PNG / WEBP · maks ~4 MB</div>
-                        </div>
-                        <input type="file" name="model_image[]" form="product-form" accept="image/*" style="display: none;">
-                    </label>
-                    <div class="upload-preview" data-preview></div>
-                </div>
-            </div>
-            <div class="variant-remove">
-                <button type="button" class="icon-button" aria-label="Hapus model">×</button>
+            <div class="variant-list" data-rows></div>
+            <div class="variant-actions">
+                <span class="chip">Tambah baris varian untuk kategori ini.</span>
+                <button type="button" class="button-add variant-add-row">
+                    <span class="icon">＋</span>
+                    <span>Tambah baris</span>
+                </button>
             </div>
         `;
 
-        const fileInput = row.querySelector('input[type="file"]');
-        const preview   = row.querySelector('[data-preview]');
-        const removeBtn = row.querySelector('.variant-remove .icon-button');
+        const rowsContainer = block.querySelector('[data-rows]');
+        const addRowBtn     = block.querySelector('.variant-add-row');
+        const removeCatBtn  = block.querySelector('.variant-category-remove');
 
-        fileInput.addEventListener('change', () => {
-            const file = fileInput.files && fileInput.files[0];
-            if (!file) {
-                preview.style.backgroundImage = '';
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = e => {
-                preview.style.backgroundImage = `url('${e.target.result}')`;
-            };
-            reader.readAsDataURL(file);
-        });
+        if (rowsContainer && addRowBtn) {
+            addRowBtn.addEventListener('click', () => {
+                const row = createVariantRow(categoryIndex);
+                rowsContainer.appendChild(row);
+                updateAllRemoveButtonsState();
+            });
 
-        removeBtn.addEventListener('click', () => {
-            if (modelList.children.length > 1) {
-                row.remove();
-            }
-            updateModelRemoveButtonsState();
-        });
-
-        return row;
-    }
-
-    function addModelRow() {
-        if (!modelList) return;
-        const row = createModelRow();
-        if (row) {
-            modelList.appendChild(row);
-            updateModelRemoveButtonsState();
+            // initial one row per kategori
+            const firstRow = createVariantRow(categoryIndex);
+            rowsContainer.appendChild(firstRow);
         }
+
+        if (removeCatBtn) {
+            removeCatBtn.addEventListener('click', () => {
+                if (categoriesContainer.children.length > 1) {
+                    block.remove();
+                    categoryCount = categoriesContainer.children.length;
+                    updateCategoryControlsState();
+                    updateAllRemoveButtonsState();
+                }
+            });
+        }
+
+        return block;
     }
 
-    function updateModelRemoveButtonsState() {
-        if (!modelList) return;
-        const rows = modelList.querySelectorAll('.variant-row');
-        rows.forEach((row) => {
-            const btn = row.querySelector('.variant-remove .icon-button');
-            if (rows.length === 1) {
-                btn.setAttribute('disabled', 'disabled');
-            } else {
-                btn.removeAttribute('disabled');
-            }
+    function addCategoryBlock() {
+        if (!categoriesContainer) return;
+        if (categoryCount >= 3) return;
+        const idx = categoryCount;
+        const block = createCategoryBlock(idx);
+        categoriesContainer.appendChild(block);
+        categoryCount = categoriesContainer.children.length;
+        updateCategoryControlsState();
+        updateAllRemoveButtonsState();
+    }
+
+    function updateCategoryControlsState() {
+        if (!addCategoryBtn) return;
+        addCategoryBtn.disabled = categoryCount >= 3;
+    }
+
+    function updateAllRemoveButtonsState() {
+        // Setiap kategori minimal 1 baris; jika hanya 1 baris, nonaktifkan tombol hapus baris
+        document.querySelectorAll('.variant-category-block').forEach(block => {
+            const rows = block.querySelectorAll('.variant-row');
+            rows.forEach(row => {
+                const btn = row.querySelector('.variant-remove .icon-button');
+                if (!btn) return;
+                if (rows.length === 1) {
+                    btn.setAttribute('disabled', 'disabled');
+                } else {
+                    btn.removeAttribute('disabled');
+                }
+            });
         });
     }
 
-    addVariantBtn.addEventListener('click', () => {
-        addVariantRow();
-    });
-
-    if (addModelBtn && modelList) {
-        addModelBtn.addEventListener('click', () => {
-            addModelRow();
+    if (addCategoryBtn && categoriesContainer) {
+        addCategoryBtn.addEventListener('click', () => {
+            addCategoryBlock();
         });
     }
 
-    // Initialize with one row
-    addVariantRow();
-    if (modelList) {
-        addModelRow();
+    // Inisialisasi dengan satu kategori dan satu baris
+    if (categoriesContainer) {
+        addCategoryBlock();
     }
 
     function dismissToast() {

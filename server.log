@@ -27,3 +27,8 @@ product_input debug: {"variant_color":["merah"],"variant_image_names":["Screensh
 product_input debug: {"variant_color":[""],"variant_image_names":["Screenshot 2025-07-30 072200.png"],"variant_image_errors":[0]}
 product_input debug: {"variant_color":["merah"],"variant_image_names":["Screenshot 2025-07-29 123138.png"],"variant_image_errors":[0]}
 product_input debug: {"variant_color":["merah"],"variant_image_names":["Screenshot 2025-08-11 071154.png"],"variant_image_errors":[0]}
+product_input debug: {"variant_category_name":["bya"],"variant_item_name":["wow"],"variant_item_price":["10000"],"variant_item_category_index":["0"],"variant_item_image_names":["Screenshot 2025-07-30 072200.png"],"variant_item_image_errors":[0]}
+product_input debug: {"variant_category_name":["merah"],"variant_item_name":["putih"],"variant_item_price":["10000"],"variant_item_category_index":["0"],"variant_item_image_names":["Screenshot 2025-08-11 071154.png"],"variant_item_image_errors":[0]}
+product_input no_images_saved: {"product_id":3,"upload_dir":"C:\\xamp\\htdocs\\purunikk\\admin\/..\/uploads\/products\\"}
+product_input debug: {"variant_category_name":["mearh","ukuran"],"variant_item_name":["merah","kecil","besar"],"variant_item_price":["10000","3000","4000"],"variant_item_category_index":["0","1","1"],"variant_item_image_names":["Screenshot 2025-07-30 072200.png","Screenshot 2025-08-11 071154.png","Screenshot 2025-08-05 124021.png"],"variant_item_image_errors":[0,0,0]}
+product_input no_images_saved: {"product_id":4,"upload_dir":"C:\\xamp\\htdocs\\purunikk\\admin\/..\/uploads\/products\\"}

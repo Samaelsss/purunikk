@@ -112,12 +112,12 @@ const RAW_PRODUCTS_DATA = [
     {
         id: 12,
         name: 'Purun Decoration',
-         category: 'purun',
-         description: 'Dekorasi rumah purun dengan bentuk artistik',
-         price: 'Rp 145.000',
-         icon: '✨',
-         image: 'img/products/product-012.jpg'
-     },
+        category: 'purun',
+        description: 'Dekorasi rumah purun dengan bentuk artistik',
+        price: 'Rp 145.000',
+        icon: '✨',
+        image: 'img/products/product-012.jpg'
+    },
     {
         id: 13,
         name: 'Purun Table Runner',
@@ -1050,7 +1050,7 @@ function getCart() {
 function setCart(arr) {
     try {
         localStorage.setItem('cart', JSON.stringify(arr));
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function getCategoryIcon(category) {
@@ -1106,7 +1106,7 @@ function getPageProducts(page) {
 function renderProductCards(page) {
     const productsGrid = document.getElementById('productsGrid');
     const products = getPageProducts(page);
-    
+
     productsGrid.innerHTML = products.map(product => `
         <div class="product-card" data-id="${product.id}">
             <div class="card-header">
@@ -1117,7 +1117,7 @@ function renderProductCards(page) {
                 </div>
             </div>
             <div class="card-image">
-                <img src="${product.img}" alt="${product.name}" loading="lazy">
+                <img src="${product.image || product.img}" alt="${product.name}" loading="lazy">
             </div>
             <div class="card-content-product">
                 <h2 class="card-title-product">${product.name}</h2>
@@ -1140,7 +1140,7 @@ function renderProductCards(page) {
                 if (product) {
                     try {
                         localStorage.setItem('pk-last-product', JSON.stringify(product));
-                    } catch (e) {}
+                    } catch (e) { }
                     // arahkan ke Produk_detail.html
                     goToDetail(productId);
                 }
@@ -1157,7 +1157,7 @@ function renderProductCards(page) {
             if (product) {
                 try {
                     localStorage.setItem('pk-last-product', JSON.stringify(product));
-                } catch (e) {}
+                } catch (e) { }
                 // arahkan ke Produk_detail.html
                 goToDetail(productId);
             }
@@ -1208,7 +1208,7 @@ function updatePaginationUI() {
     const paginationNumbers = document.getElementById('paginationNumbers');
     if (!paginationNumbers) return;
     let paginationHTML = '';
-    
+
     // Update total pages based on filtered products
     totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
 
@@ -1370,7 +1370,7 @@ if (paginationNextBtn) {
 }
 
 // Category filter handlers for new chips
-(function initCategoryChips(){
+(function initCategoryChips() {
     const chips = document.querySelectorAll('.category-chip');
     if (!chips.length) return;
     chips.forEach(chip => {
@@ -1393,124 +1393,136 @@ if (paginationNextBtn) {
 loadProductsFromApi();
 
 // --- Shop Hero helpers ---
-function addRecentlyViewed(id){
-  try {
-    const key = 'rv-ids';
-    const arr = JSON.parse(localStorage.getItem(key) || '[]').map(String);
-    const sid = String(id);
-    const next = [sid, ...arr.filter(x=>x!==sid)].slice(0, 8);
-    localStorage.setItem(key, JSON.stringify(next));
-  } catch(e){}
+function addRecentlyViewed(id) {
+    try {
+        const key = 'rv-ids';
+        const arr = JSON.parse(localStorage.getItem(key) || '[]').map(String);
+        const sid = String(id);
+        const next = [sid, ...arr.filter(x => x !== sid)].slice(0, 8);
+        localStorage.setItem(key, JSON.stringify(next));
+    } catch (e) { }
 }
 
-function goToDetail(id){
-  const path = window.location.pathname;
-  // arahkan ke Produk_detail.html
-  addRecentlyViewed(id);
-  if (path.includes('/Product/')) {
-    window.location.href = `../Produk_detail.html?id=${encodeURIComponent(id)}`;
-  } else {
-    window.location.href = `Produk_detail.html?id=${encodeURIComponent(id)}`;
-  }
+function goToDetail(id) {
+    addRecentlyViewed(id);
+
+    // Use absolute path from the root to avoid case sensitivity and path resolution issues
+    // Get the base path by finding where 'purunikk' is in the current path
+    const currentPath = window.location.pathname;
+    const purunikkIndex = currentPath.toLowerCase().indexOf('/purunikk/');
+
+    if (purunikkIndex !== -1) {
+        // Extract base path up to /purunikk/
+        const basePath = currentPath.substring(0, purunikkIndex + '/purunikk/'.length);
+        window.location.href = `${basePath}Produk_detail.html?id=${encodeURIComponent(id)}`;
+    } else {
+        // Fallback: try relative path
+        const path = window.location.pathname.toLowerCase();
+        if (path.includes('/product/')) {
+            window.location.href = `../Produk_detail.html?id=${encodeURIComponent(id)}`;
+        } else {
+            window.location.href = `Produk_detail.html?id=${encodeURIComponent(id)}`;
+        }
+    }
 }
 // pada saat klik kartu produk
 // document.addEventListener('click', (e)=>{ ... })
 // Ganti pemanggilan ke goToDetail(id)
 
 (() => {
-  function initThemeToggle() {
-    const btns = [
-      document.getElementById('themeToggleMobile'),
-      document.getElementById('themeToggleTablet'),
-      document.getElementById('themeToggleDesktop'),
-    ].filter(Boolean);
+    function initThemeToggle() {
+        const btns = [
+            document.getElementById('themeToggleMobile'),
+            document.getElementById('themeToggleTablet'),
+            document.getElementById('themeToggleDesktop'),
+        ].filter(Boolean);
 
-    const saved = localStorage.getItem('pk-theme');
-    if (saved === 'light') {
-      document.body.classList.add('light');
-      document.body.classList.remove('dark');
-    } else if (saved === 'dark') {
-      document.body.classList.add('dark');
-      document.body.classList.remove('light');
+        const saved = localStorage.getItem('pk-theme');
+        if (saved === 'light') {
+            document.body.classList.add('light');
+            document.body.classList.remove('dark');
+        } else if (saved === 'dark') {
+            document.body.classList.add('dark');
+            document.body.classList.remove('light');
+        }
+
+        function setTheme(mode) {
+            if (mode === 'light') {
+                document.body.classList.add('light');
+                document.body.classList.remove('dark');
+                localStorage.setItem('pk-theme', 'light');
+            } else {
+                document.body.classList.remove('light');
+                document.body.classList.add('dark');
+                localStorage.setItem('pk-theme', 'dark');
+            }
+        }
+
+        function currentMode() {
+            return document.body.classList.contains('light') ? 'light' : 'dark';
+        }
+
+        btns.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const next = currentMode() === 'light' ? 'dark' : 'light';
+                setTheme(next);
+            });
+        });
+
+        if (!saved) {
+            setTheme('dark');
+        }
     }
 
-    function setTheme(mode) {
-      if (mode === 'light') {
-        document.body.classList.add('light');
-        document.body.classList.remove('dark');
-        localStorage.setItem('pk-theme', 'light');
-      } else {
-        document.body.classList.remove('light');
-        document.body.classList.add('dark');
-        localStorage.setItem('pk-theme', 'dark');
-      }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initThemeToggle);
+    } else {
+        initThemeToggle();
     }
-
-    function currentMode() {
-      return document.body.classList.contains('light') ? 'light' : 'dark';
-    }
-
-    btns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const next = currentMode() === 'light' ? 'dark' : 'light';
-        setTheme(next);
-      });
-    });
-
-    if (!saved) {
-      setTheme('dark');
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initThemeToggle);
-  } else {
-    initThemeToggle();
-  }
 })();
 
 // Render the new shop-hero section if present
-function initShopHero(){
-  const catEl = document.getElementById('shopCategories');
-  const mainEl = document.getElementById('shopBannerMain');
-  const tilesEl = document.getElementById('shopBannerTiles');
-  const rvEl = document.getElementById('recentlyViewed');
-  const sugEl = document.getElementById('suggestions');
-  if (!catEl && !mainEl && !tilesEl && !rvEl && !sugEl) return;
-  if (!Array.isArray(PRODUCTS_DATA) || !PRODUCTS_DATA.length) return;
+function initShopHero() {
+    const catEl = document.getElementById('shopCategories');
+    const mainEl = document.getElementById('shopBannerMain');
+    const tilesEl = document.getElementById('shopBannerTiles');
+    const rvEl = document.getElementById('recentlyViewed');
+    const sugEl = document.getElementById('suggestions');
+    if (!catEl && !mainEl && !tilesEl && !rvEl && !sugEl) return;
+    if (!Array.isArray(PRODUCTS_DATA) || !PRODUCTS_DATA.length) return;
 
-  // Build categories list dynamically (all + unique categories)
-  if (catEl) {
-    const pretty = (s)=> String(s||'').replace(/[-_]+/g,' ').replace(/\b\w/g, m=>m.toUpperCase());
-    const counts = PRODUCTS_DATA.reduce((acc,p)=>{ const k=(p.category||'lain').toLowerCase(); acc[k]=(acc[k]||0)+1; return acc; },{});
-    const baseCats = [
-      { key: 'all', label: 'Semua', count: PRODUCTS_DATA.length },
-      ...Object.entries(counts).map(([key,count])=>({ key, label: pretty(key), count }))
-    ];
-    catEl.innerHTML = baseCats.map(c => `<button class="cat-item" data-category="${c.key}"><span>${c.label}</span><span style="margin-left:auto;opacity:.7;font-weight:600;">${c.count}</span></button>`).join('');
-    const catButtons = Array.from(catEl.querySelectorAll('.cat-item'));
-    if (catButtons.length) catButtons[0].classList.add('active');
-    catButtons.forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        catButtons.forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        const target = btn.dataset.category || 'all';
-        if (target==='all') {
-          document.querySelector(`.category-chip[data-category="all"]`)?.click();
-        } else {
-          // Map to UI chips if exists, else fall back to 'all'
-          const chip = document.querySelector(`.category-chip[data-category="${target}"]`) || document.querySelector('.category-chip[data-category="all"]');
-          chip?.click();
-        }
-        window.scrollTo({ top: document.querySelector('.products-container')?.offsetTop || 0, behavior:'smooth' });
-      });
-    });
-  }
+    // Build categories list dynamically (all + unique categories)
+    if (catEl) {
+        const pretty = (s) => String(s || '').replace(/[-_]+/g, ' ').replace(/\b\w/g, m => m.toUpperCase());
+        const counts = PRODUCTS_DATA.reduce((acc, p) => { const k = (p.category || 'lain').toLowerCase(); acc[k] = (acc[k] || 0) + 1; return acc; }, {});
+        const baseCats = [
+            { key: 'all', label: 'Semua', count: PRODUCTS_DATA.length },
+            ...Object.entries(counts).map(([key, count]) => ({ key, label: pretty(key), count }))
+        ];
+        catEl.innerHTML = baseCats.map(c => `<button class="cat-item" data-category="${c.key}"><span>${c.label}</span><span style="margin-left:auto;opacity:.7;font-weight:600;">${c.count}</span></button>`).join('');
+        const catButtons = Array.from(catEl.querySelectorAll('.cat-item'));
+        if (catButtons.length) catButtons[0].classList.add('active');
+        catButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                catButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const target = btn.dataset.category || 'all';
+                if (target === 'all') {
+                    document.querySelector(`.category-chip[data-category="all"]`)?.click();
+                } else {
+                    // Map to UI chips if exists, else fall back to 'all'
+                    const chip = document.querySelector(`.category-chip[data-category="${target}"]`) || document.querySelector('.category-chip[data-category="all"]');
+                    chip?.click();
+                }
+                window.scrollTo({ top: document.querySelector('.products-container')?.offsetTop || 0, behavior: 'smooth' });
+            });
+        });
+    }
 
-  // Banner main: pick a featured product (first of filtered or first in dataset)
-  const datasetFull = PRODUCTS_DATA;
-  function bannerCard(p){
-    return `<div class="banner-inner">
+    // Banner main: pick a featured product (first of filtered or first in dataset)
+    const datasetFull = PRODUCTS_DATA;
+    function bannerCard(p) {
+        return `<div class="banner-inner">
       <div class="banner-text">
         <p>Biggest Offer Revealed</p>
         <h2>${p.name}</h2>
@@ -1518,74 +1530,74 @@ function initShopHero(){
       </div>
       <img src="${p.img || p.image}" alt="${p.name}">
     </div>`;
-  }
-  if (mainEl) {
-    const picks = [...datasetFull].slice(0, 6);
-    let idx = 0;
-    const render = ()=>{
-      const p = picks[idx % picks.length] || PRODUCTS_DATA[0];
-      mainEl.innerHTML = bannerCard(p);
-      idx++;
-    };
-    render();
-    setInterval(render, 6000);
-  }
-  if (tilesEl) {
-    const picks = PRODUCTS_DATA.slice(0, 4);
-    tilesEl.innerHTML = picks.map(p=>`<div class="tile"><img src="${p.img}" alt="${p.name}"><div><div class="t-title">${p.name}</div><div class="t-sub">${p.price}</div></div></div>`).join('');
-  }
+    }
+    if (mainEl) {
+        const picks = [...datasetFull].slice(0, 6);
+        let idx = 0;
+        const render = () => {
+            const p = picks[idx % picks.length] || PRODUCTS_DATA[0];
+            mainEl.innerHTML = bannerCard(p);
+            idx++;
+        };
+        render();
+        setInterval(render, 6000);
+    }
+    if (tilesEl) {
+        const picks = PRODUCTS_DATA.slice(0, 4);
+        tilesEl.innerHTML = picks.map(p => `<div class="tile"><img src="${p.img}" alt="${p.name}"><div><div class="t-title">${p.name}</div><div class="t-sub">${p.price}</div></div></div>`).join('');
+    }
 
-  function renderMiniList(el, items){
-    if (!el) return;
-    el.innerHTML = items.map(p=>`<div class="mini" data-id="${p.id}"><img src="${p.img}" alt="${p.name}"><div><div class="m-title">${p.name}</div><div class="m-price">${p.price}</div></div></div>`).join('');
-    el.querySelectorAll('.mini').forEach(div=>{
-      div.addEventListener('click',()=>{ goToDetail(div.dataset.id); });
-    });
-  }
+    function renderMiniList(el, items) {
+        if (!el) return;
+        el.innerHTML = items.map(p => `<div class="mini" data-id="${p.id}"><img src="${p.img}" alt="${p.name}"><div><div class="m-title">${p.name}</div><div class="m-price">${p.price}</div></div></div>`).join('');
+        el.querySelectorAll('.mini').forEach(div => {
+            div.addEventListener('click', () => { goToDetail(div.dataset.id); });
+        });
+    }
 
-  // Recently viewed from localStorage
-  try {
-    const ids = JSON.parse(localStorage.getItem('rv-ids') || '[]');
-    const rvItems = ids
-      .map(id => PRODUCTS_DATA.find(p => String(p.id) === String(id)))
-      .filter(Boolean)
-      .slice(0, 4);
-    renderMiniList(rvEl, rvItems);
-  } catch(e){}
+    // Recently viewed from localStorage
+    try {
+        const ids = JSON.parse(localStorage.getItem('rv-ids') || '[]');
+        const rvItems = ids
+            .map(id => PRODUCTS_DATA.find(p => String(p.id) === String(id)))
+            .filter(Boolean)
+            .slice(0, 4);
+        renderMiniList(rvEl, rvItems);
+    } catch (e) { }
 
-  // Suggestions panel: quick category shortcuts (Purun, Eceng Gondok, Rotan)
-  if (sugEl) {
-    const catMap = {
-      purun: 'Purun',
-      'eceng-gondok': 'Eceng Gondok',
-      rotan: 'Rotan',
-    };
+    // Suggestions panel: quick category shortcuts (Purun, Eceng Gondok, Rotan)
+    if (sugEl) {
+        const catMap = {
+            purun: 'Purun',
+            'eceng-gondok': 'Eceng Gondok',
+            rotan: 'Rotan',
+        };
 
-    const availableKeys = Object.keys(catMap).filter(key =>
-      PRODUCTS_DATA.some(p => (p.category || '').toLowerCase() === key)
-    );
+        const availableKeys = Object.keys(catMap).filter(key =>
+            PRODUCTS_DATA.some(p => (p.category || '').toLowerCase() === key)
+        );
 
-    sugEl.innerHTML = availableKeys.map(key => {
-      const count = PRODUCTS_DATA.filter(p => (p.category || '').toLowerCase() === key).length;
-      return `<button class="mini" data-category="${key}">
+        sugEl.innerHTML = availableKeys.map(key => {
+            const count = PRODUCTS_DATA.filter(p => (p.category || '').toLowerCase() === key).length;
+            return `<button class="mini" data-category="${key}">
         <div>
           <div class="m-title">${catMap[key]}</div>
           <div class="m-price">${count} produk</div>
         </div>
       </button>`;
-    }).join('');
+        }).join('');
 
-    sugEl.querySelectorAll('.mini').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.category;
-        const chip = document.querySelector(`.category-chip[data-category="${key}"]`) ||
-          document.querySelector('.category-chip[data-category="all"]');
-        chip?.click();
-        window.scrollTo({
-          top: document.querySelector('.products-container')?.offsetTop || 0,
-          behavior: 'smooth',
+        sugEl.querySelectorAll('.mini').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.dataset.category;
+                const chip = document.querySelector(`.category-chip[data-category="${key}"]`) ||
+                    document.querySelector('.category-chip[data-category="all"]');
+                chip?.click();
+                window.scrollTo({
+                    top: document.querySelector('.products-container')?.offsetTop || 0,
+                    behavior: 'smooth',
+                });
+            });
         });
-      });
-    });
-  }
+    }
 }
