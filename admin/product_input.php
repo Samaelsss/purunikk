@@ -273,6 +273,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 $stmtModel->close();
             }
 
+            // Insert models (optional)
+            if ($modelImages && isset($modelImages['name']) && is_array($modelImages['name'])) {
+                $modelFileNames  = $modelImages['name'];
+                $modelTmpNames   = $modelImages['tmp_name'] ?? [];
+                $modelFileErrors = $modelImages['error'] ?? [];
+
+                $stmtModel = $conn->prepare('INSERT INTO product_models (product_id, model_name, image_path) VALUES (?, ?, ?)');
+
+                foreach ($modelFileNames as $idx => $originalName) {
+                    $modelName = trim($modelNames[$idx] ?? '');
+                    if ($originalName === '' || $modelName === '') {
+                        continue;
+                    }
+
+                    if (!isset($modelTmpNames[$idx], $modelFileErrors[$idx])) {
+                        continue;
+                    }
+
+                    if ($modelFileErrors[$idx] !== UPLOAD_ERR_OK) {
+                        throw new RuntimeException('Error uploading file for model ' . htmlspecialchars($modelName));
+                    }
+
+                    $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+                    if (!in_array($ext, $allowedExtensions, true)) {
+                        throw new RuntimeException('Invalid image type for model ' . htmlspecialchars($modelName) . '. Allowed: jpg, jpeg, png, webp.');
+                    }
+
+                    $safeBase  = preg_replace('/[^a-zA-Z0-9-_]/', '_', pathinfo($originalName, PATHINFO_FILENAME));
+                    $uniqueKey = bin2hex(random_bytes(4));
+                    $newName   = $safeBase . '_model_' . $uniqueKey . '.' . $ext;
+                    $target    = $uploadDir . $newName;
+
+                    if (!move_uploaded_file($modelTmpNames[$idx], $target)) {
+                        throw new RuntimeException('Failed to move uploaded file for model ' . htmlspecialchars($modelName));
+                    }
+
+                    $relativePath = 'uploads/products/' . $newName;
+                    $stmtModel->bind_param('iss', $productId, $modelName, $relativePath);
+                    $stmtModel->execute();
+                }
+
+                $stmtModel->close();
+            }
+
             $conn->commit();
 
             $successMessage = 'Produk berhasil disimpan.';
@@ -1188,6 +1232,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
 
             <div class="variant-footer-text">
                 Berkas diunggah ke <code>uploads/products/</code> di dalam proyek Anda. Pastikan folder dapat ditulis oleh server.
+            </div>
+
+            <div class="variant-header" style="margin-top: 18px;">
+                <div>
+                    <div class="variant-title">Model Produk</div>
+                    <div class="variant-subtitle">Beri nama model, lalu unggah foto tampilan model tersebut.</div>
+                </div>
+            </div>
+
+            <div id="model-list" class="variant-list"></div>
+
+            <div class="variant-actions">
+                <span class="chip">Contoh: Kecil, Sedang, Besar atau Model A, Model B.</span>
+                <button type="button" class="button-add" id="add-model">
+                    <span class="icon">＋</span>
+                    <span>Tambah model lain</span>
+                </button>
+            </div>
+
+            <div class="variant-footer-text">
+                Gambar model disimpan bersama gambar produk di <code>uploads/products/</code>.
             </div>
         </div>
     </div>
