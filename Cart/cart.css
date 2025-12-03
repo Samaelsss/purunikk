@@ -229,6 +229,37 @@ body::after {
 
 .empty-cart{background:#fff;border:2px dashed #d3b890;border-radius:12px;padding:28px;text-align:center;color:#6b4b30}
 
+<<<<<<< Updated upstream
+=======
+@media(max-width:900px){.cart-layout{grid-template-columns:1fr}.item-right{flex-wrap:wrap;gap:12px;justify-content:flex-end}.item-left{align-items:flex-start}}
+
+@media(max-width:600px){
+  .cart-page{padding:0 16px 24px;}
+  .cart-layout{gap:20px;}
+  .cart-item{flex-direction:column;align-items:flex-start;gap:14px;}
+  .item-left{width:100%;align-items:flex-start;}
+  .item-right{width:100%;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+  .qty-group{min-width:0;align-items:flex-start;}
+  .item-total{text-align:left;align-items:flex-start;}
+  .item-actions{width:100%;justify-content:flex-start;flex-wrap:wrap;}
+  .cart-actions{flex-wrap:wrap;justify-content:space-between;}
+}
+
+@media(max-width:400px){
+  .cart-page{margin:84px auto 40px;padding:0 12px 24px;}
+  .cart-title{font-size:28px;margin:12px 0 20px;}
+  .cart-item{padding:14px 14px;}
+  .item-thumb{width:80px;height:80px;}
+  .qty-group{width:100%;align-items:stretch;}
+  .item-right{flex-direction:column;align-items:flex-start;gap:16px;}
+  .item-actions{justify-content:flex-start;width:100%;}
+  .cart-summary{margin-top:16px;}
+  .cart-actions{flex-direction:column;align-items:stretch;gap:8px;}
+  .btn-ghost{width:100%;text-align:center;}
+}
+
+/* Add breathing room from footer and navbar containers present on this page */
+>>>>>>> Stashed changes
 .navbar-scope + .cart-page{ margin-top: 56px; }
 
 .grass-section {
