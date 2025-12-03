@@ -166,11 +166,11 @@ body::after {
   flex-direction: column;
   align-items: center;
   background-color: #b68a60; /* rail */
-  padding: 0 12px 10px; /* no top padding so we can scroll to absolute top */
+  padding: 14px 12px 12px 12px;
   border-radius: 10px;
   margin-left: 0;
   width: 140px;
-  height: var(--detail-main-size);
+  height: auto; /* adapt to number of images on desktop */
   max-height: var(--detail-main-size);
   overflow: auto;
   border: 3px solid #d3b890;
@@ -854,8 +854,13 @@ button:hover {
   .product-section {
     gap: 18px;
   }
+  .main-image-wrapper{
+   width: var(--detail-main-size);
+  height: var(--detail-main-size);
+  }
+   
   .product-info {
-    width: 100%;
+    width: 100%
     padding: 16px 18px;
   }
   .product-info h2 {
@@ -888,18 +893,31 @@ button:hover {
     padding: 10px 6px 0;
     font-size: 12px;
   }
+  .product-images {
+    flex-direction: column-reverse; 
+    align-items: center;
+    gap: 8px;
+  }
+  .thumbnail-list {
+    width: 100%;
+    justify-content: flex-start; 
+  }
   .product-section {
     padding: 10px;
     gap: 14px;
+    height: auto;
   }
   .product-info {
-    padding: 14px 14px;
+    padding: 10px 12px; /* slightly tighter for small screens */
+    height: auto;       /* let card height follow its content */
+    min-height: auto;   /* override desktop min-height */
   }
   .product-info h2 {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
   .price {
-    font-size: 1.7rem;
+    font-size: 1.5rem;
+    margin: 10px 0 12px;
   }
   .quantity-container {
     gap: 16px;
@@ -935,9 +953,21 @@ button:hover {
     font-size: 12px;
   }
   .action-buttons button {
-    padding: 8px 12px;
-    font-size: 13px;
+    font-size: 12px;
+    padding: 6px 10px;
+    width: 90%;
+
   }
+  .fa-cart-shopping{
+    display: none;
+  }
+  .fa-bolt{
+    display: none;
+  }
+  .rekomendasi-section h3{
+    font-size: 25px;
+  }
+
 }
 
 @media (min-width: 900px) {

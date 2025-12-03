@@ -301,12 +301,8 @@ if (document.readyState === 'loading') {
       const div = document.createElement('div');
       div.className = 'Model_1';
       if (idx === 0) div.classList.add('active');
-      const img = document.createElement('img');
-      img.src = resolveProductImagePath(row.image_path || '');
-      img.alt = row.model_name || '';
       const h4 = document.createElement('h4');
       h4.textContent = row.model_name || '';
-      div.appendChild(img);
       div.appendChild(h4);
       modelsWrap.appendChild(div);
     });
@@ -321,12 +317,8 @@ if (document.readyState === 'loading') {
       const div = document.createElement('div');
       div.className = 'Model_1';
       if (idx === 0) div.classList.add('active');
-      const img = document.createElement('img');
-      img.src = resolveProductImagePath(imgRow.image_path || '');
-      img.alt = imgRow.color || '';
       const h4 = document.createElement('h4');
       h4.textContent = imgRow.color || '';
-      div.appendChild(img);
       div.appendChild(h4);
       modelsWrap.appendChild(div);
     });
