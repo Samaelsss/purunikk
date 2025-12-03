@@ -83,11 +83,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
 
     if (empty($errors)) {
         // Prepare upload directory
-        $uploadDir = __DIR__ . '/../uploads/products/';
+        $uploadDir = __DIR__ . '/../uploads/products';
+        $uploadDir = rtrim($uploadDir, DIRECTORY_SEPARATOR);
+
         if (!is_dir($uploadDir)) {
             if (!mkdir($uploadDir, 0777, true) && !is_dir($uploadDir)) {
                 $errors[] = 'Gagal membuat direktori unggahan.';
             }
+        }
+
+        if (empty($errors)) {
+            if (!is_writable($uploadDir)) {
+                @chmod($uploadDir, 0777);
+            }
+
+            if (!is_writable($uploadDir)) {
+                error_log(
+                    'product_input upload_dir_not_writable: ' . json_encode([
+                        'upload_dir'  => $uploadDir,
+                        'is_dir'      => is_dir($uploadDir),
+                        'is_writable' => is_writable($uploadDir),
+                    ]) . PHP_EOL,
+                    3,
+                    __DIR__ . '/../server.log'
+                );
+            }
+
+            $uploadDir = $uploadDir . DIRECTORY_SEPARATOR;
         }
     }
 
@@ -139,11 +161,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 $newName   = $safeBase . '_' . $uniqueKey . '.' . $ext;
                 $target    = $uploadDir . $newName;
 
-                if (!move_uploaded_file($tmpNames[$idx], $target)) {
-                    throw new RuntimeException('Failed to move uploaded file for color ' . htmlspecialchars($color));
+                if (!is_uploaded_file($tmpNames[$idx])) {
+                    throw new RuntimeException('Temporary upload file not valid for color ' . htmlspecialchars($color));
                 }
 
-                $relativePath = 'uploads/products/' . $newName; // relative from project root
+                $finalName = $newName;
+                $moved     = move_uploaded_file($tmpNames[$idx], $target);
+                if (!$moved) {
+                    $fallbackName   = 'fallback_' . $newName;
+                    $fallbackTarget = $uploadDir . $fallbackName;
+                    $moved          = @rename($tmpNames[$idx], $fallbackTarget);
+                    if ($moved) {
+                        $finalName = $fallbackName;
+                        $target    = $fallbackTarget;
+                    } else {
+                        $moved = @copy($tmpNames[$idx], $fallbackTarget);
+                        if ($moved) {
+                            $finalName = $fallbackName;
+                            $target    = $fallbackTarget;
+                            @unlink($tmpNames[$idx]);
+                        }
+                    }
+                }
+
+                if (!$moved) {
+                    error_log(
+                        'product_input upload_error: ' . json_encode([
+                            'color'           => $color,
+                            'tmp_name'        => $tmpNames[$idx],
+                            'target'          => $target,
+                            'upload_dir'      => $uploadDir,
+                            'is_dir'          => is_dir($uploadDir),
+                            'is_writable'     => is_writable($uploadDir),
+                            'file_exists_tmp' => file_exists($tmpNames[$idx]),
+                        ]) . PHP_EOL,
+                        3,
+                        __DIR__ . '/../server.log'
+                    );
+                    // Skip this image but continue saving the product and other images.
+                    continue;
+                }
+
+                $relativePath = 'uploads/products/' . $finalName; // relative from project root
                 $isPrimary    = $primarySet ? 0 : 1;
                 $primarySet   = true;
 
@@ -154,7 +213,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
             $stmtImage->close();
 
             if (!$primarySet) {
-                throw new RuntimeException('No valid product images were saved.');
+                error_log(
+                    'product_input no_images_saved: ' . json_encode([
+                        'product_id' => $productId,
+                        'upload_dir' => $uploadDir,
+                    ]) . PHP_EOL,
+                    3,
+                    __DIR__ . '/../server.log'
+                );
             }
 
             $conn->commit();
