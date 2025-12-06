@@ -736,6 +736,7 @@ button:hover {
     padding: 16px 18px;
     min-height: auto;
     height: auto;
+    max-width: none;
   }
   .tabs-section {
     padding: 12px 12px;
@@ -879,39 +880,190 @@ button:hover {
     align-items: center;
     gap: 18px;
     padding: 16px;
-    --detail-main-size: clamp(320px, 56vw, 520px);
+    --detail-main-size: min(70vw, 520px);
   }
   .product-images {
     width: 100%;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 12px;
+  }
+  .main-image-wrapper {
+    width: 100%;
+    max-width: 200px;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+  }
+  .thumbnail-list {
     flex-direction: row;
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
     justify-content: center;
+    padding: 12px 10px;
+    gap: 12px;
+  }
+  .thumbnail-list img { width: 78px; height: 78px; }
+  .product-info {
+    width: 100%;
+    padding: 18px 20px;
+    min-height: auto;
+    height: auto;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1024px) {
+  .page-wrapper-v2 {
+    margin-top: 10vw;
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+  }
+  .product-section {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 20px;
+    padding: 20px;
+    --detail-main-size: clamp(360px, 42vw, 520px);
+  }
+  .product-images {
+    flex: 1.1 1 0;
+    flex-direction: row;
     align-items: flex-start;
     gap: 14px;
   }
   .main-image-wrapper {
     width: var(--detail-main-size);
     height: var(--detail-main-size);
-    max-width: 520px;
     min-width: 0;
     min-height: 0;
   }
   .thumbnail-list {
-    flex-direction: column;
-    width: 124px;
+    width: 132px;
     max-height: var(--detail-main-size);
     overflow-y: auto;
     overflow-x: hidden;
-    justify-content: flex-start;
+    flex-direction: column;
+    gap: 14px;
     align-items: center;
     padding: 12px 10px;
+  }
+  .thumbnail-list img { width: 80px; height: 80px; }
+  .product-info {
+    flex: 0.9 1 0;
+    width: 100%;
+    min-width: 0;            /* prevent horizontal scroll from flex children */
+    max-width: 520px;
+    overflow-x: hidden;
+    padding: 18px 20px;
+    min-height: var(--detail-main-size);
+  }
+  .product-info h2 { font-size: 1.3rem; }
+  .rates h3 { font-size: 11px; }
+  .price { font-size: 1.6rem; margin: 10px 0 12px; }
+  .action-buttons h4 { font-size: 0.92rem; margin: 4px 0 6px; }
+  .model_produk,
+  .model_produk_fun { gap: 7px; }
+  .model_produk > div { width: 88px; padding: 4px; }
+  .model_produk_fun .Model_1 { padding: 7px 11px; font-size: 12px; }
+  .Jumlah_produk { gap: 8px; }
+  .quantity-container { gap: 10px; padding: 7px 11px; }
+  .Total,
+  .pengurangan,
+  .penambahan { width: 32px; height: 28px; font-size: 12px; }
+  .action-buttons {
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .action-buttons button { font-size: 12px; padding: 7px 10px; }
+  .chat-seller { font-size: 13px; padding: 8px 10px; width: 100%; }
+}
+
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .page-wrapper-v2 {
+    margin-top: 8vw;
+    margin-left: 2rem;
+    margin-right: 2rem;
+  }
+  .product-section {
+    gap: 22px;
+    padding: 20px;
+    --detail-main-size: clamp(420px, 36vw, 600px);
+  }
+  .product-images {
+    flex: 1 1 0;
     gap: 14px;
   }
-  .thumbnail-list img { width: 86px; height: 86px; }
+  .thumbnail-list {
+    width: 132px;
+    max-height: var(--detail-main-size);
+    gap: 14px;
+  }
+  .thumbnail-list img { width: 92px; height: 92px; }
   .product-info {
+    flex: 1 1 0;
+    min-height: var(--detail-main-size);
+    padding: 20px 22px;
+  }
+  .product-info h2 { font-size: 1.5rem; }
+  .rates h3 { font-size: 12px; }
+  .price { font-size: 1.8rem; margin: 10px 0 12px; }
+  .action-buttons h4 { font-size: 0.95rem; margin: 4px 0 6px; }
+  .model_produk,
+  .model_produk_fun { gap: 8px; }
+  .model_produk > div { width: 92px; padding: 5px; }
+  .model_produk_fun .Model_1 { padding: 8px 12px; }
+  .Jumlah_produk { gap: 10px; }
+  .quantity-container { gap: 14px; padding: 8px 14px; }
+  .Total,
+  .pengurangan,
+  .penambahan { width: 36px; height: 32px; }
+  .action-buttons {
     width: 100%;
-    padding: 18px 20px;
-    min-height: auto;
-    height: auto;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .action-buttons .add-cart,
+  .action-buttons .buy-now {
+    flex: 1 1 0;
+    max-width: none;
+  }
+  .action-buttons button { font-size: 13px; padding: 10px 14px; width: 100%; }
+  .chat-seller { width: 100%; font-size: 14px; padding: 9px 12px; }
+}
+
+@media (min-width: 1441px) and (max-width: 3000px) {
+  .page-wrapper {
+    max-width: 1240px;
+  }
+  .page-wrapper-v2 {
+    margin-top: 6vw;
+    margin-left: 2.5rem;
+    margin-right: 2.5rem;
+  }
+  .product-section {
+    gap: 24px;
+    padding: 24px;
+    --detail-main-size: clamp(520px, 36vw, 720px);
+  }
+  .product-images {
+    flex: 1.15 1 0;
+    gap: 18px;
+  }
+  .thumbnail-list {
+    width: 148px;
+    max-height: var(--detail-main-size);
+    gap: 18px;
+  }
+  .thumbnail-list img { width: 104px; height: 104px; }
+  .product-info {
+    flex: 0.85 1 0;
+    min-height: var(--detail-main-size);
+    padding: 22px 26px;
   }
 }
 
@@ -960,6 +1112,41 @@ button:hover {
   .tab-content {
     padding: 14px 16px;
     font-size: 14px;
+  }
+  .Jumlah_produk {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .quantity-container {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .Total,
+  .pengurangan,
+  .penambahan {
+    width: 80px;
+    height: 40px;
+  }
+  .favorite {
+    width: 100%;
+    max-width: 50px;
+    align-self: stretch;
+  }
+  .product-actions .action-buttons {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .product-actions .action-buttons .add-cart,
+  .product-actions .action-buttons .buy-now {
+    flex: 1 1 0;
+    max-width: none;
+  }
+  .chat-seller {
+    width: 100%;
   }
 }
 
@@ -1032,12 +1219,17 @@ button:hover {
   .model_produk_fun h4 {
     font-size: 12px;
   }
+  .action-buttons{
+    gap: 10px;
+  }
   .action-buttons button {
     font-size: 12px;
     padding: 6px 10px;
     width: 90%;
+    margin: 0;
 
   }
+  .favorite { width: 40px; height: 40px; margin-left: 0;}
   .fa-cart-shopping{
     display: none;
   }
@@ -1050,82 +1242,52 @@ button:hover {
 
 }
 
-@media (min-width: 900px) {
+@media (max-width: 320px) {
+  .page-wrapper-v2 {
+    margin-top: 24vw;
+    margin-left: 0.4rem;
+    margin-right: 0.4rem;
+  }
   .product-section {
-    align-items: stretch;
-  }
-  .product-info {
-    height: var(--detail-main-size);
-    overflow-y: hidden;
-    padding: 14px 18px;
-  }
-  .product-info h2 {
-    font-size: 1.7rem;
-    margin-bottom: 4px;
-  }
-  .rates {
-    padding: 3px 6px;
-    margin-bottom: 4px;
-  }
-  .rates h3 {
-    font-size: 12px;
-  }
-  .Bintang i {
-    font-size: 11px;
-  }
-  .price {
-    font-size: 1.85rem;
-    margin: 10px 0 10px;
-  }
-  .model_produk,
-  .model_produk_fun {
-    margin-bottom: 6px;
-  }
-  .model_produk h4,
-  .model_produk_fun h4 {
-    font-size: 0.8rem;
-  }
-  .model_produk > div {
-    padding: 3px;
-    width: 86px;
-  }
-  .model_produk img,
-  .model_produk_fun img {
-    height: 40px;
-  }
-  .Jumlah_produk {
+    padding: 8px;
     gap: 10px;
-    margin-bottom: 6px;
   }
-  .quantity-container {
-    gap: 14px;
-    padding: 6px 12px;
+  .product-images { gap: 6px; }
+  .thumbnail-list { gap: 8px; }
+  .thumbnail-list img { width: 60px; height: 60px; }
+  .product-info {
+    padding: 10px 12px;
   }
-  .Total {
-    width: 36px;
-    height: 32px;
-    font-size: 13px;
-  }
+  .product-info h2 { font-size: 1.2rem; }
+  .price { font-size: 1.4rem; margin: 8px 0 10px; }
+  .rates h3 { font-size: 11px; }
+  .model_produk,
+  .model_produk_fun { gap: 6px; }
+  .model_produk > div { width: 78px; padding: 4px; }
+  .model_produk_fun .Model_1 { padding: 6px 10px; font-size: 11px; }
+  .Jumlah_produk { gap: 6px; }
+  .quantity-container { gap: 10px; padding: 6px 10px; }
+  .Total,
   .pengurangan,
-  .penambahan {
-    width: 36px;
-    height: 32px;
-  }
-  .favorite {
-    width: 46px;
-    height: 46px;
-  }
-  .action-buttons {
+  .penambahan { width: 32px; height: 30px; font-size: 12px; }
+  .favorite { width: 35px; height: 35px; margin-left: 0;}
+  .product-actions .action-buttons {
+    flex-direction: column;
+    align-items: center;
     gap: 6px;
+    width: 100%;
   }
-  .action-buttons button {
-    padding: 7px 10px;
+  .product-actions .action-buttons button {
+    width: 100%;
+    max-width: 240px;
+    justify-content: center;
     font-size: 12px;
-    margin-right: 4px;
+    padding: 8px 10px;
+    margin: 0;
   }
   .chat-seller {
-    font-size: 14px;
-    padding: 7px 10px;
     width: 100%;
+    font-size: 12px;
+    padding: 8px 10px;
   }
 }
