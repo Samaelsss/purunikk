@@ -132,7 +132,7 @@ placeBtn?.addEventListener('click', ()=>{
     setTimeout(()=>{ window.print(); }, 50);
   });
   btnWa && (btnWa.onclick = () => {
-    const wa = `https://wa.me/?text=${text}`;
+    const wa = `https://wa.me/6285249746506?text=${text}`;
     window.open(wa, '_blank');
   });
   const modal = document.getElementById('receipt-modal');

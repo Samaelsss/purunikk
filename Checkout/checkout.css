@@ -202,30 +202,61 @@ body::after {
 .btn.primary{background:var(--primary);color:var(--primary-foreground);border-color:var(--accent)}
 
 @media print{
-  @page{margin:6mm}
-  html, body{background:#fff}
+  @page{margin:4mm; size:A4; orphans:1; widows:1}
+  html, body{background:#fff; margin:0; padding:0; height:auto}
   /* Hide everything visually */
   body *{visibility:hidden !important}
   /* Show only the receipt modal and its content */
-  #receipt-modal{visibility:visible !important; display:block !important; position:static !important}
+  #receipt-modal{visibility:visible !important; display:block !important; position:static !important; margin:0; padding:0; width:100%; height:auto; inset:auto}
   #receipt-modal *{visibility:visible !important}
   .receipt-backdrop{display:none !important}
   .receipt-actions{display:none !important}
   /* Normalize card for print */
-  .receipt-card{box-shadow:none; border-radius:0; max-width:640px; width:100%; margin:0; position:static; transform:none; background:#fff; font-size:10.5px; page-break-inside:avoid}
-  .receipt-header{padding:6px 10px; gap:4px; border-bottom:1px solid #ddd}
-  .receipt-brand{font-size:16px}
-  .receipt-header h3{font-size:14px}
-  .receipt-body{padding:6px 10px}
-  .receipt-info{line-height:1.3}
+  .receipt-card{box-shadow:none; border-radius:0; max-width:100%; width:100%; margin:0; padding:0; position:static; transform:none; background:#fff; font-size:9px; page-break-inside:avoid; height:auto}
+  .receipt-header{padding:4px 8px; gap:2px; border-bottom:1px solid #999; margin:0}
+  .receipt-brand{font-size:14px; margin:0}
+  .receipt-header h3{font-size:12px; margin:2px 0 0}
+  .receipt-body{padding:4px 8px; margin:0}
+  .receipt-info{line-height:1.2; margin:0; font-size:9px}
+  .receipt-info div{margin:2px 0}
   .receipt-sep{display:none !important}
-  .receipt-items{gap:3px; margin:3px 0 5px}
-  .receipt-item{padding:2px 0; border-bottom:none}
-  .receipt-item .ri-price{min-width:90px}
-  .receipt-total{font-size:14px; margin-top:3px}
-  .receipt-thanks{margin-top:6px; font-size:11px}
+  .receipt-items{gap:0; margin:4px 0; padding:0}
+  .receipt-item{padding:1px 0; border-bottom:none; margin:0; display:flex; justify-content:space-between; font-size:9px}
+  .receipt-item .ri-name{flex:1; margin-right:4px}
+  .receipt-item .ri-price{min-width:70px; text-align:right; flex-shrink:0}
+  .receipt-total{font-size:12px; margin:4px 0 0; padding:2px 0; border-top:1px solid #999}
+  .receipt-thanks{margin:3px 0 0; font-size:8px; line-height:1.1}
 }
 
 @media (max-width:900px){
-  .checkout-container{grid-template-columns:1fr;}
+  .checkout-container{grid-template-columns:1fr;
+}
+.receipt-card{
+  width:calc(100% - 32px);
+  max-width:480px;
+}
+}
+@media (max-width:600px){
+  .receipt-card{
+    width:calc(100% - 20px);
+    max-width:420px;
+  }
+}
+@media (max-width:480px){
+  .receipt-card{
+    width:calc(100% - 16px);
+    max-width:380px;
+  }
+}
+@media (max-width:400px){
+  .receipt-card{
+    width:calc(100% - 12px);
+    max-width:340px;
+  }
+}
+@media (max-width:360px){
+  .receipt-card{
+    width:calc(100% - 8px);
+    max-width:200px;
+  }
 }

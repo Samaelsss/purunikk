@@ -610,6 +610,16 @@ async function renderProduct() {
     });
   }
 
+  const chatSellerBtn = document.querySelector('.chat-seller');
+  if (chatSellerBtn) {
+    chatSellerBtn.addEventListener('click', () => {
+      const variant = getSelectedVariant();
+      const message = `Halo, saya tertarik dengan produk: ${prod.name}%0AModel: ${variant.model}%0AMotif: ${variant.motif}%0AHarga: ${formatRupiah(variant.price)}%0A%0AApakah produk ini masih tersedia?`;
+      const waLink = `https://wa.me/6285249746506?text=${message}`;
+      window.open(waLink, '_blank');
+    });
+  }
+
   // Recommendations: prefer grid with Product card styles; fallback to old scroller if absent
   // Use PRODUCTS_DATA (full catalog) if available; otherwise fall back to current dataset
   const recDataset = (typeof PRODUCTS_DATA !== 'undefined' && Array.isArray(PRODUCTS_DATA) && PRODUCTS_DATA.length)
