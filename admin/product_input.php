@@ -1336,6 +1336,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         <nav class="admin-nav">
             <a href="dashboard_admin.php" class="admin-nav-item">Dashboard</a>
             <a href="product_input.php" class="admin-nav-item active">Produk</a>
+            <a href="manage_products.php" class="admin-nav-item">Kelola Produk</a>
         </nav>
     </div>
 <form method="post" enctype="multipart/form-data" id="product-form" novalidate>

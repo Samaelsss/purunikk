@@ -435,6 +435,9 @@ if (isset($_GET['logout'])) {
                     <a href="product_input.php" class="admin-nav-item">
                         <span>Produk</span>
                     </a>
+                    <a href="manage_products.php" class="admin-nav-item">
+                        <span>Edit Produk</span>
+                    </a>
                 </nav>
             </div>
 
