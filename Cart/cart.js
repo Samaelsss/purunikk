@@ -203,17 +203,20 @@
       });
 
       // Move to wishlist (toggle add)
-      el.querySelector('.move-to-wishlist').addEventListener('click', ()=>{
-        const idStr = String(it.id);
-        let w = getWishlist();
-        if (!w.includes(idStr)) w.push(idStr); else w = w.filter(x=>x!==idStr);
-        setWishlist(w);
-        if (typeof showToast === 'function') {
-          showToast('Produk dipindahkan ke wishlist.', 'info');
-        } else {
-          alert('Produk dipindahkan ke wishlist.');
-        }
-      });
+      const wishlistBtn = el.querySelector('.move-to-wishlist');
+      if (wishlistBtn) {
+        wishlistBtn.addEventListener('click', ()=>{
+          const idStr = String(it.id);
+          let w = getWishlist();
+          if (!w.includes(idStr)) w.push(idStr); else w = w.filter(x=>x!==idStr);
+          setWishlist(w);
+          if (typeof showToast === 'function') {
+            showToast('Produk dipindahkan ke wishlist.', 'info');
+          } else {
+            alert('Produk dipindahkan ke wishlist.');
+          }
+        });
+      }
 
       listEl.appendChild(node);
     });
