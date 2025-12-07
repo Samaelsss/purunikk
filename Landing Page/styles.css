@@ -342,7 +342,7 @@ body.light .section-connector::before {
 .hero {
   position: relative;
   max-width: 1120px;
-  margin: 0 auto;
+  margin: 100px auto;
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
   gap: 2rem;
@@ -2868,7 +2868,8 @@ body.light .icon-button--filled { background: #F9F4E1; }
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(249,244,225,0.25);
-  z-index: 2;
+  z-index: 6; /* keep above iframe/backdrop */
+  pointer-events: auto;
 }
 .video-modal__close::before {
   content: "\00D7";
