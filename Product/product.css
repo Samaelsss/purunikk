@@ -76,6 +76,12 @@
 .shop-banner__main .banner-inner { display: grid; grid-template-columns: 1.3fr 1fr; align-items: center; gap: 1.2rem; height: 100%; animation: fadeIn .5s ease both; }
 .shop-banner__main .banner-text h2 { font-size: clamp(24px, 3.2vw, 40px); margin: 0 0 8px; color: var(--primary-foreground); letter-spacing: .3px; text-shadow: 0 1px 0 rgba(0,0,0,.12); }
 .shop-banner__main .banner-text p { margin: 0; color: color-mix(in oklab, var(--primary-foreground) 88%, transparent); }
+
+/* Dark mode text override for banner */
+body.dark .shop-banner__main .banner-text h2,
+body.dark .shop-banner__main .banner-text p {
+  color: #f9f4e1;
+}
 .shop-banner__main img { width: 100%; max-height: 260px; border-radius: 16px; object-fit: cover; box-shadow: 0 12px 30px rgba(0,0,0,.20); animation: floatUp 6s ease-in-out infinite alternate; }
 
 .shop-banner__tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; padding: 0.8rem; }

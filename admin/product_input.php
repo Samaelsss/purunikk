@@ -14,7 +14,7 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
 $dbHost = 'localhost';
 $dbUser = 'root';
 $dbPass = '';
-$dbName = 'purunikk_db'; // create this DB and required tables in phpMyAdmin
+$dbName = 'mseet_40337985_purunik_db'; // create this DB and required tables in phpMyAdmin
 
 $connectionError = '';
 $conn = null;

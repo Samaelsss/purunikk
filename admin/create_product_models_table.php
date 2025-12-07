@@ -3,7 +3,7 @@
 $dbHost = 'localhost';
 $dbUser = 'root';
 $dbPass = '';
-$dbName = 'purunikk_db';
+$dbName = 'mseet_40337985_purunik_db';
 
 // Koneksi ke MySQL
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
