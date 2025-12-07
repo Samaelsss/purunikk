@@ -1334,6 +1334,8 @@ function loadProductsFromApi() {
                         console.error('pkOnProductsLoaded callback error:', e);
                     }
                 }
+
+                document.dispatchEvent(new CustomEvent('productDataLoaded'));
             })
             .catch((err) => {
                 console.error('Gagal memuat produk dari API:', err);

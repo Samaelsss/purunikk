@@ -715,6 +715,8 @@ async function renderProduct() {
       });
     }
   }
+
+  document.dispatchEvent(new CustomEvent('productDataLoaded'));
 }
 
 renderProduct();

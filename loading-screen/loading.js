@@ -11,29 +11,44 @@
 
   let loadingProgress = 0;
   const bar = loadingScreen.querySelector('.loading-progress');
+  let loadingIntervalId;
+  let hasFinished = false;
 
   const finishLoading = () => {
+    if (hasFinished) return;
+    hasFinished = true;
+    
+    if (loadingIntervalId) clearInterval(loadingIntervalId);
+    loadingProgress = 100;
+    if (bar) {
+      bar.style.width = '100%';
+    }
     loadingScreen.classList.add('hidden');
     if (loadingTarget) {
       loadingTarget.classList.add('loaded');
     }
     setTimeout(() => {
       loadingScreen.style.display = 'none';
-    }, 50);
+    }, 300);
   };
 
-  const loadingInterval = setInterval(() => {
-    loadingProgress += Math.random() * 15;
-    if (loadingProgress >= 100) {
-      loadingProgress = 100;
-    }
-    if (bar) {
-      bar.style.width = loadingProgress + '%';
-    }
+  const startProgressAnimation = () => {
+    loadingIntervalId = setInterval(() => {
+      loadingProgress += Math.random() * 15;
+      if (loadingProgress >= 95) {
+        loadingProgress = 95;
+      }
+      if (bar) {
+        bar.style.width = loadingProgress + '%';
+      }
+    }, 100);
+  };
 
-    if (loadingProgress >= 100) {
-      clearInterval(loadingInterval);
-      setTimeout(finishLoading, 100);
-    }
-  }, 100);
+  startProgressAnimation();
+
+  // Listen for custom productDataLoaded event (from Produk_detail.js)
+  document.addEventListener('productDataLoaded', finishLoading);
+
+  // Fallback: ensure loading completes after 3 seconds max
+  setTimeout(finishLoading, 3000);
 })();
