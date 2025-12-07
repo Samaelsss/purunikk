@@ -898,6 +898,119 @@
       }
     }
 
+    function parsePriceToNumber(price) {
+      var digits = String(price || '').replace(/[^0-9]/g, '');
+      return Number(digits || 0);
+    }
+
+    function getCart() {
+      try {
+        return JSON.parse(localStorage.getItem('cart') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setCart(arr) {
+      try {
+        localStorage.setItem('cart', JSON.stringify(arr));
+      } catch (e) { }
+    }
+
+    function goToDetail(id) {
+      var currentPath = window.location.pathname || '';
+      var lowerPath = currentPath.toLowerCase();
+      var baseIndex = lowerPath.indexOf('/purunikk/');
+
+      if (baseIndex !== -1) {
+        var basePath = currentPath.substring(0, baseIndex + '/purunikk/'.length);
+        window.location.href = basePath + 'Produk_detail.html?id=' + encodeURIComponent(id);
+        return;
+      }
+
+      if (lowerPath.indexOf('/product/') !== -1) {
+        window.location.href = '../Produk_detail.html?id=' + encodeURIComponent(id);
+      } else {
+        window.location.href = 'Produk_detail.html?id=' + encodeURIComponent(id);
+      }
+    }
+
+    function addToCart(product) {
+      var cart = getCart();
+      var key = String(product.id);
+      var existing = cart.find(function (item) { return String(item.key || item.id) === key; });
+      var priceNum = parsePriceToNumber(product.price);
+      var thumb = product.image || product.image_path || product.img || product.thumb || '';
+
+      if (existing) {
+        existing.qty = (existing.qty || 1) + 1;
+      } else {
+        cart.push({
+          key: key,
+          id: product.id,
+          name: product.name,
+          model: product.model || '-',
+          motif: product.motif || '-',
+          price: priceNum,
+          qty: 1,
+          thumb: thumb
+        });
+      }
+
+      setCart(cart);
+
+      if (typeof showToast === 'function') {
+        showToast('Produk ' + (product.name || '') + ' ditambahkan ke keranjang.', 'success');
+      } else {
+        alert('Produk ' + (product.name || '') + ' ditambahkan ke keranjang.');
+      }
+    }
+
+    function attachCardHandlers(products) {
+      if (!Array.isArray(products)) return;
+      var cards = grid.querySelectorAll('.product-card');
+      cards.forEach(function (card) {
+        var productId = card.getAttribute('data-id');
+        var product = products.find(function (p) { return String(p.id) === String(productId); });
+
+        card.addEventListener('click', function (e) {
+          if (e.target.closest('.card-icon-btn')) return;
+          if (!productId) return;
+          if (product) {
+            try {
+              localStorage.setItem('pk-last-product', JSON.stringify(product));
+            } catch (err) { }
+          }
+          goToDetail(productId);
+        });
+
+        var detailBtn = card.querySelector('.card-icon-btn--detail');
+        if (detailBtn) {
+          detailBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (product) {
+              try {
+                localStorage.setItem('pk-last-product', JSON.stringify(product));
+              } catch (err) { }
+            }
+            if (productId) {
+              goToDetail(productId);
+            }
+          });
+        }
+
+        var buyBtn = card.querySelector('.card-icon-btn--buy');
+        if (buyBtn) {
+          buyBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (product) {
+              addToCart(product);
+            }
+          });
+        }
+      });
+    }
+
     function getIcon(category) {
       var c = String(category || '').toLowerCase();
       if (c.indexOf('tas') !== -1) return '👜';
@@ -918,6 +1031,7 @@
         }
 
         var cardsHtml = products.map(function (product) {
+          var productId = product.id;
           var name = product.name || '';
           var category = product.category || '';
           var description = product.description || '';
@@ -932,7 +1046,7 @@
           var icon = getIcon(category);
 
           return (
-            '<article class="product-card">' +
+            '<article class="product-card" data-id="' + escapeHtml(productId || '') + '">' +
               '<div class="card-header">' +
                 '<div class="card-header-icon">' + icon + '</div>' +
                 '<div class="card-header-text">' +
@@ -964,6 +1078,7 @@
         }).join('');
 
         grid.innerHTML = cardsHtml;
+        attachCardHandlers(products);
 
         if (window && window.initLandingProductCarousel) {
           window.initLandingProductCarousel();
