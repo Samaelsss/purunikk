@@ -14,7 +14,7 @@ try {
     $conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName);
     $conn->set_charset('utf8mb4');
 
-    // Fetch latest products with their primary image (or first image fallback)
+    // Fetch latest products with their primary image (prioritize main product image)
     $sql = "
         SELECT
             p.id,
@@ -23,6 +23,7 @@ try {
             p.description,
             p.category,
             COALESCE(
+                p.image_path,
                 (
                     SELECT pi.image_path
                     FROM product_images pi

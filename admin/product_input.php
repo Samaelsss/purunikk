@@ -38,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
     $price       = trim($_POST['product_price'] ?? '');
     $description = trim($_POST['product_description'] ?? '');
     $category    = trim($_POST['product_category'] ?? '');
+    $productImage = $_FILES['product_image'] ?? null;
 
     // Data varian generik: hingga 3 kategori, masing-masing punya banyak baris
     $variantCategoryNames    = $_POST['variant_category_name'] ?? [];
@@ -71,21 +72,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
     if ($category === '') {
         $errors[] = 'Kategori produk wajib diisi.';
     }
+    
+    // Validate product image (required)
+    $productImagePath = null;
+    if (!$productImage || !isset($productImage['name']) || $productImage['name'] === '') {
+        $errors[] = 'Gambar produk wajib diunggah.';
+    } elseif ($productImage['error'] !== UPLOAD_ERR_OK) {
+        $errors[] = 'Error mengunggah gambar produk.';
+    } else {
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+        $ext = strtolower(pathinfo($productImage['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowedExtensions, true)) {
+            $errors[] = 'Format gambar tidak didukung. Gunakan JPG, PNG, atau WEBP.';
+        }
+    }
 
-    // Minimal satu baris varian dengan gambar agar ada media utama
-    $hasAtLeastOneImage = false;
-    if ($variantFiles && isset($variantFiles['name']) && is_array($variantFiles['name'])) {
-        foreach ($variantFiles['name'] as $idx => $fileName) {
-            $itemName = trim($variantItemNames[$idx] ?? '');
-            if ($fileName !== '' && $itemName !== '') {
-                $hasAtLeastOneImage = true;
+    // Cek minimal satu baris varian dengan nama (gambar opsional)
+    $hasAtLeastOneVariant = false;
+    if (is_array($variantItemNames)) {
+        foreach ($variantItemNames as $itemName) {
+            if (trim($itemName ?? '') !== '') {
+                $hasAtLeastOneVariant = true;
                 break;
             }
         }
     }
 
-    if (!$hasAtLeastOneImage) {
-        $errors[] = 'Tambahkan minimal satu baris varian dengan gambar.';
+    if (!$hasAtLeastOneVariant) {
+        $errors[] = 'Tambahkan minimal satu baris varian.';
     }
 
     // Siapkan folder upload
@@ -120,14 +134,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         }
     }
 
+    // Process main product image upload
+    if (empty($errors) && $productImage && $productImage['name'] !== '') {
+        try {
+            $ext = strtolower(pathinfo($productImage['name'], PATHINFO_EXTENSION));
+            $safeBase  = preg_replace('/[^a-zA-Z0-9-_]/', '_', pathinfo($productImage['name'], PATHINFO_FILENAME));
+            $uniqueKey = bin2hex(random_bytes(4));
+            $newName   = $safeBase . '_main_' . $uniqueKey . '.' . $ext;
+            $target    = $uploadDir . $newName;
+
+            if (!is_uploaded_file($productImage['tmp_name'])) {
+                $errors[] = 'File gambar produk tidak valid.';
+            } else {
+                $moved = move_uploaded_file($productImage['tmp_name'], $target);
+                if (!$moved) {
+                    $fallbackName   = 'fallback_' . $newName;
+                    $fallbackTarget = $uploadDir . $fallbackName;
+                    $moved          = @rename($productImage['tmp_name'], $fallbackTarget);
+                    if ($moved) {
+                        $newName = $fallbackName;
+                        $target  = $fallbackTarget;
+                    } else {
+                        $moved = @copy($productImage['tmp_name'], $fallbackTarget);
+                        if ($moved) {
+                            $newName = $fallbackName;
+                            $target  = $fallbackTarget;
+                            @unlink($productImage['tmp_name']);
+                        }
+                    }
+                }
+
+                if ($moved) {
+                    $productImagePath = 'uploads/products/' . $newName;
+                } else {
+                    $errors[] = 'Gagal mengunggah gambar produk.';
+                    error_log(
+                        'product_input image_upload_failed: ' . json_encode([
+                            'file' => $productImage['name'],
+                            'target' => $target,
+                        ]) . PHP_EOL,
+                        3,
+                        __DIR__ . '/../server.log'
+                    );
+                }
+            }
+        } catch (Throwable $e) {
+            $errors[] = 'Error saat mengunggah gambar: ' . $e->getMessage();
+        }
+    }
+
     if (empty($errors)) {
         try {
             $conn->begin_transaction();
 
-            // Insert product
-            $stmtProduct = $conn->prepare('INSERT INTO products (name, price, description, category, created_at) VALUES (?, ?, ?, ?, NOW())');
+            // Ensure image_path column exists
+            try {
+                $checkColStmt = $conn->prepare('SHOW COLUMNS FROM products WHERE Field = ?');
+                $colName = 'image_path';
+                $checkColStmt->bind_param('s', $colName);
+                $checkColStmt->execute();
+                $result = $checkColStmt->get_result();
+                if ($result->num_rows === 0) {
+                    $conn->query('ALTER TABLE products ADD COLUMN image_path VARCHAR(255) DEFAULT NULL');
+                }
+                $checkColStmt->close();
+            } catch (Throwable $e) {
+                // If check fails, try to add the column anyway
+                @$conn->query('ALTER TABLE products ADD COLUMN image_path VARCHAR(255) DEFAULT NULL');
+            }
+
+            // Insert product with image_path
+            $stmtProduct = $conn->prepare('INSERT INTO products (name, price, description, category, image_path, created_at) VALUES (?, ?, ?, ?, ?, NOW())');
             $priceFloat  = (float)$price;
-            $stmtProduct->bind_param('sdss', $name, $priceFloat, $description, $category);
+            $stmtProduct->bind_param('sdsss', $name, $priceFloat, $description, $category, $productImagePath);
             $stmtProduct->execute();
             $productId = $stmtProduct->insert_id;
             $stmtProduct->close();
@@ -152,77 +231,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 $rawPrice      = trim($variantItemPrices[$idx] ?? '');
                 $optionPrice   = is_numeric($rawPrice) ? (float)$rawPrice : 0.0;
 
-                if ($originalName === '' || $optionName === '' || $categoryName === '') {
+                if ($optionName === '' || $categoryName === '') {
                     continue;
                 }
 
-                if (!isset($tmpNames[$idx], $fileErrors[$idx])) {
-                    continue;
-                }
+                $relativePath = null;
 
-                if ($fileErrors[$idx] !== UPLOAD_ERR_OK) {
-                    throw new RuntimeException('Error uploading file for variant ' . htmlspecialchars($optionName));
-                }
+                // Jika ada file upload, proses gambar (opsional)
+                if ($originalName !== '' && isset($tmpNames[$idx], $fileErrors[$idx])) {
+                    if ($fileErrors[$idx] !== UPLOAD_ERR_OK) {
+                        throw new RuntimeException('Error uploading file for variant ' . htmlspecialchars($optionName));
+                    }
 
-                $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
-                if (!in_array($ext, $allowedExtensions, true)) {
-                    throw new RuntimeException('Invalid image type for variant ' . htmlspecialchars($optionName) . '. Allowed: jpg, jpeg, png, webp.');
-                }
+                    $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+                    if (!in_array($ext, $allowedExtensions, true)) {
+                        throw new RuntimeException('Invalid image type for variant ' . htmlspecialchars($optionName) . '. Allowed: jpg, jpeg, png, webp.');
+                    }
 
-                $safeBase  = preg_replace('/[^a-zA-Z0-9-_]/', '_', pathinfo($originalName, PATHINFO_FILENAME));
-                $uniqueKey = bin2hex(random_bytes(4));
-                $newName   = $safeBase . '_var_' . $uniqueKey . '.' . $ext;
-                $target    = $uploadDir . $newName;
+                    $safeBase  = preg_replace('/[^a-zA-Z0-9-_]/', '_', pathinfo($originalName, PATHINFO_FILENAME));
+                    $uniqueKey = bin2hex(random_bytes(4));
+                    $newName   = $safeBase . '_var_' . $uniqueKey . '.' . $ext;
+                    $target    = $uploadDir . $newName;
 
-                if (!is_uploaded_file($tmpNames[$idx])) {
-                    throw new RuntimeException('Temporary upload file not valid for variant ' . htmlspecialchars($optionName));
-                }
+                    if (!is_uploaded_file($tmpNames[$idx])) {
+                        throw new RuntimeException('Temporary upload file not valid for variant ' . htmlspecialchars($optionName));
+                    }
 
-                $finalName = $newName;
-                $moved     = move_uploaded_file($tmpNames[$idx], $target);
-                if (!$moved) {
-                    $fallbackName   = 'fallback_' . $newName;
-                    $fallbackTarget = $uploadDir . $fallbackName;
-                    $moved          = @rename($tmpNames[$idx], $fallbackTarget);
-                    if ($moved) {
-                        $finalName = $fallbackName;
-                        $target    = $fallbackTarget;
-                    } else {
-                        $moved = @copy($tmpNames[$idx], $fallbackTarget);
+                    $finalName = $newName;
+                    $moved     = move_uploaded_file($tmpNames[$idx], $target);
+                    if (!$moved) {
+                        $fallbackName   = 'fallback_' . $newName;
+                        $fallbackTarget = $uploadDir . $fallbackName;
+                        $moved          = @rename($tmpNames[$idx], $fallbackTarget);
                         if ($moved) {
                             $finalName = $fallbackName;
                             $target    = $fallbackTarget;
-                            @unlink($tmpNames[$idx]);
+                        } else {
+                            $moved = @copy($tmpNames[$idx], $fallbackTarget);
+                            if ($moved) {
+                                $finalName = $fallbackName;
+                                $target    = $fallbackTarget;
+                                @unlink($tmpNames[$idx]);
+                            }
                         }
                     }
+
+                    if (!$moved) {
+                        error_log(
+                            'product_input upload_error: ' . json_encode([
+                                'category_name'    => $categoryName,
+                                'option_name'      => $optionName,
+                                'tmp_name'         => $tmpNames[$idx],
+                                'target'           => $target,
+                                'upload_dir'       => $uploadDir,
+                                'is_dir'           => is_dir($uploadDir),
+                                'is_writable'      => is_writable($uploadDir),
+                                'file_exists_tmp'  => file_exists($tmpNames[$idx]),
+                            ]) . PHP_EOL,
+                            3,
+                            __DIR__ . '/../server.log'
+                        );
+                        continue;
+                    }
+
+                    $relativePath = 'uploads/products/' . $finalName;
                 }
 
-                if (!$moved) {
-                    error_log(
-                        'product_input upload_error: ' . json_encode([
-                            'category_name'    => $categoryName,
-                            'option_name'      => $optionName,
-                            'tmp_name'         => $tmpNames[$idx],
-                            'target'           => $target,
-                            'upload_dir'       => $uploadDir,
-                            'is_dir'           => is_dir($uploadDir),
-                            'is_writable'      => is_writable($uploadDir),
-                            'file_exists_tmp'  => file_exists($tmpNames[$idx]),
-                        ]) . PHP_EOL,
-                        3,
-                        __DIR__ . '/../server.log'
-                    );
-                    continue;
-                }
-
-                $relativePath = 'uploads/products/' . $finalName;
-
-                // Simpan ke tabel varian generik
+                // Simpan ke tabel varian generik (gambar opsional, bisa NULL)
                 $stmtVariant->bind_param('issds', $productId, $categoryName, $optionName, $optionPrice, $relativePath);
                 $stmtVariant->execute();
 
-                // Kompatibilitas: jika kategori mengandung "warna" atau "color", isi product_images
-                if (stripos($categoryName, 'warna') !== false || stripos($categoryName, 'color') !== false) {
+                // Kompatibilitas: jika kategori mengandung "warna" atau "color" dan ada gambar, isi product_images
+                if ($relativePath !== null && (stripos($categoryName, 'warna') !== false || stripos($categoryName, 'color') !== false)) {
                     $isPrimary  = $primarySet ? 0 : 1;
                     $primarySet = true;
                     $colorLabel = $optionName;
@@ -230,8 +310,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                     $stmtImage->execute();
                 }
 
-                // Kompatibilitas: jika kategori mengandung "model", isi product_models
-                if (stripos($categoryName, 'model') !== false) {
+                // Kompatibilitas: jika kategori mengandung "model" dan ada gambar, isi product_models
+                if ($relativePath !== null && stripos($categoryName, 'model') !== false) {
                     $stmtModel->bind_param('iss', $productId, $optionName, $relativePath);
                     $stmtModel->execute();
                 }
@@ -1332,6 +1412,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                                 placeholder="Tulis cerita singkat: bahan, kapasitas, gaya, dan tips perawatan."
                             ></textarea>
                         </div>
+
+                        <div class="field">
+                            <div class="field-label">
+                                <span>Gambar Produk <span class="required">*</span></span>
+                            </div>
+                            <div class="field-description">Upload gambar utama produk. JPG / PNG / WEBP · maks ~4 MB</div>
+                            <div style="border: 2px dashed #b68a60; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease;" id="product-image-dropzone">
+                                <div style="font-size: 32px; margin-bottom: 8px;">⇪</div>
+                                <div style="font-weight: 600; margin-bottom: 4px;">Seret gambar atau klik untuk memilih</div>
+                                <div style="color: #999; font-size: 13px;">JPG / PNG / WEBP · maks ~4 MB</div>
+                                <input type="file" name="product_image" id="product_image" form="product-form" accept="image/*" style="display: none;" required>
+                            </div>
+                            <div id="product-image-preview" style="margin-top: 12px; text-align: center;"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -1447,7 +1541,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 <input type="number" name="variant_item_price[]" form="product-form" min="0" step="1000" placeholder="Mis. 25000">
             </div>
             <div class="variant-upload">
-                <div>Gambar opsi</div>
+                <div>Gambar opsi (opsional)</div>
                 <div class="upload-shell">
                     <label class="upload-dropzone">
                         <div class="upload-icon">⇪</div>
@@ -1603,6 +1697,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         const t = document.getElementById('toast');
         if (t) dismissToast();
     }, 6000);
+
+    // Product image dropzone + preview
+    const productImageDropzone = document.getElementById('product-image-dropzone');
+    const productImageInput = document.getElementById('product_image');
+    const productImagePreview = document.getElementById('product-image-preview');
+
+    if (productImageDropzone && productImageInput) {
+        // Click to open file picker
+        productImageDropzone.addEventListener('click', () => productImageInput.click());
+
+        // Drag and drop
+        productImageDropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            productImageDropzone.style.backgroundColor = '#f5ede2';
+            productImageDropzone.style.borderColor = '#b68a60';
+        });
+
+        productImageDropzone.addEventListener('dragleave', () => {
+            productImageDropzone.style.backgroundColor = '';
+            productImageDropzone.style.borderColor = '#b68a60';
+        });
+
+        productImageDropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            productImageDropzone.style.backgroundColor = '';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                productImageInput.files = files;
+                updateProductImagePreview();
+            }
+        });
+
+        // File input change
+        productImageInput.addEventListener('change', updateProductImagePreview);
+
+        function updateProductImagePreview() {
+            const file = productImageInput.files && productImageInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    productImagePreview.innerHTML = `
+                        <img src="${e.target.result}" style="max-width: 200px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <p style="margin-top: 8px; font-size: 13px; color: #666;">${file.name}</p>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                productImagePreview.innerHTML = '';
+            }
+        }
+    }
 </script>
 </body>
 </html>

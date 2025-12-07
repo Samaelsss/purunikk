@@ -240,11 +240,26 @@ async function renderProduct() {
     console.error('Gagal memuat model produk:', e);
   }
 
+  // Ambil semua varian generik (kategori + opsi) untuk produk ini
+  let variantOptions = [];
+  try {
+    if (prod.id) {
+      const resVariants = await fetch('http://localhost/purunikk/admin/product_variant_options_api.php?product_id=' + encodeURIComponent(prod.id));
+      if (resVariants.ok) {
+        const dataVariants = await resVariants.json();
+        if (Array.isArray(dataVariants)) {
+          variantOptions = dataVariants;
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Gagal memuat varian produk:', e);
+  }
+
   const imgEl = document.getElementById('product-img') || document.getElementById('main-img');
   const nameEl = document.getElementById('product-name');
   const priceEl = document.getElementById('product-price');
   const descEl = document.getElementById('product-desc');
-  const specsWrap = document.getElementById('product-specs');
   const breadcrumbEl = document.getElementById('breadcrumb-product');
   const mainImgSrc = resolveProductImagePath(prod.img || prod.image || prod.image_path || prod.thumb || '');
   if (imgEl) { imgEl.src = mainImgSrc; imgEl.alt = prod.name || ''; }
@@ -253,11 +268,29 @@ async function renderProduct() {
   if (priceEl) { priceEl.textContent = formatRupiah(prod.price); }
   if (descEl) { descEl.textContent = prod.description || ''; }
 
-  const rawThumbs = (Array.isArray(colorImages) && colorImages.length)
-    ? colorImages.map(ci => ci.image_path)
-    : ((Array.isArray(prod.images) && prod.images.length)
-      ? prod.images
-      : [prod.thumb || prod.img || prod.image || prod.image_path].filter(Boolean));
+  // Build thumbnail list: main image first, then color images or other variants
+  let rawThumbs = [];
+  const mainImage = prod.image_path || prod.img || prod.image || prod.thumb;
+  
+  if (mainImage) {
+    rawThumbs.push(mainImage);
+  }
+  
+  if (Array.isArray(colorImages) && colorImages.length) {
+    colorImages.forEach(ci => {
+      const imgPath = ci.image_path;
+      if (imgPath && imgPath !== mainImage) {
+        rawThumbs.push(imgPath);
+      }
+    });
+  } else if (Array.isArray(prod.images) && prod.images.length) {
+    prod.images.forEach(img => {
+      if (img && img !== mainImage) {
+        rawThumbs.push(img);
+      }
+    });
+  }
+  
   const thumbs = rawThumbs.map(resolveProductImagePath);
   const thumbList = document.getElementById('thumbnail-list');
   if (thumbList && thumbs.length) {
@@ -275,41 +308,6 @@ async function renderProduct() {
     });
   }
 
-  if (specsWrap) {
-    specsWrap.innerHTML = '';
-    if (prod.specs && typeof prod.specs === 'object') {
-      for (const k in prod.specs) {
-        const box = document.createElement('div');
-        const label = document.createElement('h4');
-        label.textContent = k;
-        const val = document.createElement('img');
-        val.alt = k;
-        val.style.display = 'none';
-        box.appendChild(label);
-        specsWrap.appendChild(box);
-      }
-    }
-  }
-  const specContent = document.getElementById('spec-content');
-  if (specContent) {
-    if (prod.specs && typeof prod.specs === 'object') {
-      const table = document.createElement('table');
-      Object.entries(prod.specs).forEach(([k, v]) => {
-        const tr = document.createElement('tr');
-        if (Array.isArray(v)) {
-          const list = `<ul>${v.map(item => `<li>${item}</li>`).join('')}</ul>`;
-          tr.innerHTML = `<td>${k}</td><td>${list}</td>`;
-        } else {
-          tr.innerHTML = `<td>${k}</td><td>${v}</td>`;
-        }
-        table.appendChild(tr);
-      });
-      specContent.innerHTML = '';
-      specContent.appendChild(table);
-    } else {
-      specContent.textContent = 'Spesifikasi belum tersedia.';
-    }
-  }
   const descContent = document.getElementById('desc-content');
   if (descContent) { descContent.textContent = prod.description || ''; }
 
@@ -326,81 +324,163 @@ async function renderProduct() {
     }
   }
 
-  // Render motifs dari data
-  const motifsWrap = document.querySelector('.model_produk');
-  if (motifsWrap && Array.isArray(prod.motifs) && prod.motifs.length) {
-    motifsWrap.innerHTML = '';
-    prod.motifs.forEach((m, idx) => {
-      const div = document.createElement('div');
-      if (idx === 0) div.classList.add('active');
-      const img = document.createElement('img');
-      img.src = resolveProductImagePath(m.img || '');
-      img.alt = m.name || '';
-      const h4 = document.createElement('h4');
-      h4.textContent = m.name || '';
-      div.appendChild(img);
-      div.appendChild(h4);
-      motifsWrap.appendChild(div);
+  // ===== Render varian (semua kategori) dari database =====
+  const variantContainer = document.getElementById('variant-categories-container');
+
+  function groupVariantOptions(options) {
+    const groups = {};
+    (options || []).forEach((opt) => {
+      const key = (opt.category_name || '').trim();
+      if (!key) return;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(opt);
     });
+    return groups;
   }
 
-  // Render models dari data
-  const modelsWrap = document.querySelector('.model_produk_fun');
-  if (modelsWrap && Array.isArray(modelsFromDb) && modelsFromDb.length) {
-    const title = modelsWrap.querySelector('h4')?.textContent || 'Pilih model';
-    modelsWrap.innerHTML = '';
+  function renderVariantCategory(categoryName, list) {
+    if (!list || !list.length) return null;
+
+    const categoryDiv = document.createElement('div');
+    categoryDiv.className = 'model_produk';
+    categoryDiv.dataset.categoryName = categoryName;
+
     const titleEl = document.createElement('h4');
-    titleEl.textContent = title;
-    modelsWrap.appendChild(titleEl);
-    modelsFromDb.forEach((row, idx) => {
+    titleEl.textContent = categoryName;
+    categoryDiv.appendChild(titleEl);
+
+    const isMotifsCategory = /(motif|warna|color)/i.test(categoryName);
+    const isModelCategory = /model/i.test(categoryName);
+
+    if (isModelCategory) {
+      categoryDiv.classList.add('model-category');
+    }
+
+    list.forEach((opt, idx) => {
       const div = document.createElement('div');
-      div.className = 'Model_1';
       if (idx === 0) div.classList.add('active');
+
+      const optionPrice = opt.option_price && parseFloat(opt.option_price) > 0 ? parseFloat(opt.option_price) : null;
+      const imageSrc = opt.image_path ? resolveProductImagePath(opt.image_path) : '';
+
+      if (!isMotifsCategory) {
+        div.classList.add('Model_1');
+      }
+
+      if (imageSrc) {
+        div.dataset.imgSrc = imageSrc;
+      }
+
       const h4 = document.createElement('h4');
-      h4.textContent = row.model_name || '';
+      h4.textContent = opt.option_name || '';
       div.appendChild(h4);
-      modelsWrap.appendChild(div);
+
+      if (optionPrice) {
+        div.dataset.optionPrice = optionPrice;
+      }
+
+      categoryDiv.appendChild(div);
     });
-  } else if (modelsWrap && Array.isArray(colorImages) && colorImages.length) {
-    // fallback: gunakan gambar warna sebagai model jika belum ada tabel model
-    const title = modelsWrap.querySelector('h4')?.textContent || 'Pilih model';
-    modelsWrap.innerHTML = '';
-    const titleEl = document.createElement('h4');
-    titleEl.textContent = title;
-    modelsWrap.appendChild(titleEl);
-    colorImages.forEach((imgRow, idx) => {
-      const div = document.createElement('div');
-      div.className = 'Model_1';
-      if (idx === 0) div.classList.add('active');
-      const h4 = document.createElement('h4');
-      h4.textContent = imgRow.color || '';
-      div.appendChild(h4);
-      modelsWrap.appendChild(div);
-    });
-  } else if (modelsWrap && Array.isArray(prod.models) && prod.models.length) {
-    // fallback ke perilaku lama jika tidak ada data gambar warna di database
-    const title = modelsWrap.querySelector('h4')?.textContent || 'Pilih model';
-    modelsWrap.innerHTML = '';
-    const titleEl = document.createElement('h4');
-    titleEl.textContent = title;
-    modelsWrap.appendChild(titleEl);
-    prod.models.forEach((name, idx) => {
-      const div = document.createElement('div');
-      div.className = 'Model_1';
-      if (idx === 0) div.classList.add('active');
-      const h4 = document.createElement('h4');
-      h4.textContent = name;
-      div.appendChild(h4);
-      modelsWrap.appendChild(div);
-    });
+
+    return categoryDiv;
   }
 
-  // Helper: hitung harga berdasarkan pilihan motif + model
+  if (variantContainer && Array.isArray(variantOptions) && variantOptions.length) {
+    variantContainer.innerHTML = '';
+    const variantGroups = groupVariantOptions(variantOptions);
+
+    Object.entries(variantGroups).forEach(([categoryName, items]) => {
+      const categorySection = renderVariantCategory(categoryName, items);
+      if (categorySection) {
+        variantContainer.appendChild(categorySection);
+      }
+    });
+  } else if (variantContainer) {
+    variantContainer.innerHTML = '';
+    if (Array.isArray(prod.motifs) && prod.motifs.length) {
+      const motifsDiv = renderVariantCategory('Pilih motif', prod.motifs.map(m => ({
+        option_name: m.name,
+        image_path: m.img,
+      })));
+      if (motifsDiv) variantContainer.appendChild(motifsDiv);
+    }
+    if (Array.isArray(modelsFromDb) && modelsFromDb.length) {
+      const modelsDiv = renderVariantCategory('Pilih Model', modelsFromDb.map(m => ({
+        option_name: m.model_name,
+        image_path: m.image_path,
+      })));
+      if (modelsDiv) variantContainer.appendChild(modelsDiv);
+    } else if (Array.isArray(prod.models) && prod.models.length) {
+      const modelsDiv = renderVariantCategory('Pilih Model', prod.models.map(name => ({
+        option_name: name,
+      })));
+      if (modelsDiv) variantContainer.appendChild(modelsDiv);
+    }
+  }
+
+  // Kumpulkan semua gambar varian dan tambahkan ke thumbnail-list
+  function populateThumbnailsFromVariants() {
+    if (!thumbList) return;
+
+    const variantImages = new Set();
+    const variantDivs = document.querySelectorAll('#variant-categories-container .model_produk > div:not(h4)');
+    
+    variantDivs.forEach((div) => {
+      const imgSrc = div.dataset.imgSrc;
+      if (imgSrc) {
+        variantImages.add(imgSrc);
+      }
+    });
+
+    const combinedThumbs = [...thumbs];
+    variantImages.forEach((src) => {
+      if (!combinedThumbs.includes(src)) {
+        combinedThumbs.push(src);
+      }
+    });
+
+    if (thumbList && combinedThumbs.length) {
+      thumbList.innerHTML = '';
+      combinedThumbs.forEach((src, idx) => {
+        const t = document.createElement('img');
+        t.src = src;
+        if (idx === 0) t.classList.add('active');
+        t.addEventListener('click', () => {
+          document.querySelectorAll('#thumbnail-list img').forEach(i => i.classList.remove('active'));
+          t.classList.add('active');
+          if (imgEl) imgEl.src = src;
+        });
+        thumbList.appendChild(t);
+      });
+    }
+  }
+
+  populateThumbnailsFromVariants();
+
+  // Helper: hitung harga berdasarkan pilihan varian (support semua kategori + harga varian)
   function getSelectedVariant() {
-    const motifActive = document.querySelector('.model_produk > div.active h4');
-    const modelActive = document.querySelector('.model_produk_fun > .Model_1.active h4');
-    let motif = motifActive ? motifActive.textContent.trim() : (prod.motifs?.[0]?.name || '');
-    let model = modelActive ? modelActive.textContent.trim() : '';
+    let basePrice = parsePriceToNumber(prod.price);
+    let selectedVariants = {};
+    let variantPrices = [];
+
+    const variantDivs = document.querySelectorAll('#variant-categories-container .model_produk');
+    variantDivs.forEach((categoryDiv) => {
+      const categoryName = categoryDiv.dataset.categoryName || '';
+      const activeDiv = categoryDiv.querySelector('div.active');
+      const activeText = activeDiv ? activeDiv.querySelector('h4')?.textContent?.trim() : '';
+
+      if (activeText) {
+        selectedVariants[categoryName] = activeText;
+
+        const optionPrice = activeDiv?.dataset?.optionPrice;
+        if (optionPrice && parseFloat(optionPrice) > 0) {
+          variantPrices.push(parseFloat(optionPrice));
+        }
+      }
+    });
+
+    let motif = selectedVariants[Object.keys(selectedVariants).find(k => /(motif|warna|color)/i.test(k))] || (prod.motifs?.[0]?.name || '');
+    let model = selectedVariants[Object.keys(selectedVariants).find(k => /model/i.test(k))] || '';
 
     if (!model) {
       if (Array.isArray(prod.models) && prod.models.length) {
@@ -409,11 +489,16 @@ async function renderProduct() {
         model = modelsFromDb[0].model_name || '';
       }
     }
-    let price = parsePriceToNumber(prod.price);
-    if (prod.pricing && prod.pricing[model] && prod.pricing[model][motif] != null) {
+
+    let price = basePrice;
+
+    if (variantPrices.length > 0) {
+      price = variantPrices[0];
+    } else if (prod.pricing && prod.pricing[model] && prod.pricing[model][motif] != null) {
       price = parsePriceToNumber(prod.pricing[model][motif]);
     }
-    return { motif, model, price };
+
+    return { motif, model, price, selectedVariants };
   }
 
   function updateDisplayedPrice() {
@@ -421,33 +506,41 @@ async function renderProduct() {
     if (priceEl) priceEl.textContent = formatRupiah(price);
   }
 
-  // Set listener untuk update harga ketika motif / model diklik
-  document.querySelectorAll('.model_produk > div').forEach(div => {
-    div.addEventListener('click', () => {
-      div.parentElement.querySelectorAll('div').forEach(b => b.classList.remove('active'));
-      div.classList.add('active');
-      updateDisplayedPrice();
-    });
-  });
-  document.querySelectorAll('.model_produk_fun > .Model_1').forEach((div, index) => {
-    div.addEventListener('click', () => {
-      document.querySelectorAll('.model_produk_fun > .Model_1').forEach(b => b.classList.remove('active'));
-      div.classList.add('active');
-      updateDisplayedPrice();
+  function wireVariantClickHandlers() {
+    document.querySelectorAll('#variant-categories-container .model_produk > div:not(h4)').forEach((div) => {
+      div.addEventListener('click', () => {
+        const categoryDiv = div.parentElement;
+        const categoryName = categoryDiv.dataset.categoryName || '';
+        const isModelCategory = /model/i.test(categoryName);
 
-      // Sinkronkan gambar utama dan thumbnail dengan model/warna yang aktif
-      const thumbImgs = document.querySelectorAll('#thumbnail-list img');
-      const targetSrc = Array.isArray(thumbs) ? thumbs[index] : null;
+        categoryDiv.querySelectorAll('div:not(h4)').forEach(b => b.classList.remove('active'));
+        div.classList.add('active');
 
-      if (imgEl && targetSrc) {
-        imgEl.src = targetSrc;
-      }
-      if (thumbImgs.length && thumbImgs[index]) {
-        thumbImgs.forEach(i => i.classList.remove('active'));
-        thumbImgs[index].classList.add('active');
-      }
+        if (imgEl && div.dataset.imgSrc) {
+          imgEl.src = div.dataset.imgSrc;
+        }
+
+        updateDisplayedPrice();
+
+        if (isModelCategory) {
+          const thumbImgs = document.querySelectorAll('#thumbnail-list img');
+          const targetSrc = div.dataset.imgSrc;
+          if (imgEl && targetSrc) {
+            imgEl.src = targetSrc;
+          }
+          if (thumbImgs.length) {
+            const divIndex = Array.from(categoryDiv.querySelectorAll('div:not(h4)')).indexOf(div);
+            if (thumbImgs[divIndex]) {
+              thumbImgs.forEach(i => i.classList.remove('active'));
+              thumbImgs[divIndex].classList.add('active');
+            }
+          }
+        }
+      });
     });
-  });
+  }
+
+  wireVariantClickHandlers();
   // Inisialisasi harga varian awal
   updateDisplayedPrice();
   const wbtn = document.getElementById('add-wishlist-btn') || document.getElementById('favorite');
@@ -630,57 +723,34 @@ renderProduct();
 /* ============================
    1️⃣ MODEL SELECT ACTIVE STATE
    ============================ */
-document
-  .querySelectorAll(".model_produk > div, .model_produk_fun > div")
-  .forEach((box) => {
-    box.addEventListener("click", () => {
-      box.parentElement
-        .querySelectorAll("div")
-        .forEach((b) => b.classList.remove("active"));
-      box.classList.add("active");
+document.addEventListener("DOMContentLoaded", () => {
+  document
+    .querySelectorAll("#variant-categories-container .model_produk > div:not(h4)")
+    .forEach((box) => {
+      box.addEventListener("click", () => {
+        box.parentElement
+          .querySelectorAll("div:not(h4)")
+          .forEach((b) => b.classList.remove("active"));
+        box.classList.add("active");
+      });
     });
-  });
+});
 
 /* ============================
    2️⃣ TABS + INFO BUTTON TOGGLE
    ============================ */
 document.addEventListener("DOMContentLoaded", () => {
-  const specTab = document.getElementById("tab-spec");
-  const descTab = document.getElementById("tab-desc");
-  const specContent = document.getElementById("spec-content");
   const descContent = document.getElementById("desc-content");
-  const tabsContainer = document.querySelector(".tabs");
   const tabContent = document.querySelector(".tab-content");
   const infoBtn = document.querySelector(".info-btn");
 
-  // Initial state: info section hidden, button prompts to open
-  if (tabsContainer) tabsContainer.style.display = "none";
   if (tabContent) tabContent.style.display = "none";
-  if (specContent) specContent.style.display = "block";
-  if (descContent) descContent.style.display = "none";
   if (infoBtn) infoBtn.textContent = "Lihat informasi produk";
-
-  if (specTab && descTab && specContent && descContent) {
-    specTab.addEventListener("click", () => {
-      specTab.classList.add("active");
-      descTab.classList.remove("active");
-      specContent.style.display = "block";
-      descContent.style.display = "none";
-    });
-
-    descTab.addEventListener("click", () => {
-      descTab.classList.add("active");
-      specTab.classList.remove("active");
-      specContent.style.display = "none";
-      descContent.style.display = "block";
-    });
-  }
 
   if (infoBtn) {
     infoBtn.addEventListener("click", () => {
-      if (!tabsContainer || !tabContent) return;
-      const willOpen = tabsContainer.style.display === "none";
-      tabsContainer.style.display = willOpen ? "flex" : "none"; // tabs are flex row
+      if (!tabContent) return;
+      const willOpen = tabContent.style.display === "none";
       tabContent.style.display = willOpen ? "block" : "none";
       infoBtn.textContent = willOpen ? "Tutup informasi produk" : "Lihat informasi produk";
     });
@@ -779,4 +849,3 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!isDragging || !isZoomed) return; e.preventDefault(); moveX = e.pageX - startX; moveY = e.pageY - startY; mainImg.style.transform = `scale(2) translate(${moveX / 2}px, ${moveY / 2}px)`;
   });
 });
-

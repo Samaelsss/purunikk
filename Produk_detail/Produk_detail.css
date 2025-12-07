@@ -637,6 +637,7 @@ button:hover {
   color: #fff;
   max-width: 900px;
   margin: 0 auto;
+  padding: 24px;
   text-align: left;
   font-size: 15px;
   line-height: 1.8;
@@ -667,7 +668,8 @@ button:hover {
 }
 
 .description {
-  display: none;
+  display: block;
+  width: 100%;
 }
 
 .specs.active,
@@ -989,24 +991,24 @@ button:hover {
     margin-right: 2rem;
   }
   .product-section {
-    gap: 22px;
-    padding: 20px;
-    --detail-main-size: clamp(420px, 36vw, 600px);
+    gap: 24px;
+    padding: 22px;
+    --detail-main-size: clamp(460px, 40vw, 640px);
   }
   .product-images {
-    flex: 1 1 0;
-    gap: 14px;
+    flex: 1.1 1 0;
+    gap: 16px;
   }
   .thumbnail-list {
-    width: 132px;
+    width: 136px;
     max-height: var(--detail-main-size);
-    gap: 14px;
+    gap: 16px;
   }
-  .thumbnail-list img { width: 92px; height: 92px; }
+  .thumbnail-list img { width: 96px; height: 96px; }
   .product-info {
-    flex: 1 1 0;
+    flex: 0.9 1 0;
     min-height: var(--detail-main-size);
-    padding: 20px 22px;
+    padding: 22px 24px;
   }
   .product-info h2 { font-size: 1.5rem; }
   .rates h3 { font-size: 12px; }
@@ -1022,17 +1024,10 @@ button:hover {
   .pengurangan,
   .penambahan { width: 36px; height: 32px; }
   .action-buttons {
-    width: 100%;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 2px;
   }
-  .action-buttons .add-cart,
-  .action-buttons .buy-now {
-    flex: 1 1 0;
-    max-width: none;
-  }
-  .action-buttons button { font-size: 13px; padding: 10px 14px; width: 100%; }
+  .action-buttons button { font-size: 13px; padding: 8px 12px; }
   .chat-seller { width: 100%; font-size: 14px; padding: 9px 12px; }
 }
 

@@ -117,14 +117,7 @@
 
                          <p id="product-price" class="price"></p>
 
-                        <div class="action-buttons">
-                            <h4> Pilih motif </h4>
-                            <div class="model_produk" style="display: flex;"></div>
-                            <div class="model_produk_fun">
-                                <h4>Pilih Model</h4>
-                                <!-- Model cards akan dirender dari products.js -->
-                                <div class="Model_1"></div>
-                            </div>
+                        <div class="action-buttons" id="variant-categories-container">
                         </div>
                         <div class="product-actions">
                             <div class="Jumlah_produk" style="display: flex; align-items: center; gap: 10px;">
@@ -158,22 +151,15 @@
                     </div>
                 </section>
 
-                <!-- Specification & Description Tabs -->
-
-                <div class="tabs">
-                    <button class="tab active" id="tab-spec">Spesifikasi Produk</button>
-                    <button class="tab" id="tab-desc">Deskripsi Produk</button>
-                </div>
+                <!-- Description Tabs -->
 
                 <div class="tab-content">
-                    <!-- Spesifikasi -->
-                    <div id="spec-content" class="specs active"></div>
-
-                    <!-- Deskripsi -->
+                
+                        <h3>Deskripsi Produk</h3>
                     <div id="desc-content" class="description"></div>
                 </div>
 
-                <button class="info-btn">Tutup informasi produk</button>
+                <button class="info-btn">Lihat informasi produk</button>
             </section>
 
             <section class="rekomendasi-section">
