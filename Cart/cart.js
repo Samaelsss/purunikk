@@ -50,6 +50,21 @@
   const getSelection = () => JSON.parse(localStorage.getItem(selectionKey)||'[]').map(String);
   const setSelection = (arr) => localStorage.setItem('cartSelection', JSON.stringify(arr.map(String)));
 
+  function resolveImagePath(path) {
+    if (!path) return '../Product/img/IMG_4099.jpg';
+    let p = String(path).trim();
+    if (/^(https?:)?\/\//.test(p) || p.startsWith('data:')) return p;
+    if (p.startsWith('../')) return p;
+    if (p.startsWith('uploads/') || p.startsWith('Product/')) {
+      return '../' + p;
+    }
+    if (p.startsWith('./uploads/') || p.startsWith('./Product/')) {
+      return '../' + p.substring(2);
+    }
+    if (p.startsWith('/')) return '..' + p;
+    return p;
+  }
+
   function normalizeCartItem(it){
     return {
       key: it.key || String(it.id),
@@ -59,7 +74,7 @@
       motif: it.motif || '-',
       price: Number(it.price || 0),
       qty: Math.max(1, Number(it.qty || 1)),
-      thumb: it.thumb || it.img || it.image || 'Product/img/IMG_4099.jpg'
+      thumb: resolveImagePath(it.thumb || it.img || it.image)
     };
   }
 
@@ -134,8 +149,12 @@
       const node = tpl.content.cloneNode(true);
       const el = node.querySelector('.cart-item');
       el.dataset.key = it.key;
-      el.querySelector('.item-thumb').src = it.thumb;
-      el.querySelector('.item-thumb').alt = it.name;
+      const thumbEl = el.querySelector('.item-thumb');
+      thumbEl.src = it.thumb;
+      thumbEl.alt = it.name;
+      thumbEl.onerror = function() {
+        this.src = '../Product/img/IMG_4099.jpg';
+      };
       el.querySelector('.item-name').textContent = it.name;
       const variantEl = el.querySelector('.item-variant');
       if (variantEl) {

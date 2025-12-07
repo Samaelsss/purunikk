@@ -497,7 +497,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
             display: flex;
             justify-content: flex-start;
             align-items: center;
-            margin-top: 4px;
+            margin-top: -12px;
+            min-height: 50px;
         }
 
         @media (max-width: 960px) {
@@ -1094,20 +1095,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         }
 
         .button-primary {
-            top: -170px;
-            position: relative;
+            position: sticky;
+            top: 20px;
             border-radius: 999px;
             border: none;
-            padding: 9px 18px;
+            padding: 12px 32px;
             font-size: 0.9rem;
-            display: inline-flex;
+            display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            width: 100%;
+            max-width: 700px;
             background: linear-gradient(135deg, #B08F70, #73512C);
             color: var(--primary-foreground);
             cursor: pointer;
             box-shadow: 0 16px 36px rgba(176, 143, 112, 0.7);
             transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+            z-index: 100;
         }
 
         .button-primary:hover {
@@ -1428,6 +1433,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                         </div>
                     </div>
                 </div>
+                <div class="submit-row">
+        <button type="submit" class="button-primary">
+            <span>Simpan Produk</span>
+        </button>
+    </div>
 
                 <div class="form-footer">
                     <div class="status-pill">
@@ -1443,6 +1453,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
     </div>
 
     <div class="side-panel">
+        <div class="side-header">
         <div class="side-inner">
             <div class="pill">Studio Varian · Kategori & Gambar</div>
             <h2 class="side-title">Tabel Varian Produk</h2>
@@ -1466,6 +1477,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
                 </div>
             </div>
         </div>
+
+    </div>
     </div>
 
     <div class="card card-model-panel">
@@ -1490,11 +1503,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
         </div>
     </div>
 
-    <div class="submit-row">
-        <button type="submit" class="button-primary">
-            <span>Simpan Produk</span>
-        </button>
-    </div>
 </div>
 </form>
 
