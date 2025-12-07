@@ -1310,3 +1310,153 @@
 [Sun Dec  7 18:48:11 2025] [::1]:58092 Accepted
 [Sun Dec  7 18:48:11 2025] [::1]:58092 [200]: GET /favicon.ico
 [Sun Dec  7 18:48:11 2025] [::1]:58092 Closing
+[Sun Dec  7 18:57:27 2025] [::1]:54775 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54775 [200]: GET /Produk_detail.html?id=1
+[Sun Dec  7 18:57:28 2025] [::1]:54775 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54790 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54792 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54790 [200]: GET /Produk_detail/Produk_detail.css?v=8
+[Sun Dec  7 18:57:28 2025] [::1]:54793 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54794 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54795 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54790 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54796 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54792 [200]: GET /ui/toast.css?v=1
+[Sun Dec  7 18:57:28 2025] [::1]:54793 [200]: GET /navbar/navbar.css
+[Sun Dec  7 18:57:28 2025] [::1]:54794 [200]: GET /footer/footer.css
+[Sun Dec  7 18:57:28 2025] [::1]:54792 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54795 [200]: GET /Product/product.css
+[Sun Dec  7 18:57:28 2025] [::1]:54796 [200]: GET /loading-screen/loading.js
+[Sun Dec  7 18:57:28 2025] [::1]:54793 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54794 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54795 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54796 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54798 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54798 [200]: GET /loading-screen/loading.css
+[Sun Dec  7 18:57:28 2025] [::1]:54798 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54799 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54800 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54801 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54799 [200]: GET /navbar/navbar.js
+[Sun Dec  7 18:57:28 2025] [::1]:54799 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54802 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54803 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54800 [200]: GET /footer/footer.js
+[Sun Dec  7 18:57:28 2025] [::1]:54800 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54801 [200]: GET /Product/products.js?v=2
+[Sun Dec  7 18:57:28 2025] [::1]:54801 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54802 [200]: GET /Product/product.js?v=1
+[Sun Dec  7 18:57:28 2025] [::1]:54802 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54803 [200]: GET /Produk_detail/Produk_detail.js?v=7
+[Sun Dec  7 18:57:28 2025] [::1]:54804 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54803 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54804 [200]: GET /ui/toast.js?v=1
+[Sun Dec  7 18:57:28 2025] [::1]:54804 Closing
+[Sun Dec  7 18:57:28 2025] [::1]:54805 Accepted
+[Sun Dec  7 18:57:28 2025] [::1]:54805 [200]: GET /logo.png
+[Sun Dec  7 18:57:28 2025] [::1]:54805 Closing
+[Sun Dec  7 18:57:29 2025] [::1]:54822 Accepted
+[Sun Dec  7 18:57:29 2025] [::1]:54823 Accepted
+[Sun Dec  7 18:57:29 2025] [::1]:54824 Accepted
+[Sun Dec  7 18:57:29 2025] [::1]:54822 [200]: GET /uploads/products/01_main_966241ad.webp
+[Sun Dec  7 18:57:29 2025] [::1]:54823 [200]: GET /uploads/products/01_main_cfb20020.webp
+[Sun Dec  7 18:57:29 2025] [::1]:54824 [200]: GET /uploads/products/01_main_0f55306f.webp
+[Sun Dec  7 18:57:29 2025] [::1]:54822 Closing
+[Sun Dec  7 18:57:29 2025] [::1]:54823 Closing
+[Sun Dec  7 18:57:29 2025] [::1]:54824 Closing
+[Sun Dec  7 18:57:29 2025] [::1]:54827 Accepted
+[Sun Dec  7 18:57:29 2025] [::1]:54828 Accepted
+[Sun Dec  7 18:57:29 2025] [::1]:54827 [200]: GET /uploads/products/02_var_5648290d.webp
+[Sun Dec  7 18:57:29 2025] [::1]:54829 Accepted
+[Sun Dec  7 18:57:29 2025] [::1]:54827 Closing
+[Sun Dec  7 18:57:29 2025] [::1]:54830 Accepted
+[Sun Dec  7 18:57:29 2025] [::1]:54831 Accepted
+[Sun Dec  7 18:57:29 2025] [::1]:54828 [200]: GET /uploads/products/04_var_3855f4e3.webp
+[Sun Dec  7 18:57:29 2025] [::1]:54829 [200]: GET /uploads/products/03_var_be6055a9.webp
+[Sun Dec  7 18:57:29 2025] [::1]:54830 [200]: GET /uploads/products/05_var_78b12944.webp
+[Sun Dec  7 18:57:29 2025] [::1]:54831 [200]: GET /uploads/products/06_var_55ca84cd.webp
+[Sun Dec  7 18:57:29 2025] [::1]:54828 Closing
+[Sun Dec  7 18:57:29 2025] [::1]:54829 Closing
+[Sun Dec  7 18:57:29 2025] [::1]:54831 Closing
+[Sun Dec  7 18:57:29 2025] [::1]:54830 Closing
+[Sun Dec  7 18:57:29 2025] [::1]:54832 Accepted
+[Sun Dec  7 18:57:29 2025] [::1]:54833 Accepted
+[Sun Dec  7 18:57:29 2025] [::1]:54832 [200]: GET /uploads/products/01_main_966241ad.webp
+[Sun Dec  7 18:57:29 2025] [::1]:54832 Closing
+[Sun Dec  7 18:57:29 2025] [::1]:54833 [200]: GET /uploads/products/01_main_cfb20020.webp
+[Sun Dec  7 18:57:29 2025] [::1]:54833 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54917 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54917 [200]: GET /Produk_detail.html?id=2
+[Sun Dec  7 18:57:32 2025] [::1]:54917 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54918 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54919 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54918 [200]: GET /Produk_detail/Produk_detail.css?v=8
+[Sun Dec  7 18:57:32 2025] [::1]:54918 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54920 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54921 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54922 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54923 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54919 [200]: GET /ui/toast.css?v=1
+[Sun Dec  7 18:57:32 2025] [::1]:54919 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54921 [200]: GET /footer/footer.css
+[Sun Dec  7 18:57:32 2025] [::1]:54922 [200]: GET /Product/product.css
+[Sun Dec  7 18:57:32 2025] [::1]:54921 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54923 [200]: GET /loading-screen/loading.js
+[Sun Dec  7 18:57:32 2025] [::1]:54920 [200]: GET /navbar/navbar.css
+[Sun Dec  7 18:57:32 2025] [::1]:54922 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54923 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54920 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54925 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54926 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54928 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54925 [200]: GET /loading-screen/loading.css
+[Sun Dec  7 18:57:32 2025] [::1]:54926 [200]: GET /navbar/navbar.js
+[Sun Dec  7 18:57:32 2025] [::1]:54929 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54925 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54930 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54926 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54928 [200]: GET /footer/footer.js
+[Sun Dec  7 18:57:32 2025] [::1]:54931 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54928 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54929 [200]: GET /Product/products.js?v=2
+[Sun Dec  7 18:57:32 2025] [::1]:54929 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54930 [200]: GET /Product/product.js?v=1
+[Sun Dec  7 18:57:32 2025] [::1]:54930 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54931 [200]: GET /Produk_detail/Produk_detail.js?v=7
+[Sun Dec  7 18:57:32 2025] [::1]:54931 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54932 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54932 [200]: GET /ui/toast.js?v=1
+[Sun Dec  7 18:57:32 2025] [::1]:54932 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54933 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54933 [200]: GET /logo.png
+[Sun Dec  7 18:57:32 2025] [::1]:54933 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54934 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54934 [200]: GET /uploads/products/01_main_cfb20020.webp
+[Sun Dec  7 18:57:32 2025] [::1]:54935 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54934 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54936 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54937 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54938 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54939 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54935 [200]: GET /uploads/products/02_var_515cf0bf.webp
+[Sun Dec  7 18:57:32 2025] [::1]:54936 [200]: GET /uploads/products/04_var_3105c4a4.webp
+[Sun Dec  7 18:57:32 2025] [::1]:54937 [200]: GET /uploads/products/03_var_a16534a5.webp
+[Sun Dec  7 18:57:32 2025] [::1]:54935 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54938 [200]: GET /uploads/products/05_var_ec1522dc.webp
+[Sun Dec  7 18:57:32 2025] [::1]:54936 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54937 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54939 [200]: GET /uploads/products/06_var_8c091356.webp
+[Sun Dec  7 18:57:32 2025] [::1]:54938 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54939 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54942 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54943 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54942 [200]: GET /uploads/products/08_var_bc3d54e4.webp
+[Sun Dec  7 18:57:32 2025] [::1]:54942 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54944 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54945 Accepted
+[Sun Dec  7 18:57:32 2025] [::1]:54943 [200]: GET /uploads/products/07_var_9f30110b.webp
+[Sun Dec  7 18:57:32 2025] [::1]:54943 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54944 [200]: GET /uploads/products/01_main_966241ad.webp
+[Sun Dec  7 18:57:32 2025] [::1]:54945 [200]: GET /uploads/products/01_main_0f55306f.webp
+[Sun Dec  7 18:57:32 2025] [::1]:54944 Closing
+[Sun Dec  7 18:57:32 2025] [::1]:54945 Closing

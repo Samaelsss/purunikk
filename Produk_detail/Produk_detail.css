@@ -342,6 +342,11 @@ body::after {
   gap: 10px 12px;
   justify-content: flex-start; /* ensure left aligned */
 }
+.model_produk > h4 {
+  flex-basis: 100%;      /* take full width row on top */
+  margin: 0 0 8px 0;     /* space under the heading */
+}
+
 .model_produk_fun > h4 {
   flex-basis: 100%;      /* take full width row on top */
   margin: 0 0 8px 0;     /* space under the heading */
