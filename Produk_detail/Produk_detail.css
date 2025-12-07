@@ -1428,7 +1428,6 @@ button:hover {
     gap: 10px;
     padding: 10px;
     --detail-main-size: min(70vw, 260px);
-    max-height: 500px;
     overflow-y: auto;
   }
   .product-images {
