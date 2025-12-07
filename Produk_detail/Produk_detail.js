@@ -652,7 +652,6 @@ async function renderProduct() {
         </div>
         <div class="card-content-product">
           <h2 class="card-title-product">${p.name || ''}</h2>
-          <p class="card-subtitle-product">${subtitle}</p>
           <p class="card-price">${priceStr}</p>
           <div class="card-buttons-product">
             <button class="btn btn-secondary">Detail</button>
