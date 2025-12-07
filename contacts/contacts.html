@@ -8,13 +8,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="contacts.css">
     <link rel="stylesheet" href="../navbar/navbar.css">
+    <link rel="stylesheet" href="../loading-screen/loading.css">
     <link rel="stylesheet" href="../footer/footer.css">
+    <script defer src="../loading-screen/loading.js"></script>
 </head>
 
 <body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-container">
+      <div class="loading-cube">
+        <div class="cube-face front"></div>
+        <div class="cube-face back"></div>
+        <div class="cube-face left"></div>
+        <div class="cube-face right"></div>
+        <div class="cube-face top"></div>
+        <div class="cube-face bottom"></div>
+      </div>
+      <div class="loading-text">
+        <p>Loading</p>
+        <span class="loading-dots">
+          <span class="dot-center"></span>
+        </span>
+      </div>
+      <div class="loading-bar">
+        <div class="loading-progress"></div>
+      </div>
+    </div>
+  </div>
 <div class="Ultra-wrapper">
     <div class="page-wrapper">
-        <div class="main-content">
+        <div class="main-content" data-loading-target>
 
             <!-- 🧭 NAVBAR SPACE -->
             <header class="navbar-space"></header>

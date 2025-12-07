@@ -10,7 +10,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="navbar/navbar.css">
+    <link rel="stylesheet" href="loading-screen/loading.css">
     <link rel="stylesheet" href="footer/footer.css">
+    <script defer src="loading-screen/loading.js"></script>
     <style>
       /* Hero top waving element */
       @property --tx { syntax: '<length>'; inherits: false; initial-value: 0px; }
@@ -113,6 +115,29 @@
     </style>
 </head>
 <body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-container">
+      <div class="loading-cube">
+        <div class="cube-face front"></div>
+        <div class="cube-face back"></div>
+        <div class="cube-face left"></div>
+        <div class="cube-face right"></div>
+        <div class="cube-face top"></div>
+        <div class="cube-face bottom"></div>
+      </div>
+      <div class="loading-text">
+        <p>Loading</p>
+        <span class="loading-dots">
+          <span class="dot-center"></span>
+        </span>
+      </div>
+      <div class="loading-bar">
+        <div class="loading-progress"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Top scroll progress -->
   <div class="scroll-progress scroll-progress--top">
     <div class="scroll-progress__bar"></div>
@@ -120,7 +145,7 @@
 
   <!-- HEADER removed: replaced by shared navbar component -->
 
-  <main class="main-content">
+  <main class="main-content" data-loading-target>
     <!-- HERO -->
     <section class="hero-section" id="home">
       <div class="hero-wave" aria-hidden="true">
