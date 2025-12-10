@@ -1187,3 +1187,39 @@ body.dark .category-chip.active {
     position: sticky !important;
     top: 0 !important;
 }
+@media (max-width: 500px){
+    .t-title, .t-sub{
+        display: none;
+    }
+    .shop-banner__tiles {
+        grid-template-columns: 1fr;
+        padding: 0;
+        gap: 0;
+    }
+    .tile{
+        display: grid;
+        place-items: center;
+        padding: 0;
+        gap: 0;
+        width: fit-content;
+        height: auto;
+        min-height: auto;
+        border-radius: 14px;
+        border: 1px solid color-mix(in oklab, var(--border) 80%, #000 20%);
+        background: linear-gradient(180deg, color-mix(in oklab, var(--primary) 18%, var(--card) 82%), color-mix(in oklab, var(--accent) 22%, var(--card) 78%));
+    }
+    .tile img{
+        display: block;
+        max-width: 300px;
+        height: auto;
+        object-fit: contain;
+        object-position: center;
+        transition: all 0.5s ease-in-out;
+    }
+}
+@media (max-width: 480px){
+    .shop-banner__main{
+       height: 200px !important;
+       min-height: 200px !important;
+    }
+}
