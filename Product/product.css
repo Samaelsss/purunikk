@@ -7,12 +7,9 @@
     --darker-color: #1D1B20;
     --white-color: #fff;
     --foreground: hsl(25, 70%, 20%);
-    /* Sesuaikan aksen dengan palet natural (bukan merah) */
     --accent-color: var(--medium-light-color);
     --success-color: #27AE60;
-    --warning-color: #F39C12;
-    /* Variabel aksen transparan untuk glow/shadow */
-    --accent-glow-10: rgba(176, 143, 112, 0.10);
+    --warning-color: #F39C12;    --accent-glow-10: rgba(176, 143, 112, 0.10);
     --accent-glow-30: rgba(176, 143, 112, 0.30);
     --accent-glow-50: rgba(176, 143, 112, 0.50);
     --accent-glow-70: rgba(176, 143, 112, 0.70);
@@ -20,15 +17,9 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
         'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
-/* Bigger image area to match larger cards */
 .card-image { height: 260px; }
-
- 
-
-/* Shop Hero Section */
 .shop-hero {
   margin-top: 10rem;
-  /* stretch to full width of page content (cancel inner padding) */
   margin-left: -2rem;
   margin-right: -2rem;
   padding: 1.5rem 2rem 2.2rem;
@@ -178,7 +169,6 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--background);
   color: var(--foreground);
-  /* Remove browser default gaps and align content exactly with stripe inner edges */
   margin: 0;
   padding-left: var(--stripe-total);
   padding-right: var(--stripe-total);
@@ -192,9 +182,7 @@ body {
     padding: 0;
     box-sizing: border-box;
 }
-/* Responsive side border stripes (left and right) */
 :root {
-  /* At 1920px viewport these equal: 106px, 21px, 21px */
   --stripe-1: calc(100vw * 106 / 1920); /* #543310 */
   --stripe-2: calc(100vw * 21 / 1920);  /* #73512C */
   --stripe-3: calc(100vw * 21 / 1920);  /* #D7B290 */
@@ -243,7 +231,6 @@ body::after {
   );
 }
 
-/* Scroll progress bars */
 .scroll-progress {
   position: fixed;
   left: 0;
@@ -263,9 +250,6 @@ body::after {
   width: 0;
   background: linear-gradient(to right, var(--primary), var(--accent));
 }
-
-
-/* Main Product Page Layout */
 .product-page {
     max-width: 1400px;
     margin: 0;
@@ -275,20 +259,8 @@ body::after {
     flex: 1 0 auto;
 }
 
-/* Footer container inside product page should sit at the bottom */
 .footer-scope { margin-top: auto; width: 100%; }
 
-/* Prevent navbar mobile search dropdown from reserving layout space */
-.navbar-scope .mobile-search-dropdown {
-  position: fixed;
-  left: var(--stripe-total);
-  right: var(--stripe-total);
-  top: 84px;
-  margin-top: 0;
-}
-
-
-/* Enhanced 3D Effects for Product Page */
 .product-page {
     opacity: 0;
     transform: translateY(50px);
@@ -299,8 +271,6 @@ body::after {
     opacity: 1;
     transform: translateY(0);
 }
-
-/* 3D Card Effects */
 .gallery-card {
     transform-style: preserve-3d;
     transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
