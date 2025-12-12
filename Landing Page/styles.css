@@ -1803,13 +1803,8 @@ body.light .products-carousel-shadow--right {
 
   /* On very small screens, show only icons in buttons to save space */
   .card-icon-btn__label {
-    display: none;
+    font-size: 0.5rem;
   }
-
-  .card-icon-btn__icon {
-    font-size: 1.1rem;
-  }
-
   .card-buttons-product .btn-secondary {
     padding: 0.4rem 0.55rem;
     font-size: 0.68rem;
