@@ -1940,9 +1940,26 @@ body.light .products-carousel-shadow--right {
 }
 
 .review-card__title {
-  font-weight: 800;
+  font-weight: 600;
   color: #F9F4E1;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.review-card__attr {
+  font-weight: 700;
+}
+
+.review-card__product {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #B08F70;
+  margin: 0.6rem 0 0.4rem 0;
+  padding: 0.4rem 0.6rem;
+  background: rgba(176, 143, 112, 0.12);
+  border-radius: 8px;
+  display: inline-block;
 }
 
 .review-card__text {
@@ -1965,6 +1982,20 @@ body.light .products-carousel-shadow--right {
   border-radius: 999px;
   object-fit: cover;
   box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+}
+.review-card__avatar {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #B08F70, #73512C);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #F9F4E1;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  flex-shrink: 0;
 }
 .review-card__name {
   font-size: 0.9rem;
