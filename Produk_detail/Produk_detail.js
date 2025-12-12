@@ -581,7 +581,21 @@ async function renderProduct() {
       const existing = cart.find(x => String(x.key) === String(key));
       const priceNum = parsePriceToNumber(variant.price);
       const variantImage = imgEl ? imgEl.src : prod.img;
-      if (existing) existing.qty += qty; else cart.push({ key, id: prod.id, name: prod.name, model: variant.model, motif: variant.motif, price: priceNum, qty, thumb: variantImage });
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({
+          key,
+          id: prod.id,
+          name: prod.name,
+          model: variant.model,
+          motif: variant.motif,
+          selectedVariants: variant.selectedVariants,
+          price: priceNum,
+          qty,
+          thumb: variantImage
+        });
+      }
       localStorage.setItem('cart', JSON.stringify(cart));
       if (typeof showToast === 'function') {
         showToast((prod.name || 'Produk') + ' ditambahkan ke keranjang.', 'success');
@@ -600,7 +614,17 @@ async function renderProduct() {
       const priceNum = parsePriceToNumber(variant.price);
       const variantImage = imgEl ? imgEl.src : prod.img;
       const existing = cart.find(x => String(x.key) === String(key));
-      const itemObj = { key, id: prod.id, name: prod.name, model: variant.model, motif: variant.motif, price: priceNum, qty, thumb: variantImage };
+      const itemObj = {
+        key,
+        id: prod.id,
+        name: prod.name,
+        model: variant.model,
+        motif: variant.motif,
+        selectedVariants: variant.selectedVariants,
+        price: priceNum,
+        qty,
+        thumb: variantImage
+      };
       if (existing) existing.qty = (existing.qty || 0) + qty; else cart.push(itemObj);
       localStorage.setItem('cart', JSON.stringify(cart));
       // Only checkout this one item

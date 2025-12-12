@@ -136,11 +136,20 @@ body::after {
   padding:0 24px 32px;
   margin-top: 10rem;
 }
-.cart-title{text-align:center;font-size:42px;margin:16px 0 28px;color:#23190f}
-
-body.dark .cart-title{
-  color:#f9f4e1;
+.cart-title{
+  text-align:center;
+  font-size:42px;
+  margin:16px 0 28px;
+  color: var(--foreground);
 }
+body.dark .cart-title {
+  background: linear-gradient(135deg, var(--foreground) 0%, rgba(240, 240, 240, 0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+
 
 .cart-layout{display:grid;grid-template-columns:1fr 320px;gap:28px}
 

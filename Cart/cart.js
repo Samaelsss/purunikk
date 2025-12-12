@@ -131,6 +131,52 @@
     sumSubtotalEl.textContent = rupiah(subtotal);
   }
 
+  async function buildVariantDisplay(productId, cartItem) {
+    try {
+      const res = await fetch('http://localhost/purunikk/admin/product_variant_options_api.php?product_id=' + encodeURIComponent(productId));
+      if (!res.ok) return null;
+      const variants = await res.json();
+      if (!Array.isArray(variants) || !variants.length) return null;
+
+      const groupedVariants = {};
+      variants.forEach((v) => {
+        const categoryName = (v.category_name || '').trim();
+        if (categoryName) {
+          if (!groupedVariants[categoryName]) groupedVariants[categoryName] = [];
+          groupedVariants[categoryName].push(v);
+        }
+      });
+
+      const spans = [];
+      const selectedVariants = cartItem.selectedVariants || {};
+      
+      Object.entries(groupedVariants).forEach(([categoryName, items]) => {
+        let displayValue = '-';
+        
+        if (selectedVariants && selectedVariants[categoryName]) {
+          displayValue = selectedVariants[categoryName];
+        } else {
+          const isMotifsCategory = /(motif|warna|color)/i.test(categoryName);
+          const isModelCategory = /model/i.test(categoryName);
+          
+          if (isMotifsCategory && cartItem.motif && cartItem.motif !== '-') {
+            displayValue = cartItem.motif;
+          } else if (isModelCategory && cartItem.model && cartItem.model !== '-') {
+            displayValue = cartItem.model;
+          } else {
+            displayValue = items[0]?.option_name || '-';
+          }
+        }
+        
+        spans.push(`<span>${categoryName}: ${displayValue}</span>`);
+      });
+
+      return spans.length ? spans : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   function render(){
     let cart = getCart().map(normalizeCartItem);
     // IMPORTANT: detect if selection key exists to differentiate default-all vs empty selection
@@ -158,7 +204,15 @@
       el.querySelector('.item-name').textContent = it.name;
       const variantEl = el.querySelector('.item-variant');
       if (variantEl) {
-        variantEl.innerHTML = `<span>Motif: ${it.motif}</span><span>Model: ${it.model}</span>`;
+        buildVariantDisplay(it.id, it).then(spans => {
+          if (spans && spans.length) {
+            variantEl.innerHTML = spans.join('');
+          } else {
+            variantEl.innerHTML = `<span>Motif: ${it.motif}</span><span>Model: ${it.model}</span>`;
+          }
+        }).catch(() => {
+          variantEl.innerHTML = `<span>Motif: ${it.motif}</span><span>Model: ${it.model}</span>`;
+        });
       }
       el.querySelector('.item-price').textContent = rupiah(it.price);
       el.querySelector('.qty-value').textContent = String(it.qty);
