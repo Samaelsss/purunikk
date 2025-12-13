@@ -1,4 +1,4 @@
-/* ===== BUNDLE: product-detail.js + Produk_detail.js =====
+﻿/* ===== BUNDLE: product-detail.js + Produk_detail.js =====
    Catatan: Urutan dijaga. Bagian product-detail.js dulu (render data),
    lalu UI interaksi dari Produk_detail.js. */
 
@@ -163,7 +163,7 @@ async function renderProduct() {
   // If still not found, try to fetch from database API
   if (!prod) {
     try {
-      const res = await fetch('http://localhost/purunikk/admin/products_api.php');
+      const res = await fetch('admin/products_api.php');
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {
@@ -212,7 +212,7 @@ async function renderProduct() {
   let colorImages = [];
   try {
     if (prod.id) {
-      const res = await fetch('http://localhost/purunikk/admin/product_images_api.php?product_id=' + encodeURIComponent(prod.id));
+      const res = await fetch('admin/product_images_api.php?product_id=' + encodeURIComponent(prod.id));
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {
@@ -228,7 +228,7 @@ async function renderProduct() {
   let modelsFromDb = [];
   try {
     if (prod.id) {
-      const resModels = await fetch('http://localhost/purunikk/admin/product_models_api.php?product_id=' + encodeURIComponent(prod.id));
+      const resModels = await fetch('admin/product_models_api.php?product_id=' + encodeURIComponent(prod.id));
       if (resModels.ok) {
         const dataModels = await resModels.json();
         if (Array.isArray(dataModels)) {
@@ -244,7 +244,7 @@ async function renderProduct() {
   let variantOptions = [];
   try {
     if (prod.id) {
-      const resVariants = await fetch('http://localhost/purunikk/admin/product_variant_options_api.php?product_id=' + encodeURIComponent(prod.id));
+      const resVariants = await fetch('admin/product_variant_options_api.php?product_id=' + encodeURIComponent(prod.id));
       if (resVariants.ok) {
         const dataVariants = await resVariants.json();
         if (Array.isArray(dataVariants)) {
@@ -886,3 +886,4 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!isDragging || !isZoomed) return; e.preventDefault(); moveX = e.pageX - startX; moveY = e.pageY - startY; mainImg.style.transform = `scale(2) translate(${moveX / 2}px, ${moveY / 2}px)`;
   });
 });
+

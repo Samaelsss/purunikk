@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
@@ -8,9 +8,9 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$dbHost = 'localhost';
-$dbUser = 'root';
-$dbPass = '';
+$dbHost = 'sql100.hstn.me';
+$dbUser = 'mseet_40337985';
+$dbPass = 'Purunik123';
 $dbName = 'mseet_40337985_purunik_db';
 
 $connectionError = '';
@@ -381,3 +381,4 @@ if (!$connectionError && $conn) {
     </div>
 </body>
 </html>
+

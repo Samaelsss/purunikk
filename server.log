@@ -1486,3 +1486,4 @@ product_input debug: {"variant_category_name":["Warna"],"variant_item_name":["Pu
 product_input no_images_saved: {"product_id":10,"upload_dir":"C:\\xamp\\htdocs\\purunikk\\admin\/..\/uploads\/products\\"}
 product_input debug: {"variant_category_name":["Warna"],"variant_item_name":["Natural"],"variant_item_price":[""],"variant_item_category_index":["0"],"variant_item_image_names":[""],"variant_item_image_errors":[4]}
 product_input no_images_saved: {"product_id":11,"upload_dir":"C:\\xamp\\htdocs\\purunikk\\admin\/..\/uploads\/products\\"}
+product_input debug: {"variant_category_name":["Warna","ukuran"],"variant_item_name":["Hijau","Merah","15cm"],"variant_item_price":["7000","7677676","4000"],"variant_item_category_index":["0","0","1"],"variant_item_image_names":["683b65722a3175dc2d7ef38dc9dfd5b7.webp","id-11134207-7rasm-m4tvia51wfb665.webp","id-11134207-7rasm-m4tvia51wfb665.webp"],"variant_item_image_errors":[0,0,0]}

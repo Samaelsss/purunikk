@@ -1,13 +1,13 @@
-<?php
+﻿<?php
 // JSON API untuk mengambil varian (kategori + opsi) sebuah produk
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$dbHost = 'localhost';
-$dbUser = 'root';
-$dbPass = '';
+$dbHost = 'sql100.hstn.me';
+$dbUser = 'mseet_40337985';
+$dbPass = 'Purunik123';
 $dbName = 'mseet_40337985_purunik_db';
 
 try {
@@ -39,3 +39,4 @@ try {
         'message' => $e->getMessage(),
     ]);
 }
+

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1033,7 +1033,7 @@
       return '🧺';
     }
 
-    fetch('http://localhost/purunikk/admin/products_api.php')
+    fetch('admin/products_api.php')
       .then(function (res) {
         if (!res.ok) throw new Error('Network response was not ok');
         return res.json();
@@ -1105,7 +1105,7 @@
   // Simple visit logger for landing page
   (function(){
     try {
-      fetch('http://localhost/purunikk/admin/visits_api.php', {
+      fetch('admin/visits_api.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ page: 'landing' })
@@ -1155,3 +1155,4 @@
   </script>
 </body>
 </html>
+

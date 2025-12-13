@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 // Protect page: only logged-in admin can access
@@ -11,9 +11,9 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
 // Database configuration
 // ========================
 // TODO: adjust these values to match your MySQL server/database
-$dbHost = 'localhost';
-$dbUser = 'root';
-$dbPass = '';
+$dbHost = 'sql100.hstn.me';
+$dbUser = 'mseet_40337985';
+$dbPass = 'Purunik123';
 $dbName = 'mseet_40337985_purunik_db'; // create this DB and required tables in phpMyAdmin
 
 $connectionError = '';
@@ -1760,3 +1760,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$connectionError && $conn) {
 </script>
 </body>
 </html>
+

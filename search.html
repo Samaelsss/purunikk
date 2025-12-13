@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -881,8 +881,10 @@
           }
           var subtitle = product.subtitle || product.category || '';
           var imgSrc = product.img || product.image || '';
+          var desc = (product.description || '').toString().trim();
+          var shortDesc = desc.length > 120 ? desc.slice(0, 117) + '...' : desc;
           return (
-            '<div class="product-card" data-id="' + String(product.id) + '">' +
+            '<article class="product-card" data-id="' + String(product.id) + '">' +
               '<div class="card-header">' +
                 '<div class="card-header-icon">' + (product.icon || '') + '</div>' +
                 '<div class="card-header-text">' +
@@ -896,13 +898,14 @@
               '<div class="card-content-product">' +
                 '<h2 class="card-title-product">' + (product.name || '') + '</h2>' +
                 '<p class="card-subtitle-product">' + subtitle + '</p>' +
+                '<p class="card-description-product">' + shortDesc + '</p>' +
                 '<p class="card-price">' + (product.price || '') + '</p>' +
                 '<div class="card-buttons-product">' +
                   '<button class="btn btn-secondary">Detail</button>' +
                   '<button class="btn btn-primary">Beli</button>' +
                 '</div>' +
               '</div>' +
-            '</div>'
+            '</article>'
           );
         }).join('');
 
@@ -976,7 +979,7 @@
             return;
           }
 
-          fetch('http://localhost/purunikk/admin/products_api.php')
+          fetch('admin/products_api.php')
             .then(function (res) {
               if (!res.ok) throw new Error('Network response was not ok');
               return res.json();
@@ -1040,3 +1043,4 @@
   </script>
 </body>
 </html>
+

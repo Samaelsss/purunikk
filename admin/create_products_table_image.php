@@ -1,8 +1,8 @@
-<?php
+﻿<?php
 // Konfigurasi database – sesuaikan jika perlu
-$dbHost = 'localhost';
-$dbUser = 'root';
-$dbPass = '';
+$dbHost = 'sql100.hstn.me';
+$dbUser = 'mseet_40337985';
+$dbPass = 'Purunik123';
 $dbName = 'mseet_40337985_purunik_db';
 
 // Koneksi ke MySQL
@@ -39,3 +39,4 @@ try {
 }
 
 $conn->close();
+
