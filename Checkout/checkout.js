@@ -13,10 +13,17 @@ function parsePriceToNumber(price){
   return Number(digits || 0);
 }
 
-// --- Receipt helpers ---
+function getVariantString(item) {
+  if (!item.selectedVariants || Object.keys(item.selectedVariants).length === 0) {
+    return `${item.model} - ${item.motif}`;
+  }
+  const variantParts = Object.entries(item.selectedVariants).map(([key, val]) => `${key}: ${val}`);
+  return variantParts.join(' · ');
+}
+
 let lastReceiptText = '';
 function prepareReceipt(fullname, address, phone){
-  const messageLines = cart.map(c=>`• ${c.name} (${c.model} - ${c.motif}) x${c.qty} = ${formatRupiah(parsePriceToNumber(c.price)*c.qty)}`);
+  const messageLines = cart.map(c=>`• ${c.name} (${getVariantString(c)}) x${c.qty} = ${formatRupiah(parsePriceToNumber(c.price)*c.qty)}`);
   const total = cart.reduce((s,c)=> s + (parsePriceToNumber(c.price)*c.qty), 0);
   const header = `Data Pembeli:%0ANama: ${encodeURIComponent(fullname)}%0AAlamat: ${encodeURIComponent(address)}%0ANo. HP: ${encodeURIComponent(phone)}`;
   const items = `Pesanan:%0A${messageLines.map(encodeURIComponent).join('%0A')}`;
@@ -57,6 +64,52 @@ const cart = Array.isArray(selection) && selection.length
   ? selection
   : JSON.parse(localStorage.getItem('cart')||'[]');
 
+async function buildVariantDisplay(productId, cartItem) {
+  try {
+    const res = await fetch('http://localhost/purunikk/admin/product_variant_options_api.php?product_id=' + encodeURIComponent(productId));
+    if (!res.ok) return null;
+    const variants = await res.json();
+    if (!Array.isArray(variants) || !variants.length) return null;
+
+    const groupedVariants = {};
+    variants.forEach((v) => {
+      const categoryName = (v.category_name || '').trim();
+      if (categoryName) {
+        if (!groupedVariants[categoryName]) groupedVariants[categoryName] = [];
+        groupedVariants[categoryName].push(v);
+      }
+    });
+
+    const spans = [];
+    const selectedVariants = cartItem.selectedVariants || {};
+    
+    Object.entries(groupedVariants).forEach(([categoryName, items]) => {
+      let displayValue = '-';
+      
+      if (selectedVariants && selectedVariants[categoryName]) {
+        displayValue = selectedVariants[categoryName];
+      } else {
+        const isMotifsCategory = /(motif|warna|color)/i.test(categoryName);
+        const isModelCategory = /model/i.test(categoryName);
+        
+        if (isMotifsCategory && cartItem.motif && cartItem.motif !== '-') {
+          displayValue = cartItem.motif;
+        } else if (isModelCategory && cartItem.model && cartItem.model !== '-') {
+          displayValue = cartItem.model;
+        } else {
+          displayValue = items[0]?.option_name || '-';
+        }
+      }
+      
+      spans.push(`${categoryName}: ${displayValue}`);
+    });
+
+    return spans.length ? spans.join(' · ') : null;
+  } catch (e) {
+    return null;
+  }
+}
+
 function renderSummary(){
   const list = document.getElementById('summary-list');
   const totalItemsEl = document.getElementById('total-items');
@@ -78,12 +131,21 @@ function renderSummary(){
     div.innerHTML = `
       <div>
         <div class="name">${item.name || 'Produk'}</div>
-        <div class="meta">Model: ${item.model || '-'} · Motif: ${item.motif || '-'}</div>
+        <div class="meta" style="min-height: 1.2em;">
+          <span class="variant-loading">Memuat varian...</span>
+        </div>
       </div>
       <div class="price">${formatRupiah(price * qty)}</div>
       <div class="qty">x ${qty}</div>
     `;
     list.appendChild(div);
+
+    const metaEl = div.querySelector('.meta');
+    buildVariantDisplay(item.id, item).then(variantText => {
+      metaEl.innerHTML = variantText || '';
+    }).catch(() => {
+      metaEl.innerHTML = '';
+    });
   });
 
   totalItemsEl.textContent = `${totalQty} Pesanan`;

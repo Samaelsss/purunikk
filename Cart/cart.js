@@ -205,13 +205,9 @@
       const variantEl = el.querySelector('.item-variant');
       if (variantEl) {
         buildVariantDisplay(it.id, it).then(spans => {
-          if (spans && spans.length) {
-            variantEl.innerHTML = spans.join('');
-          } else {
-            variantEl.innerHTML = `<span>Motif: ${it.motif}</span><span>Model: ${it.model}</span>`;
-          }
+          variantEl.innerHTML = spans && spans.length ? spans.join('') : '';
         }).catch(() => {
-          variantEl.innerHTML = `<span>Motif: ${it.motif}</span><span>Model: ${it.model}</span>`;
+          variantEl.innerHTML = '';
         });
       }
       el.querySelector('.item-price').textContent = rupiah(it.price);
